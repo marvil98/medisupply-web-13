@@ -1,0 +1,26 @@
+<mat-toolbar role="banner" aria-label="Encabezado de la página" i18n-aria-label="@@topbar.label">
+
+  <span class="page-title">{{ pageTitle }}</span>
+
+  <span class="spacer"></span>
+
+  <div class="user-info" role="contentinfo" aria-label="Información del usuario" i18n-aria-label="@@user.block.label">
+    <a routerLink="/settings/region" aria-label="Ajustes regionales" i18n-aria-label="@@region.settings.label">
+      <img src="./assets/icons/earth.svg" alt="Ajustes regionales" i18n-alt="@@region.settings.alt" />
+    </a>
+
+    <button mat-fab aria-label="Perfil de usuario" i18n-aria-label="@@user.button.label">
+      <mat-icon svgIcon="user">user</mat-icon>
+    </button>
+
+    <div class="user-details">
+      <div class="user-name" aria-label="Nombre del usuario" i18n-aria-label="@@user.name.label">
+        <p class="body1" i18n="@@user.greeting">Hola,</p>
+        <p class="body2">{{ userName }}</p>
+      </div>
+      <div class="user-role" aria-label="Rol del usuario" i18n-aria-label="@@user.role.label">
+        <p>{{ userRole }}</p>
+      </div>
+    </div>
+  </div>
+</mat-toolbar>

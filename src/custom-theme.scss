@@ -1,0 +1,106 @@
+
+// Include theming for Angular Material with `mat.theme()`.
+// This Sass mixin will define CSS variables that are used for styling Angular Material
+// components according to the Material 3 design spec.
+// Learn more about theming and how to use it for your application's
+// custom components at https://material.angular.dev/guide/theming
+@use '@angular/material' as mat;
+
+html {
+  @include mat.theme((
+    color: mat.$blue-palette,
+    density: 0,
+    typography: '"League Spartan", sans-serif',
+  ));
+
+  --mat-sys-primary: #2260FF;
+  --mat-sys-on-primary: #ffffff; 
+  --mat-sys-surface: #CAD6FF;
+
+  // Bordes
+  --mat-sys-corner-medium: 100px; 
+  --mat-sys-corner-large: 100px; 
+
+  // Escala weight
+  --md-sys-typescale-body-small-weight: 400;
+  --md-sys-typescale-body-medium-weight: 500;
+  --md-sys-typescale-body-large-weight: 600;
+}
+
+mat-toolbar {
+  padding: 16px 80px 0px 80px !important;
+  margin-top: 16px !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  span {
+    color: var(--mat-sys-primary);
+  }
+}
+
+.mat-mdc-fab {
+  background-color: var(--mat-sys-primary) !important;
+  box-shadow: none !important;
+}
+
+body {
+  color-scheme: light;
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+  margin: 0;
+}
+
+.app-layout {
+  display: flex;
+  height: 100vh;
+
+  .sidebar {
+  width: 360px;
+  background-color: var(--mat-sys-primary);
+  color: white;
+  padding: 16px;
+
+    a.mat-mdc-list-item {
+      color: white !important; 
+      border-radius: 10px;
+      margin-bottom: 8px;
+      transition: background 0.2s;
+
+      .mdc-list-item__primary-text {
+        color: white !important;
+        display: flex;
+        gap: 12px;
+      }
+
+      mat-icon {
+        color: white !important;
+      }
+
+      &.active {
+        background: white;
+
+        .mdc-list-item__primary-text {
+          color: var(--mat-sys-primary) !important;
+        }
+
+        mat-icon {
+          color: var(--mat-sys-primary) !important;
+        }
+      }
+    }
+  }
+
+
+  .content {
+    flex: 1;
+    background: var(--mat-sys-surface);
+  }
+}
+
+p {
+  font-size: var(--md-sys-typescale-body-medium-size);
+  line-height: var(--md-sys-typescale-body-medium-line-height);
+  margin: 0px;
+  padding: 0px;
+}

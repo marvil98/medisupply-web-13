@@ -1,0 +1,28 @@
+<app-page-header [pageTitle]="pageTitle" [backRoute]="'/dashboard'"></app-page-header>
+
+<div class="regional-container">
+  <custom-select
+    [labelKey]="'languageLabel'"
+    [placeholderKey]="'languagePlaceholder'"
+    [options]="languageOptions"
+    [model]="selectedLanguage"
+    name="language"
+    [required]="true"
+  ></custom-select>
+
+  <custom-select
+    [labelKey]="'countryLabel'"
+    [placeholderKey]="'countryPlaceholder'"
+    [options]="countryOptions"
+    [model]="selectedCountry"
+    name="country"
+    [required]="true"
+    style="margin-top: 20px"
+  ></custom-select>
+
+  <div class="button-container">
+    <button mat-flat-button color="primary" (click)="saveSettings()">
+      {{ 'saveButton' | translate }}
+    </button>
+  </div>
+</div>

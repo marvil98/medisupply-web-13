@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { Component } from '@angular/core';
 import { Dashboard } from './pages/dashboard/dashboard';
+import { RegionalSettings } from './pages/regional-settings/regional-settings';
 
 @Component({
   standalone: true,
@@ -16,7 +17,7 @@ export const routes: Routes = [
   { path: 'reportes', component: EmptyComponent },
   { path: 'ventas', component: EmptyComponent },
   { path: 'rutas', component: EmptyComponent },
-  { path: 'settings/region', component: EmptyComponent },
+  { path: 'settings/region', component: RegionalSettings },
   { path: 'productos/cargar', component: EmptyComponent },
   { path: 'rutas/generar', component: EmptyComponent },
   { path: 'ventas/crear-plan', component: EmptyComponent },

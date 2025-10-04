@@ -1,5 +1,4 @@
 <app-page-header [pageTitle]="pageTitle"></app-page-header>
-
 <div class="cards-grid">
   <app-action-card
     *ngFor="let card of cards"
@@ -7,6 +6,6 @@
     [subtitleKey]="card.subtitleKey"
     [icon]="card.icon"
     [ariaLabelKey]="card.ariaLabelKey"
-    [routerPath]="card.path" 
+    [routerPath]="card.path"
   ></app-action-card>
 </div>

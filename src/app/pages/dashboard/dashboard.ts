@@ -12,43 +12,43 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./dashboard.css'],
 })
 export class Dashboard {
-  pageTitle = $localize`:@@page.dashboard.title:Dashboard`;
+  pageTitle = 'pageDashboardTitle';
 
   cards = [
     {
-      titleKey: $localize`:@@card.products.title:Carga de productos`,
-      subtitleKey: $localize`:@@card.products.subtitle:Subir plantilla`,
+      titleKey: 'cardProductsTitle',
+      subtitleKey: 'cardProductsSubtitle',
       icon: 'upload',
-      ariaLabelKey: $localize`:@@card.products.aria:Card de carga de productos`,
-      path: '/productos/cargar', 
+      ariaLabelKey: 'cardProductsAria',
+      path: '/productos/cargar',
     },
     {
-      titleKey: $localize`:@@card.routes.title:Generar rutas`,
-      subtitleKey: $localize`:@@card.routes.subtitle:Generar ahora`,
+      titleKey: 'cardRoutesTitle',
+      subtitleKey: 'cardRoutesSubtitle',
       icon: 'map',
-      ariaLabelKey: $localize`:@@card.routes.aria:Card de rutas`,
-      path: '/rutas/generar', 
+      ariaLabelKey: 'cardRoutesAria',
+      path: '/rutas/generar',
     },
     {
-      titleKey: $localize`:@@card.sales.title:Crear plan de venta`,
-      subtitleKey: $localize`:@@card.sales.subtitle:Crear ahora`,
+      titleKey: 'cardSalesTitle',
+      subtitleKey: 'cardSalesSubtitle',
       icon: 'list',
-      ariaLabelKey: $localize`:@@card.sales.aria:Card de ventas`,
-      path: '/ventas/crear-plan', 
+      ariaLabelKey: 'cardSalesAria',
+      path: '/ventas/crear-plan',
     },
     {
-      titleKey: $localize`:@@card.users.title:Registro de usuarios`,
-      subtitleKey: $localize`:@@card.users.subtitle:Importar CSV`,
+      titleKey: 'cardUsersTitle',
+      subtitleKey: 'cardUsersSubtitle',
       icon: 'users',
-      ariaLabelKey: $localize`:@@card.users.aria:Card de usuarios`,
-      path: '/usuarios/registro'
+      ariaLabelKey: 'cardUsersAria',
+      path: '/usuarios/registro',
     },
     {
-      titleKey: $localize`:@@card.reports.title:Reportes`,
-      subtitleKey: $localize`:@@card.reports.subtitle:Listar y generar métricas`,
+      titleKey: 'cardReportsTitle',
+      subtitleKey: 'cardReportsSubtitle',
       icon: 'reports',
-      ariaLabelKey: $localize`:@@card.reports.aria:Card de reportes`,
-      path: '/reportes'
+      ariaLabelKey: 'cardReportsAria',
+      path: '/reportes',
     },
   ];
 }

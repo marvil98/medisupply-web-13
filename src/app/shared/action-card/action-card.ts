@@ -2,11 +2,12 @@ import { Component, inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
+import { TranslatePipe } from '../pipes/translate.pipe';
 
 @Component({
   selector: 'app-action-card',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule, MatIconModule, TranslatePipe],
   templateUrl: './action-card.html',
   styleUrls: ['./action-card.css'],
 })

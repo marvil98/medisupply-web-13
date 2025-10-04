@@ -1,0 +1,15 @@
+::ng-deep .mat-mdc-select-arrow {
+  display: none;
+}
+
+.regional-container {
+  display: grid;
+  justify-content: center;
+  margin-top: 160px;
+}
+
+.button-container {
+  display: grid;
+  justify-content: center;
+  margin-top: 34px;
+}

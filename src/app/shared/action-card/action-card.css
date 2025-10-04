@@ -6,6 +6,7 @@ button {
   border-radius: 17px;
   height: 90px;
   padding: 20px;
+  cursor: pointer;
 
   mat-icon {
     width: 48px !important;
@@ -26,7 +27,7 @@ button p {
 .subtitle {
   font-size: 14px;
   font-weight: 300 !important;
-  margin-top: 12px;
+  margin-top: 12px !important;
 }
 
 .content-button {

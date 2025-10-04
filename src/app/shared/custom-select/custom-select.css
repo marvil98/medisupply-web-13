@@ -1,0 +1,78 @@
+.custom-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 400;
+  font-size: 16px;
+}
+
+.custom-select {
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
+  cursor: pointer;
+  font-family: 'League Spartan', sans-serif;
+  width: 460px;
+}
+
+/* Pendiente */
+.custom-select.error {
+  border-color: #dc2626; /* rojo */
+}
+
+.selected-value {
+  color: #1e1e1e;
+}
+
+.selected-value.placeholder {
+  color: #9ca3af;
+}
+
+.arrow {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  width: 1rem;
+  height: 1rem;
+  transform: translateY(-50%);
+  transition: transform 0.3s ease;
+}
+
+.custom-select.open .arrow {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.custom-options {
+  position: absolute;
+  z-index: 10;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: white;
+  list-style: none;
+  padding: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 515px;
+  margin: 0px;
+}
+
+.custom-option {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.custom-option:hover {
+  background: #f3f4f6;
+}
+
+.custom-option.selected {
+  font-weight: bold;
+}
+
+.error-message {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: #dc2626;
+}

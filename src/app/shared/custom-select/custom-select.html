@@ -1,0 +1,20 @@
+<label class="custom-label">{{ labelKey | translate }}</label>
+
+<div class="custom-select" [class.open]="isOpen()" [class.error]="hasError" (click)="toggle()">
+  <span class="selected-value" [class.placeholder]="!model()">
+    {{ selectedLabelKey | translate }}
+  </span>
+  <mat-icon svgIcon="arrow" class="arrow"></mat-icon>
+</div>
+
+<ul class="custom-options" *ngIf="isOpen()">
+  @for (opt of options; track opt.value) {
+    <li class="custom-option" [class.selected]="opt.value === model()" (click)="select(opt.value)">
+      {{ opt.labelKey | translate }}
+    </li>
+  }
+</ul>
+
+<div class="error-message" *ngIf="hasError">
+  {{ 'fieldRequired' | translate }}
+</div>

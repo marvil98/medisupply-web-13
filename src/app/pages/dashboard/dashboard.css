@@ -1,0 +1,45 @@
+.action-card {
+  display: flex;
+  align-items: center;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  color: white;
+  cursor: pointer;
+  border: none;
+  width: 100%;
+  text-align: left;
+
+  .icon {
+    font-size: 2rem;
+    margin-right: 1rem;
+  }
+
+  .texts {
+    h3 {
+      font-size: 1.25rem;
+      margin: 0;
+      font-weight: 600;
+    }
+    p {
+      font-size: 1rem;
+      margin: 0;
+      opacity: 0.9;
+    }
+  }
+
+  &:hover {
+    filter: brightness(1.1);
+  }
+}
+
+.cards-grid {
+  display: grid;
+
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+
+  gap: 24px;
+
+  justify-content: center;
+
+  padding: 60px 80px;
+}

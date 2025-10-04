@@ -53,17 +53,16 @@
   aria-label="Menú de usuario"
   i18n-aria-label="@@user.menu.label"
 >
-  <h6 class="body1">{{ userName }}</h6>
-  <p class="body2">{{ userRole }}</p>
   <mat-divider></mat-divider>
-  <a
+  
+  <button
     mat-list-item
     (click)="logout()"
     class="logout-item"
     aria-label="Cerrar sesión"
     i18n-aria-label="@@logout.label"
   >
-    <mat-icon matListIcon aria-hidden="true">logout</mat-icon>
+    <mat-icon matListIcon aria-hidden="true" svgIcon="logout"></mat-icon>
     <span matLine i18n="@@logout.text">Cerrar sesión</span>
-  </a>
+  </button>
 </div>

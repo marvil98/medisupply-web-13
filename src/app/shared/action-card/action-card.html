@@ -1,0 +1,11 @@
+<button class="card" [attr.aria-label]="ariaLabelKey" (click)="navigateTo()">
+  <div class="content-button">
+    <div>
+      <mat-icon svgIcon="{{ icon }}"></mat-icon>
+    </div>
+    <div class="text-container">
+      <p>{{ titleKey }}</p>
+      <p class="subtitle">{{ subtitleKey }}</p>
+    </div>
+  </div>
+</button>

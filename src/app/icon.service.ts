@@ -21,6 +21,9 @@ export class IconService {
       map: 'assets/icons/map.svg',
       user: 'assets/icons/user.svg',
       logout: 'assets/icons/logout.svg',
+      upload: 'assets/icons/upload.svg',
+      list: 'assets/icons/list.svg',
+      reports: 'assets/icons/reports.svg',
     };
 
     for (const [name, path] of Object.entries(icons)) {

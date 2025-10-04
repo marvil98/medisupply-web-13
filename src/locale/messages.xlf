@@ -13,183 +13,287 @@
         <source>Logo de la aplicación</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">11,12</context>
+          <context context-type="linenumber">9</context>
         </context-group>
       </trans-unit>
       <trans-unit id="menu.dashboard.aria" datatype="html">
         <source>Ir al panel principal</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">21,22</context>
+          <context context-type="linenumber">17,18</context>
         </context-group>
       </trans-unit>
       <trans-unit id="menu.dashboard.label" datatype="html">
         <source>Dashboard</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">26,30</context>
+          <context context-type="linenumber">22,26</context>
         </context-group>
       </trans-unit>
       <trans-unit id="menu.productos.aria" datatype="html">
         <source>Ir a productos</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">33,34</context>
+          <context context-type="linenumber">29,30</context>
         </context-group>
       </trans-unit>
       <trans-unit id="menu.productos.label" datatype="html">
         <source>Productos</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">38,42</context>
+          <context context-type="linenumber">34,38</context>
         </context-group>
       </trans-unit>
       <trans-unit id="menu.usuarios.aria" datatype="html">
         <source>Ir a usuarios</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">45,46</context>
+          <context context-type="linenumber">41,42</context>
         </context-group>
       </trans-unit>
       <trans-unit id="menu.usuarios.label" datatype="html">
         <source>Usuarios</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">50,54</context>
+          <context context-type="linenumber">46,50</context>
         </context-group>
       </trans-unit>
       <trans-unit id="menu.reportes.aria" datatype="html">
         <source>Ir a reportes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">57,58</context>
+          <context context-type="linenumber">53,54</context>
         </context-group>
       </trans-unit>
       <trans-unit id="menu.reportes.label" datatype="html">
         <source>Reportes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">62,66</context>
+          <context context-type="linenumber">58,62</context>
         </context-group>
       </trans-unit>
       <trans-unit id="menu.ventas.aria" datatype="html">
         <source>Ir a ventas</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">69,70</context>
+          <context context-type="linenumber">65,66</context>
         </context-group>
       </trans-unit>
       <trans-unit id="menu.ventas.label" datatype="html">
         <source>Ventas</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">74,78</context>
+          <context context-type="linenumber">70,74</context>
         </context-group>
       </trans-unit>
       <trans-unit id="menu.rutas.aria" datatype="html">
         <source>Ir a rutas</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">81,82</context>
+          <context context-type="linenumber">77,78</context>
         </context-group>
       </trans-unit>
       <trans-unit id="menu.rutas.label" datatype="html">
         <source>Rutas</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">86,88</context>
+          <context context-type="linenumber">82,84</context>
         </context-group>
       </trans-unit>
       <trans-unit id="page.dashboard.title" datatype="html">
         <source>Dashboard</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/pages/dashboard/dashboard.ts</context>
-          <context context-type="linenumber">12</context>
+          <context context-type="linenumber">15</context>
         </context-group>
-        <note priority="1" from="description">Título de la página Dashboard</note>
+      </trans-unit>
+      <trans-unit id="card.products.title" datatype="html">
+        <source>Carga de productos</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pages/dashboard/dashboard.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="card.products.subtitle" datatype="html">
+        <source>Subir plantilla</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pages/dashboard/dashboard.ts</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="card.products.aria" datatype="html">
+        <source>Card de carga de productos</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pages/dashboard/dashboard.ts</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="card.routes.title" datatype="html">
+        <source>Generar rutas</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pages/dashboard/dashboard.ts</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="card.routes.subtitle" datatype="html">
+        <source>Generar ahora</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pages/dashboard/dashboard.ts</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="card.routes.aria" datatype="html">
+        <source>Card de rutas</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pages/dashboard/dashboard.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="card.sales.title" datatype="html">
+        <source>Crear plan de venta</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pages/dashboard/dashboard.ts</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="card.sales.subtitle" datatype="html">
+        <source>Crear ahora</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pages/dashboard/dashboard.ts</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="card.sales.aria" datatype="html">
+        <source>Card de ventas</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pages/dashboard/dashboard.ts</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="card.users.title" datatype="html">
+        <source>Registro de usuarios</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pages/dashboard/dashboard.ts</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="card.users.subtitle" datatype="html">
+        <source>Importar CSV</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pages/dashboard/dashboard.ts</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="card.users.aria" datatype="html">
+        <source>Card de usuarios</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pages/dashboard/dashboard.ts</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="card.reports.title" datatype="html">
+        <source>Reportes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pages/dashboard/dashboard.ts</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="card.reports.subtitle" datatype="html">
+        <source>Listar y generar métricas</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pages/dashboard/dashboard.ts</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="card.reports.aria" datatype="html">
+        <source>Card de reportes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pages/dashboard/dashboard.ts</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="topbar.label" datatype="html">
         <source>Encabezado de la página</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/page-header/page-header.html</context>
-          <context context-type="linenumber">3,4</context>
+          <context context-type="linenumber">1</context>
         </context-group>
       </trans-unit>
       <trans-unit id="user.block.label" datatype="html">
         <source>Información del usuario</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/page-header/page-header.html</context>
-          <context context-type="linenumber">13,14</context>
+          <context context-type="linenumber">9,10</context>
         </context-group>
       </trans-unit>
       <trans-unit id="region.settings.label" datatype="html">
         <source>Ajustes regionales</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/page-header/page-header.html</context>
-          <context context-type="linenumber">18,19</context>
+          <context context-type="linenumber">14,15</context>
         </context-group>
       </trans-unit>
       <trans-unit id="region.settings.alt" datatype="html">
         <source>Ajustes regionales</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/page-header/page-header.html</context>
-          <context context-type="linenumber">23,24</context>
+          <context context-type="linenumber">19,20</context>
         </context-group>
       </trans-unit>
       <trans-unit id="user.button.label" datatype="html">
         <source>Perfil de usuario</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/page-header/page-header.html</context>
-          <context context-type="linenumber">30,31</context>
+          <context context-type="linenumber">26,27</context>
         </context-group>
       </trans-unit>
       <trans-unit id="user.details.label" datatype="html">
         <source>Detalles del usuario</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/page-header/page-header.html</context>
-          <context context-type="linenumber">39,40</context>
+          <context context-type="linenumber">35,36</context>
         </context-group>
       </trans-unit>
       <trans-unit id="user.name.label" datatype="html">
         <source>Nombre del usuario</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/page-header/page-header.html</context>
-          <context context-type="linenumber">44,45</context>
+          <context context-type="linenumber">38</context>
         </context-group>
       </trans-unit>
       <trans-unit id="user.greeting" datatype="html">
         <source>Hola,</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/page-header/page-header.html</context>
-          <context context-type="linenumber">47,48</context>
+          <context context-type="linenumber">39,40</context>
         </context-group>
       </trans-unit>
       <trans-unit id="user.role.label" datatype="html">
         <source>Rol del usuario</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/page-header/page-header.html</context>
-          <context context-type="linenumber">53,54</context>
+          <context context-type="linenumber">43</context>
         </context-group>
       </trans-unit>
       <trans-unit id="user.menu.label" datatype="html">
         <source>Menú de usuario</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/page-header/page-header.html</context>
-          <context context-type="linenumber">65,66</context>
+          <context context-type="linenumber">53,54</context>
         </context-group>
       </trans-unit>
       <trans-unit id="logout.label" datatype="html">
         <source>Cerrar sesión</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/page-header/page-header.html</context>
-          <context context-type="linenumber">75,76</context>
+          <context context-type="linenumber">63,64</context>
         </context-group>
       </trans-unit>
       <trans-unit id="logout.text" datatype="html">
         <source>Cerrar sesión</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/page-header/page-header.html</context>
-          <context context-type="linenumber">79,82</context>
+          <context context-type="linenumber">67,70</context>
         </context-group>
       </trans-unit>
     </body>

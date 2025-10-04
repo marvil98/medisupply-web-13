@@ -16,7 +16,7 @@ import { inject } from '@angular/core';
 export class App {
   protected readonly title = signal('medisupply');
   private readonly iconService = inject(IconService);
-  constructor(private router: Router) {}
+  private readonly router = inject(Router);
 
   isActive(path: string): boolean {
     return this.router.isActive(path, {

@@ -1,59 +1,86 @@
-<div class="app-layout" role="application">
-  <mat-nav-list class="sidebar" role="navigation" i18n-aria-label="@@sidebar.label" aria-label="Menú principal">
-
-    <div class="logo" role="img" i18n-aria-label="@@logo.label" aria-label="Logo de la aplicación">
-      <img src="assets/logo.svg" alt="Logo" />
+<div class="app-layout">
+  <mat-nav-list
+    class="sidebar"
+    role="navigation"
+    aria-label="Menú principal"
+    i18n-aria-label="@@sidebar.label"
+  >
+    <div class="logo">
+      <img src="assets/logo.svg" alt="Logo de la aplicación" i18n-alt="@@logo.label" />
     </div>
 
-    <a mat-list-item
-       routerLink="/dashboard"
-       routerLinkActive="active"
-       [routerLinkActiveOptions]="{ exact: true }"
-       i18n-aria-label="@@menu.dashboard.aria" aria-label="Ir al panel principal">
+    <a
+      mat-list-item
+      routerLink="/dashboard"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      aria-label="Ir al panel principal"
+      i18n-aria-label="@@menu.dashboard.aria"
+      [attr.aria-current]="isActive('/dashboard') ? 'page' : null"
+    >
       <mat-icon svgIcon="home" aria-hidden="true"></mat-icon>
       <span i18n="@@menu.dashboard.label">Dashboard</span>
     </a>
 
-    <a mat-list-item
-       routerLink="/productos"
-       routerLinkActive="active"
-       i18n-aria-label="@@menu.productos.aria" aria-label="Ir a productos">
+    <a
+      mat-list-item
+      routerLink="/productos"
+      routerLinkActive="active"
+      aria-label="Ir a productos"
+      i18n-aria-label="@@menu.productos.aria"
+      [attr.aria-current]="isActive('/productos') ? 'page' : null"
+    >
       <mat-icon svgIcon="box" aria-hidden="true"></mat-icon>
       <span i18n="@@menu.productos.label">Productos</span>
     </a>
 
-    <a mat-list-item
-       routerLink="/usuarios"
-       routerLinkActive="active"
-       i18n-aria-label="@@menu.usuarios.aria" aria-label="Ir a usuarios">
+    <a
+      mat-list-item
+      routerLink="/usuarios"
+      routerLinkActive="active"
+      aria-label="Ir a usuarios"
+      i18n-aria-label="@@menu.usuarios.aria"
+      [attr.aria-current]="isActive('/usuarios') ? 'page' : null"
+    >
       <mat-icon svgIcon="users" aria-hidden="true"></mat-icon>
       <span i18n="@@menu.usuarios.label">Usuarios</span>
     </a>
 
-    <a mat-list-item
-       routerLink="/reportes"
-       routerLinkActive="active"
-       i18n-aria-label="@@menu.reportes.aria" aria-label="Ir a reportes">
+    <a
+      mat-list-item
+      routerLink="/reportes"
+      routerLinkActive="active"
+      aria-label="Ir a reportes"
+      i18n-aria-label="@@menu.reportes.aria"
+      [attr.aria-current]="isActive('/reportes') ? 'page' : null"
+    >
       <mat-icon svgIcon="bar-chart" aria-hidden="true"></mat-icon>
       <span i18n="@@menu.reportes.label">Reportes</span>
     </a>
 
-    <a mat-list-item
-       routerLink="/ventas"
-       routerLinkActive="active"
-       i18n-aria-label="@@menu.ventas.aria" aria-label="Ir a ventas">
+    <a
+      mat-list-item
+      routerLink="/ventas"
+      routerLinkActive="active"
+      aria-label="Ir a ventas"
+      i18n-aria-label="@@menu.ventas.aria"
+      [attr.aria-current]="isActive('/ventas') ? 'page' : null"
+    >
       <mat-icon svgIcon="dollar" aria-hidden="true"></mat-icon>
       <span i18n="@@menu.ventas.label">Ventas</span>
     </a>
 
-    <a mat-list-item
-       routerLink="/rutas"
-       routerLinkActive="active"
-       i18n-aria-label="@@menu.rutas.aria" aria-label="Ir a rutas">
+    <a
+      mat-list-item
+      routerLink="/rutas"
+      routerLinkActive="active"
+      aria-label="Ir a rutas"
+      i18n-aria-label="@@menu.rutas.aria"
+      [attr.aria-current]="isActive('/rutas') ? 'page' : null"
+    >
       <mat-icon svgIcon="map" aria-hidden="true"></mat-icon>
       <span i18n="@@menu.rutas.label">Rutas</span>
     </a>
-
   </mat-nav-list>
 
   <main class="content" role="main">

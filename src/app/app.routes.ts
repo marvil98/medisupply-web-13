@@ -4,7 +4,7 @@ import { Dashboard } from './pages/dashboard/dashboard';
 
 @Component({
   standalone: true,
-  template: `<h2>Página en construcción</h2>`
+  template: `<h2>Página en construcción</h2>`,
 })
 class EmptyComponent {}
 
@@ -16,5 +16,5 @@ export const routes: Routes = [
   { path: 'reportes', component: EmptyComponent },
   { path: 'ventas', component: EmptyComponent },
   { path: 'rutas', component: EmptyComponent },
-  { path: 'settings/region', component: EmptyComponent}
+  { path: 'settings/region', component: EmptyComponent },
 ];

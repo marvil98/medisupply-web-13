@@ -19,14 +19,12 @@ export class IconService {
       'bar-chart': 'assets/icons/bar-chart.svg',
       dollar: 'assets/icons/dollar.svg',
       map: 'assets/icons/map.svg',
-      user: 'assets/icons/user.svg'
+      user: 'assets/icons/user.svg',
+      logout: 'assets/icons/logout.svg',
     };
 
     for (const [name, path] of Object.entries(icons)) {
-      this.iconRegistry.addSvgIcon(
-        name,
-        this.sanitizer.bypassSecurityTrustResourceUrl(path)
-      );
+      this.iconRegistry.addSvgIcon(name, this.sanitizer.bypassSecurityTrustResourceUrl(path));
     }
   }
 }

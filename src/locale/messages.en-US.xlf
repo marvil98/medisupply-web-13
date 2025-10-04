@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-  <file source-language="en-US" datatype="plaintext" original="ng2.template">
+  <file source-language="es-CO" target-language="en" datatype="plaintext" original="ng2.template">
     <body>
       <trans-unit id="sidebar.label" datatype="html">
         <source>Menú principal</source>
         <target>Main menu</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">2,4</context>
+          <context context-type="linenumber">5,6</context>
         </context-group>
       </trans-unit>
       <trans-unit id="logo.label" datatype="html">
@@ -15,7 +15,7 @@
         <target>Application logo</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">4,5</context>
+          <context context-type="linenumber">11,12</context>
         </context-group>
       </trans-unit>
       <trans-unit id="menu.dashboard.aria" datatype="html">
@@ -23,7 +23,7 @@
         <target>Go to dashboard</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">12,13</context>
+          <context context-type="linenumber">21,22</context>
         </context-group>
       </trans-unit>
       <trans-unit id="menu.dashboard.label" datatype="html">
@@ -31,7 +31,7 @@
         <target>Dashboard</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">14,17</context>
+          <context context-type="linenumber">26,30</context>
         </context-group>
       </trans-unit>
       <trans-unit id="menu.productos.aria" datatype="html">
@@ -39,7 +39,7 @@
         <target>Go to products</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">20,21</context>
+          <context context-type="linenumber">33,34</context>
         </context-group>
       </trans-unit>
       <trans-unit id="menu.productos.label" datatype="html">
@@ -47,15 +47,15 @@
         <target>Products</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">22,25</context>
+          <context context-type="linenumber">38,42</context>
         </context-group>
       </trans-unit>
       <trans-unit id="menu.usuarios.aria" datatype="html">
-                <source>Ir a usuarios</source>
+        <source>Ir a usuarios</source>
         <target>Go to users</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">28,29</context>
+          <context context-type="linenumber">45,46</context>
         </context-group>
       </trans-unit>
       <trans-unit id="menu.usuarios.label" datatype="html">
@@ -63,7 +63,7 @@
         <target>Users</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">30,33</context>
+          <context context-type="linenumber">50,54</context>
         </context-group>
       </trans-unit>
       <trans-unit id="menu.reportes.aria" datatype="html">
@@ -71,7 +71,7 @@
         <target>Go to reports</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">36,37</context>
+          <context context-type="linenumber">57,58</context>
         </context-group>
       </trans-unit>
       <trans-unit id="menu.reportes.label" datatype="html">
@@ -79,7 +79,7 @@
         <target>Reports</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">38,41</context>
+          <context context-type="linenumber">62,66</context>
         </context-group>
       </trans-unit>
       <trans-unit id="menu.ventas.aria" datatype="html">
@@ -87,7 +87,7 @@
         <target>Go to sales</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">44,45</context>
+          <context context-type="linenumber">69,70</context>
         </context-group>
       </trans-unit>
       <trans-unit id="menu.ventas.label" datatype="html">
@@ -95,7 +95,7 @@
         <target>Sales</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">46,49</context>
+          <context context-type="linenumber">74,78</context>
         </context-group>
       </trans-unit>
       <trans-unit id="menu.rutas.aria" datatype="html">
@@ -103,7 +103,7 @@
         <target>Go to routes</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">52,53</context>
+          <context context-type="linenumber">81,82</context>
         </context-group>
       </trans-unit>
       <trans-unit id="menu.rutas.label" datatype="html">
@@ -111,7 +111,7 @@
         <target>Routes</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.html</context>
-          <context context-type="linenumber">54,57</context>
+          <context context-type="linenumber">86,88</context>
         </context-group>
       </trans-unit>
       <trans-unit id="page.dashboard.title" datatype="html">
@@ -121,14 +121,14 @@
           <context context-type="sourcefile">src/app/pages/dashboard/dashboard.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <note priority="1" from="description">Título de la página Dashboard</note>
+        <note priority="1" from="description">Dashboard page title</note>
       </trans-unit>
       <trans-unit id="topbar.label" datatype="html">
         <source>Encabezado de la página</source>
         <target>Page header</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/page-header/page-header.html</context>
-          <context context-type="linenumber">1</context>
+          <context context-type="linenumber">3,4</context>
         </context-group>
       </trans-unit>
       <trans-unit id="user.block.label" datatype="html">
@@ -136,7 +136,7 @@
         <target>User information</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/page-header/page-header.html</context>
-          <context context-type="linenumber">7</context>
+          <context context-type="linenumber">13,14</context>
         </context-group>
       </trans-unit>
       <trans-unit id="region.settings.label" datatype="html">
@@ -144,7 +144,7 @@
         <target>Regional settings</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/page-header/page-header.html</context>
-          <context context-type="linenumber">8</context>
+          <context context-type="linenumber">18,19</context>
         </context-group>
       </trans-unit>
       <trans-unit id="region.settings.alt" datatype="html">
@@ -152,7 +152,7 @@
         <target>Regional settings</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/page-header/page-header.html</context>
-          <context context-type="linenumber">9</context>
+          <context context-type="linenumber">23,24</context>
         </context-group>
       </trans-unit>
       <trans-unit id="user.button.label" datatype="html">
@@ -160,32 +160,63 @@
         <target>User profile</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/page-header/page-header.html</context>
-          <context context-type="linenumber">12</context>
+          <context context-type="linenumber">30,31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="user.details.label" datatype="html">
+        <source>Detalles del usuario</source>
+        <target>User details</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/page-header/page-header.html</context>
+          <context context-type="linenumber">39,40</context>
         </context-group>
       </trans-unit>
       <trans-unit id="user.name.label" datatype="html">
         <source>Nombre del usuario</source>
-                <target>User name</target>
+        <target>User name</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/page-header/page-header.html</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">44,45</context>
         </context-group>
       </trans-unit>
       <trans-unit id="user.greeting" datatype="html">
         <source>Hola,</source>
-                <target>Hi,</target>
-
+        <target>Hello,</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/page-header/page-header.html</context>
-          <context context-type="linenumber">18,19</context>
+          <context context-type="linenumber">47,48</context>
         </context-group>
       </trans-unit>
       <trans-unit id="user.role.label" datatype="html">
         <source>Rol del usuario</source>
-                <target>User role</target>
+        <target>User role</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/page-header/page-header.html</context>
-          <context context-type="linenumber">21</context>
+          <context context-type="linenumber">53,54</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="user.menu.label" datatype="html">
+        <source>Menú de usuario</source>
+        <target>User menu</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/page-header/page-header.html</context>
+          <context context-type="linenumber">65,66</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="logout.label" datatype="html">
+        <source>Cerrar sesión</source>
+        <target>Log out</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/page-header/page-header.html</context>
+          <context context-type="linenumber">75,76</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="logout.text" datatype="html">
+        <source>Cerrar sesión</source>
+        <target>Log out</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/page-header/page-header.html</context>
+          <context context-type="linenumber">79,82</context>
         </context-group>
       </trans-unit>
     </body>

@@ -6,8 +6,8 @@ import { MatButtonModule } from '@angular/material/button';
   selector: 'app-dashboard',
   imports: [PageHeader, MatButtonModule],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css'
+  styleUrl: './dashboard.css',
 })
 export class Dashboard {
-pageTitle = $localize`:Título de la página Dashboard@@page.dashboard.title:Dashboard`;
+  pageTitle = $localize`:Título de la página Dashboard@@page.dashboard.title:Dashboard`;
 }

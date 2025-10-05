@@ -4,7 +4,8 @@ button {
   border: none;
   color: white;
   border-radius: 17px;
-  height: 90px;
+  min-height: 120px;
+  height: auto;
   padding: 20px;
   cursor: pointer;
 

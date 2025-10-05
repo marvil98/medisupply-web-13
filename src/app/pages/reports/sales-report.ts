@@ -25,18 +25,18 @@ export class SalesReport {
   reportData = signal<any | null>(null);
 
   vendedores = [
-    { value: 'v1', labelKey: 'Vendedor 1' },
-    { value: 'v2', labelKey: 'Vendedor 2' },
-    { value: 'v3', labelKey: 'Vendedor 3' },
-    { value: 'v4', labelKey: 'Vendedor 4' },
-    { value: 'v5', labelKey: 'Vendedor 5' },
+    { value: 'v1', labelKey: 'salesReportVendor1' },
+    { value: 'v2', labelKey: 'salesReportVendor2' },
+    { value: 'v3', labelKey: 'salesReportVendor3' },
+    { value: 'v4', labelKey: 'salesReportVendor4' },
+    { value: 'v5', labelKey: 'salesReportVendor5' },
   ];
 
   periodos = [
-    { value: 'bimestral', labelKey: 'Bimestral' },
-    { value: 'trimestral', labelKey: 'Trimestral' },
-    { value: 'semestral', labelKey: 'Semestral' },
-    { value: 'anual', labelKey: 'Anual' },
+    { value: 'bimestral', labelKey: 'salesReportPeriodBimestral' },
+    { value: 'trimestral', labelKey: 'salesReportPeriodTrimestral' },
+    { value: 'semestral', labelKey: 'salesReportPeriodSemestral' },
+    { value: 'anual', labelKey: 'salesReportPeriodAnual' },
   ];
 
   get isButtonDisabled() {

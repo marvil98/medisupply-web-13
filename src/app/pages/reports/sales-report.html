@@ -2,14 +2,14 @@
 
 <div class="report-container">
   <app-custom-select
-    [labelKey]="'Vendedor'"
+    [labelKey]="'salesReportVendorLabel'"
     [options]="vendedores"
     [model]="vendedor"
     [required]="true"
   ></app-custom-select>
 
   <app-custom-select
-    [labelKey]="'Período'"
+    [labelKey]="'salesReportPeriodLabel'"
     [options]="periodos"
     [model]="periodo"
     [required]="true"
@@ -18,7 +18,7 @@
 
   <div class="button-container">
     <button mat-flat-button color="primary" [disabled]="isButtonDisabled" (click)="generarReporte()">
-      Generar un reporte
+      {{ 'salesReportButton' | translate }}
     </button>
   </div>
 
@@ -33,18 +33,21 @@
   <div *ngIf="reportData()" class="report-result">
     <div class="summary">
       <div class="box">
-        <h3>Ventas totales</h3>
+        <h3>{{ 'salesReportTotalSales' | translate }}</h3>
         <p>{{ reportData().ventasTotales | currency:'USD' }}</p>
       </div>
       <div class="box">
-        <h3>Pedidos atendidos</h3>
+        <h3>{{ 'salesReportOrders' | translate }}</h3>
         <p>{{ reportData().pedidos }}</p>
       </div>
     </div>
 
     <table class="sales-table">
       <thead>
-        <tr><th>Producto</th><th>Ventas ($)</th></tr>
+        <tr>
+          <th>{{ 'salesReportProduct' | translate }}</th>
+          <th>{{ 'salesReportAmount' | translate }}</th>
+        </tr>
       </thead>
       <tbody>
         <tr *ngFor="let p of reportData().productos">
@@ -66,8 +69,8 @@
         [legend]="false"
         [showXAxisLabel]="true"
         [showYAxisLabel]="true"
-        [xAxisLabel]="'Periodo'"
-        [yAxisLabel]="'Ventas'"
+        [xAxisLabel]="'salesReportChartXAxisLabel' | translate"
+        [yAxisLabel]="'salesReportChartYAxisLabel' | translate"
         [animations]="true">
       </ngx-charts-line-chart>
     </div>

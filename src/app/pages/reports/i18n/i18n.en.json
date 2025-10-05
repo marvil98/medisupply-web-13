@@ -1,10 +1,49 @@
 {
-    "pageReportsTitle": "Reports",
-    "generateSalesReport": "Generate sales report",
-    "generateSalesReportSubtitle": "Create sales reports by seller",
-    "generateSalesReportAria": "Button to generate sales report",
-    "viewGoalReports": "View goal reports",
-    "viewGoalReportsSubtitle": "See goal and sales performance reports",
-    "viewGoalReportsAria": "Button to view goal reports"
-  }
+  "pageReportsTitle": "Reports",
+  "generateSalesReport": "Generate sales report",
+  "generateSalesReportSubtitle": "Create sales reports by seller",
+  "generateSalesReportAria": "Button to generate sales report",
+  "viewGoalReports": "View goal reports",
+  "viewGoalReportsSubtitle": "See goal and sales performance reports",
+  "viewGoalReportsAria": "Button to view goal reports",
   
+  "salesReportVendorLabel": "Vendor",
+  "salesReportPeriodLabel": "Period",
+  "salesReportButton": "Generate report",
+  "salesReportNoData": "Oops! No data found for this period",
+  "salesReportError": "Oops! There was an error generating the report. Please try again.",
+  "salesReportSuccess": "Report generated successfully",
+  
+  "salesReportTotalSales": "Total sales",
+  "salesReportOrders": "Orders handled",
+  "salesReportProduct": "Product",
+  "salesReportAmount": "Sales ($)",
+  "salesReportTrend": "Sales trend over time",
+  
+  "salesReportPeriodOptions": {
+    "bimestral": "Bimonthly",
+    "trimestral": "Quarterly",
+    "semestral": "Semiannual",
+    "anual": "Annual"
+  },
+  
+  "salesReportVendorOptions": {
+    "v1": "Vendor 1",
+    "v2": "Vendor 2",
+    "v3": "Vendor 3",
+    "v4": "Vendor 4",
+    "v5": "Vendor 5"
+  },
+  
+  "salesReportChartLabels": {
+    "xAxisLabel": "Period",
+    "yAxisLabel": "Sales",
+    "legendLabel": "Sales Trend"
+  },
+  
+  "salesReportValidation": {
+    "requiredField": "Required field",
+    "selectVendor": "Please select a vendor",
+    "selectPeriod": "Please select a period"
+  }
+}

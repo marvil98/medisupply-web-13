@@ -41,10 +41,6 @@ export class RoutesGenerate {
 
   ngOnInit() {
     this.tryGeolocation();
-    // Selección por defecto: 1 vehículo para evitar estado vacío
-    if (!this.selectedVehicles()) {
-      this.selectedVehicles.set('1');
-    }
   }
 
   private tryGeolocation() {
@@ -77,7 +73,7 @@ export class RoutesGenerate {
   }
 
   get isGenerateDisabled() {
-    // Permitimos generar aunque no haya permiso de geolocalización; se usará el centro por defecto
+    // Deshabilitar hasta que el usuario seleccione 1–3 vehículos
     return !this.selectedVehicles() || this.generating();
   }
 

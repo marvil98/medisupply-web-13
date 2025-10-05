@@ -8,16 +8,16 @@
 
     <!-- Clientes -->
     <map-marker *ngFor="let c of clients" [position]="{ lat: c.lat, lng: c.lng }" [title]="c.name" (mapClick)="onStopClick(c)"></map-marker>
+    <map-info-window *ngIf="selectedStop() as s">
+      <div><strong>{{ s.name }}</strong></div>
+      <div>{{ s.address }}</div>
+      <div>ID: {{ s.id }}</div>
+      <div *ngIf="vehicleForStop(s) as v">Vehículo: {{ v }}</div>
+    </map-info-window>
 
     <!-- Rutas por vehículo como polilíneas -->
     <map-polyline *ngFor="let r of routes" [path]="r.path" [options]="{ strokeColor: r.vehicle.color, strokeWeight: 3 }"></map-polyline>
   </google-map>
 
-  <!-- Tooltip simple -->
-  <div *ngIf="selectedStop() as s" class="tooltip">
-    <div><strong>{{ s.name }}</strong></div>
-    <div>{{ s.address }}</div>
-    <div>ID pedido: {{ s.id }}</div>
-    <div *ngIf="vehicleForStop(s) as v">Asignado a: {{ v }}</div>
-  </div>
+  <!-- Tooltip fuera de mapa eliminado en favor de InfoWindow -->
 </div>

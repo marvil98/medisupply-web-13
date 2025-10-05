@@ -39,6 +39,16 @@
   flex-grow: 1;
 }
 
+.dismiss {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  color: inherit;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

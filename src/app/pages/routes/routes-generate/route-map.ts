@@ -70,6 +70,13 @@ export class RouteMap implements OnInit, OnChanges {
 
   onStopClick(stop: ClientStop) {
     this.selectedStop.set(stop);
+    // Abrir InfoWindow asociado al marcador seleccionado
+    try {
+      const mapRef = this.map as unknown as { openInfoWindow: Function };
+      if (mapRef && typeof mapRef.openInfoWindow === 'function') {
+        mapRef.openInfoWindow();
+      }
+    } catch {}
   }
 
   ngOnInit(): void {

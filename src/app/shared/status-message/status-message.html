@@ -6,7 +6,7 @@
   [attr.aria-live]="type === 'error' ? 'assertive' : 'polite'"
 >
   <span class="message-text">{{ messageKey | translate }}</span>
-  <mat-icon aria-hidden="true">
-    {{ type === 'error' ? 'close' : 'check' }}
-  </mat-icon>
+  <button class="dismiss" (click)="visible.set(false)" [attr.aria-label]="'Cerrar' | translate">
+    <mat-icon aria-hidden="true">close</mat-icon>
+  </button>
 </div>

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnChanges, OnInit, SimpleChanges, computed, signal } from '@angular/core';
-import { GoogleMapsModule } from '@angular/google-maps';
+import { Component, Input, OnChanges, OnInit, SimpleChanges, ViewChild, computed, signal } from '@angular/core';
+import { GoogleMap, GoogleMapsModule } from '@angular/google-maps';
 import { ClientStop, LatLng, VehicleRoute } from '../../../shared/types/route-types';
 
 @Component({
@@ -14,6 +14,8 @@ export class RouteMap implements OnInit, OnChanges {
   @Input({ required: true }) center!: LatLng;
   @Input({ required: true }) clients: ClientStop[] = [];
   @Input({ required: true }) routes: VehicleRoute[] = [];
+
+  @ViewChild(GoogleMap) map?: GoogleMap;
 
   width = 780;
   height = 420;
@@ -89,11 +91,33 @@ export class RouteMap implements OnInit, OnChanges {
         { enableHighAccuracy: true, timeout: 5000 }
       );
     }
+    // Ajustar vista inicial
+    queueMicrotask(() => this.fitToData());
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['center'] && this.center) {
       this.mapCenter = { lat: this.center.lat, lng: this.center.lng };
     }
+    if (changes['routes'] || changes['clients'] || changes['center']) {
+      queueMicrotask(() => this.fitToData());
+    }
+  }
+
+  private fitToData(): void {
+    if (!this.map) return;
+    const bounds = new google.maps.LatLngBounds();
+    if (this.center) bounds.extend(this.center as google.maps.LatLngLiteral);
+    for (const c of this.clients) {
+      bounds.extend({ lat: c.lat, lng: c.lng });
+    }
+    for (const r of this.routes) {
+      for (const p of r.path) bounds.extend({ lat: p.lat, lng: p.lng });
+    }
+    try {
+      if (!bounds.isEmpty()) {
+        this.map.fitBounds(bounds, 32);
+      }
+    } catch {}
   }
 }

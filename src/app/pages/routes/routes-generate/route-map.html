@@ -7,12 +7,14 @@
     <map-marker [position]="{ lat: center.lat, lng: center.lng }" [title]="'Centro de distribución'"></map-marker>
 
     <!-- Clientes -->
-    <map-marker *ngFor="let c of clients" [position]="{ lat: c.lat, lng: c.lng }" [title]="c.name" (mapClick)="onStopClick(c)"></map-marker>
-    <map-info-window *ngIf="selectedStop() as s">
-      <div><strong>{{ s.name }}</strong></div>
-      <div>{{ s.address }}</div>
-      <div>ID: {{ s.id }}</div>
-      <div *ngIf="vehicleForStop(s) as v">Vehículo: {{ v }}</div>
+    <map-marker *ngFor="let c of clients" #m="mapMarker" [position]="{ lat: c.lat, lng: c.lng }" [title]="c.name" (mapClick)="openInfo(c, m)"></map-marker>
+    <map-info-window>
+      <ng-container *ngIf="selectedStop() as s">
+        <div><strong>{{ s.name }}</strong></div>
+        <div>{{ s.address }}</div>
+        <div>ID: {{ s.id }}</div>
+        <div *ngIf="vehicleForStop(s) as v">Vehículo: {{ v }}</div>
+      </ng-container>
     </map-info-window>
 
     <!-- Rutas por vehículo como polilíneas -->

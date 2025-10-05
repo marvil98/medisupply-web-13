@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnChanges, OnInit, SimpleChanges, ViewChild, computed, signal } from '@angular/core';
-import { GoogleMap, GoogleMapsModule } from '@angular/google-maps';
+import { GoogleMap, GoogleMapsModule, MapInfoWindow, MapMarker } from '@angular/google-maps';
 import { ClientStop, LatLng, VehicleRoute } from '../../../shared/types/route-types';
 
 @Component({
@@ -16,6 +16,7 @@ export class RouteMap implements OnInit, OnChanges {
   @Input({ required: true }) routes: VehicleRoute[] = [];
 
   @ViewChild(GoogleMap) map?: GoogleMap;
+  @ViewChild(MapInfoWindow) infoWindow?: MapInfoWindow;
 
   width = 780;
   height = 420;
@@ -70,13 +71,11 @@ export class RouteMap implements OnInit, OnChanges {
 
   onStopClick(stop: ClientStop) {
     this.selectedStop.set(stop);
-    // Abrir InfoWindow asociado al marcador seleccionado
-    try {
-      const mapRef = this.map as unknown as { openInfoWindow: Function };
-      if (mapRef && typeof mapRef.openInfoWindow === 'function') {
-        mapRef.openInfoWindow();
-      }
-    } catch {}
+  }
+
+  openInfo(stop: ClientStop, marker: MapMarker) {
+    this.selectedStop.set(stop);
+    this.infoWindow?.open(marker);
   }
 
   ngOnInit(): void {

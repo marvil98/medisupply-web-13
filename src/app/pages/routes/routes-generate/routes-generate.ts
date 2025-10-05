@@ -50,7 +50,7 @@ export class RoutesGenerate {
   private tryGeolocation() {
     if (!('geolocation' in navigator)) {
       this.userLocationAllowed.set(false);
-      this.message = { type: 'error', key: 'geoDeniedMessage' };
+      this.setMessage('error', 'geoDeniedMessage');
       return;
     }
     navigator.geolocation.getCurrentPosition(
@@ -59,10 +59,21 @@ export class RoutesGenerate {
       },
       () => {
         this.userLocationAllowed.set(false);
-        this.message = { type: 'error', key: 'geoDeniedMessage' };
+        this.setMessage('error', 'geoDeniedMessage');
       },
       { enableHighAccuracy: true, timeout: 3000 }
     );
+  }
+
+  private setMessage(type: 'success' | 'error', key: string) {
+    this.message = { type, key };
+    const duration = type === 'success' ? 3000 : 5000;
+    window.setTimeout(() => {
+      // Evitar borrar si cambió a otro mensaje
+      if (this.message && this.message.key === key && this.message.type === type) {
+        this.message = null;
+      }
+    }, duration);
   }
 
   get isGenerateDisabled() {
@@ -80,7 +91,7 @@ export class RoutesGenerate {
       // Validaciones de disponibilidad
       const req = Number(this.selectedVehicles());
       if (req > this.availableVehicles.length) {
-        this.message = { type: 'error', key: 'notEnoughForSelected' };
+        this.setMessage('error', 'notEnoughForSelected');
         this.generating.set(false);
         this.routes.set(null);
         return;
@@ -90,7 +101,7 @@ export class RoutesGenerate {
       const perVehicleCap = this.availableVehicles[0].capacity;
       const minByDemand = Math.ceil(totalDemand / perVehicleCap);
       if (minByDemand > this.availableVehicles.length) {
-        this.message = { type: 'error', key: 'notEnoughForAll' };
+        this.setMessage('error', 'notEnoughForAll');
         this.generating.set(false);
         this.routes.set(null);
         return;
@@ -108,7 +119,7 @@ export class RoutesGenerate {
       const duration = performance.now() - start;
       // Forzar el cumplimiento <= 5s (nuestro cálculo es inmediato, sólo verificamos)
       if (duration > 5000) {
-        this.message = { type: 'error', key: 'genericGenerationError' };
+        this.setMessage('error', 'genericGenerationError');
         this.generating.set(false);
         this.routes.set(null);
         return;
@@ -116,11 +127,11 @@ export class RoutesGenerate {
 
       this.routes.set(result.usedRoutes);
       if (!this.message) {
-        this.message = { type: 'success', key: 'routesSuccess' };
+        this.setMessage('success', 'routesSuccess');
       }
     } catch (e) {
       console.error(e);
-      this.message = { type: 'error', key: 'genericGenerationError' };
+      this.setMessage('error', 'genericGenerationError');
       this.routes.set(null);
     } finally {
       this.generating.set(false);

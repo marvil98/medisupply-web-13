@@ -41,7 +41,9 @@ export class RouteOptimizerService {
     // Crear rutas (orden NN desde el centro)
     const usedRoutes: VehicleRoute[] = vehicles.map((v, idx) => {
       const stops = balanced[idx] || [];
-      const ordered = this.nearestNeighborOrder(center, stops);
+      const nnOrdered = this.nearestNeighborOrder(center, stops);
+      const twoOpt = this.twoOptOrder(center, nnOrdered, 400); // más iteraciones 2-opt
+      const ordered = this.threeOptOrder(center, twoOpt, 120);  // más iteraciones 3-opt
       const path: LatLng[] = [center, ...ordered.map((s) => ({ lat: s.lat, lng: s.lng })), center];
       return { vehicle: v, stops: ordered, path };
     });
@@ -141,6 +143,106 @@ export class RouteOptimizerService {
       current = chosen;
     }
     return ordered;
+  }
+
+  // Refinamiento 2-opt sencillo para acortar la ruta del vehículo
+  private twoOptOrder(center: LatLng, stops: ClientStop[], maxIterations: number): ClientStop[] {
+    if (stops.length < 3) return stops.slice();
+    const current = stops.slice();
+
+    const routeDistance = (seq: ClientStop[]): number => {
+      let dist = 0;
+      let prev: LatLng = center;
+      for (const s of seq) {
+        dist += this.haversine(prev, s);
+        prev = s;
+      }
+      dist += this.haversine(prev, center);
+      return dist;
+    };
+
+    let improved = true;
+    let iterations = 0;
+    let bestDistance = routeDistance(current);
+
+    while (improved && iterations < maxIterations) {
+      improved = false;
+      iterations++;
+      for (let i = 0; i < current.length - 2; i++) {
+        for (let k = i + 1; k < current.length - 1; k++) {
+          const candidate = current.slice();
+          // reverse segment (i..k)
+          const segment = candidate.slice(i, k + 1).reverse();
+          candidate.splice(i, segment.length, ...segment);
+          const candDist = routeDistance(candidate);
+          if (candDist + 1e-9 < bestDistance) {
+            for (let t = 0; t < candidate.length; t++) current[t] = candidate[t];
+            bestDistance = candDist;
+            improved = true;
+          }
+        }
+      }
+    }
+    return current;
+  }
+
+  // 3-opt muy acotado: intenta remover tres aristas y reconectar si mejora
+  private threeOptOrder(center: LatLng, stops: ClientStop[], maxIterations: number): ClientStop[] {
+    if (stops.length < 5) return stops.slice();
+    const current = stops.slice();
+
+    const routeDistance = (seq: ClientStop[]): number => {
+      let dist = 0;
+      let prev: LatLng = center;
+      for (const s of seq) {
+        dist += this.haversine(prev, s);
+        prev = s;
+      }
+      dist += this.haversine(prev, center);
+      return dist;
+    };
+
+    let best = current.slice();
+    let bestDist = routeDistance(best);
+    let iter = 0;
+
+    const apply = (seq: ClientStop[], i: number, j: number, k: number, pattern: number): ClientStop[] => {
+      // Particiona en A|B|C|D y reconecta según patrón clásico
+      const A = seq.slice(0, i + 1);
+      const B = seq.slice(i + 1, j + 1);
+      const C = seq.slice(j + 1, k + 1);
+      const D = seq.slice(k + 1);
+      switch (pattern) {
+        case 0: return A.concat(B.reverse(), C, D);        // flip B
+        case 1: return A.concat(B, C.reverse(), D);        // flip C
+        case 2: return A.concat(C, B, D);                  // swap B,C
+        case 3: return A.concat(C.reverse(), B, D);        // flip C then concat
+        case 4: return A.concat(B.reverse(), C.reverse(), D);
+        default: return seq;
+      }
+    };
+
+    let improved = true;
+    while (improved && iter < maxIterations) {
+      improved = false;
+      iter++;
+      for (let i = 0; i < current.length - 3; i++) {
+        for (let j = i + 1; j < current.length - 2; j++) {
+          for (let k = j + 1; k < current.length - 1; k++) {
+            for (let p = 0; p < 5; p++) {
+              const candidate = apply(best, i, j, k, p);
+              const d = routeDistance(candidate);
+              if (d + 1e-9 < bestDist) {
+                best = candidate;
+                bestDist = d;
+                improved = true;
+              }
+            }
+          }
+        }
+      }
+    }
+    return best;
   }
 
   private haversine(a: LatLng, b: LatLng): number {

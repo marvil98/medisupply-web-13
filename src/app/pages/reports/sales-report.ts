@@ -5,11 +5,13 @@ import { CustomSelect } from '../../shared/custom-select/custom-select';
 import { MatButtonModule } from '@angular/material/button';
 import { StatusMessage } from '../../shared/status-message/status-message';
 import { mockSalesData } from './mocks/sales-report.mock';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe'; 
+import { NgxChartsModule } from '@swimlane/ngx-charts';
 
 @Component({
   selector: 'app-sales-report',
   standalone: true,
-  imports: [CommonModule, PageHeader, CustomSelect, MatButtonModule, StatusMessage],
+  imports: [CommonModule, PageHeader, CustomSelect, MatButtonModule, TranslatePipe, StatusMessage, NgxChartsModule],
   templateUrl: './sales-report.html',
   styleUrls: ['./sales-report.css'],
 })
@@ -41,26 +43,46 @@ export class SalesReport {
     return !this.vendedor() || !this.periodo();
   }
 
+  
+  getChartData() {
+    const data = this.reportData();
+    if (!data || !data.grafico) return [];
+  
+    return [
+      {
+        name: 'Ventas',
+        series: data.grafico.map((valor: number, index: number) => ({
+          name: `T${index + 1}`,
+          value: valor,
+        })),
+      },
+    ];
+  }
+  
+
   generarReporte() {
     try {
-      const data = (mockSalesData as Record<string, Record<string, any>>)[this.vendedor()]?.[this.periodo()] ?? null;
+      const vendedorKey = this.vendedor() as keyof typeof mockSalesData;
+      const periodoKey = this.periodo() as keyof typeof mockSalesData[typeof vendedorKey];
+      const data = mockSalesData[vendedorKey]?.[periodoKey] ?? null;
       if (!data) {
         this.messageType.set('error');
-        this.messageText.set('¡Ups! No se encontraron datos para este período');
+        this.messageText.set('salesReportNoData');
         this.showMessage.set(true);
         this.reportData.set(null);
         return;
       }
-
+  
       this.messageType.set('success');
-      this.messageText.set('Reporte generado correctamente');
+      this.messageText.set('salesReportSuccess');
       this.showMessage.set(true);
       this.reportData.set(data);
     } catch {
       this.messageType.set('error');
-      this.messageText.set('¡Ups! Hubo un error al generar el reporte. Intenta nuevamente');
+      this.messageText.set('salesReportError');
       this.showMessage.set(true);
       this.reportData.set(null);
     }
   }
+  
 }

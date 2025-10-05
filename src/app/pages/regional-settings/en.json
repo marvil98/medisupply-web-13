@@ -51,5 +51,27 @@
   "cardUsersAria": "Users card",
   "cardReportsTitle": "Reports",
   "cardReportsSubtitle": "List and Generate Metrics",
-  "cardReportsAria": "Reports card"
+  "cardReportsAria": "Reports card",
+  "pageReportsTitle": "Reports",
+  "generateSalesReport": "Generate sales report",
+  "generateSalesReportSubtitle": "Create sales reports by seller",
+  "generateSalesReportAria": "Button to generate sales report",
+  "viewGoalReports": "View goal reports",
+  "viewGoalReportsSubtitle": "See goal and sales performance reports",
+  "viewGoalReportsAria": "Button to view goal reports",
+  "salesReportVendorLabel": "Vendor",
+  "salesReportPeriodLabel": "Period",
+  "salesReportButton": "Generate report",
+  "salesReportNoData": "Oops! No data found for this period",
+  "salesReportError": "Oops! There was an error generating the report. Please try again.",
+  "salesReportSuccess": "Report generated successfully",
+  "salesReportTotalSales": "Total sales",
+  "salesReportOrders": "Orders handled",
+  "salesReportProduct": "Product",
+  "salesReportAmount": "Sales ($)",
+  "salesReportTrend": "Sales trend over time"
+  
+  
+  
+  
 }

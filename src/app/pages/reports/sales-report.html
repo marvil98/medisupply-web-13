@@ -55,8 +55,23 @@
     </table>
 
     <div class="chart">
-      <h3>Desglose de ventas en el tiempo</h3>
-      <img src="assets/mock-chart.png" alt="Gráfico de ventas mock" />
+      <h3>{{ 'salesReportTrend' | translate }}</h3>
+    
+      <ngx-charts-line-chart
+        [view]="[600, 300]"
+        [scheme]="'cool'"
+        [results]="getChartData()"
+        [xAxis]="true"
+        [yAxis]="true"
+        [legend]="false"
+        [showXAxisLabel]="true"
+        [showYAxisLabel]="true"
+        [xAxisLabel]="'Periodo'"
+        [yAxisLabel]="'Ventas'"
+        [animations]="true">
+      </ngx-charts-line-chart>
     </div>
+    
+    
   </div>
 </div>

@@ -8,7 +8,8 @@ import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { ClientStop, VehicleRoute } from '../../../shared/types/route-types';
 import { RouteMap } from './route-map';
 import { RouteOptimizerService } from './route-optimizer.service';
-import { DISTRIBUTION_CENTER, MOCK_CLIENTS, VEHICLES_POOL } from './mock-data';
+import { DISTRIBUTION_CENTER } from './mock-data';
+import { RoutesDataService } from '../../../services/routes-data.service';
 
 @Component({
   selector: 'app-routes-generate',
@@ -20,8 +21,8 @@ import { DISTRIBUTION_CENTER, MOCK_CLIENTS, VEHICLES_POOL } from './mock-data';
 export class RoutesGenerate {
   pageTitle = 'pageRoutesTitle';
   center = DISTRIBUTION_CENTER;
-  clients = MOCK_CLIENTS;
-  availableVehicles = VEHICLES_POOL; // mock
+  clients = [] as any[];
+  availableVehicles = [] as any[]; // mock via service
   userLocationAllowed = signal(true);
 
   vehicleOptions = [
@@ -37,10 +38,13 @@ export class RoutesGenerate {
   routes = signal<VehicleRoute[] | null>(null);
   usedVehiclesCount = computed(() => this.routes()?.length ?? 0);
 
-  constructor(private optimizer: RouteOptimizerService) {}
+  constructor(private optimizer: RouteOptimizerService, private data: RoutesDataService) {}
 
   ngOnInit() {
     this.tryGeolocation();
+    // Cargar datos desde assets
+    this.data.getClients().subscribe((c) => (this.clients = c));
+    this.data.getVehicles().subscribe((v) => (this.availableVehicles = v));
   }
 
   private tryGeolocation() {

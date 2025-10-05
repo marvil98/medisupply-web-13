@@ -57,7 +57,7 @@ body {
 
 .app-layout {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
 
   .sidebar {
     width: 360px;
@@ -99,6 +99,18 @@ body {
     flex: 1;
     background: var(--mat-sys-surface);
   }
+}
+
+button[mat-flat-button][disabled] {
+  background-color: rgba(117, 117, 117, 0.71) !important;
+  color: white !important;
+  opacity: 1 !important;
+  cursor: not-allowed;
+}
+
+button[mat-flat-button] {
+  font-size: 14px;
+  font-weight: 400;
 }
 
 p {

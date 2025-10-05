@@ -16,7 +16,14 @@
       <img src="./assets/icons/earth.svg" [attr.alt]="'regionSettingsAlt' | translate" />
     </a>
 
-    <button mat-fab [attr.aria-label]="'userButtonLabel' | translate" (click)="toggleMenu()">
+    <button
+      mat-fab
+      [attr.aria-label]="'userButtonLabel' | translate"
+      (click)="toggleMenu()"
+      tabindex="0"
+      (keydown.enter)="toggleMenu()"
+      (keydown.space)="toggleMenu()"
+    >
       <mat-icon svgIcon="user" aria-hidden="true"></mat-icon>
     </button>
 
@@ -42,6 +49,9 @@
     (click)="logout()"
     class="logout-item"
     [attr.aria-label]="'logoutLabel' | translate"
+    (keydown.enter)="logout()"
+    (keydown.space)="logout()"
+    tabindex="0"
   >
     <mat-icon matListIcon aria-hidden="true" svgIcon="logout"></mat-icon>
     <span matLine>{{ 'logoutText' | translate }}</span>

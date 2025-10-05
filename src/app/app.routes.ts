@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { Component } from '@angular/core';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { RegionalSettings } from './pages/regional-settings/regional-settings';
+import { Components } from './pages/components/components';
 
 @Component({
   standalone: true,
@@ -23,4 +24,6 @@ export const routes: Routes = [
   { path: 'ventas/crear-plan', component: EmptyComponent },
   { path: 'usuarios/registro', component: EmptyComponent },
   { path: 'reportes', component: EmptyComponent },
+  // El path de componentes muestra la guía de componentes para la web
+  { path: 'componentes', component: Components },
 ];

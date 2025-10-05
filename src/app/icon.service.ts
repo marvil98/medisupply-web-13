@@ -25,6 +25,7 @@ export class IconService {
       list: 'assets/icons/list.svg',
       reports: 'assets/icons/reports.svg',
       arrow: 'assets/icons/arrow-icon.svg',
+      chart: 'assets/icons/chart.svg',
     };
 
     for (const [name, path] of Object.entries(icons)) {

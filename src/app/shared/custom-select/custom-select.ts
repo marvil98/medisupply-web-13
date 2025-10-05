@@ -1,4 +1,4 @@
-import { Component, Input, signal, computed } from '@angular/core';
+import { Component, Input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslatePipe } from '../pipes/translate.pipe';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,7 +9,7 @@ interface SelectOption {
 }
 
 @Component({
-  selector: 'custom-select',
+  selector: 'app-custom-select',
   standalone: true,
   imports: [CommonModule, TranslatePipe, MatIconModule],
   templateUrl: './custom-select.html',
@@ -20,8 +20,9 @@ export class CustomSelect {
   @Input() options: SelectOption[] = [];
   @Input() model = signal<string>('');
   @Input() name = '';
-  @Input() required = false;
+  @Input() required!: boolean;
   @Input() placeholderKey = 'selectPlaceholder';
+  @Input() selectId = 'custom-select-' + Math.random().toString(36).substring(2, 8);
 
   isOpen = signal(false);
   touched = signal(false);

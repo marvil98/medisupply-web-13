@@ -1,20 +1,55 @@
-<label class="custom-label">{{ labelKey | translate }}</label>
+<label class="custom-label" [attr.for]="selectId">
+  {{ labelKey | translate }}
+</label>
 
-<div class="custom-select" [class.open]="isOpen()" [class.error]="hasError" (click)="toggle()">
-  <span class="selected-value" [class.placeholder]="!model()">
+<div
+  class="custom-select"
+  [class.open]="isOpen()"
+  [class.error]="hasError"
+  tabindex="0"
+  (click)="toggle()"
+  (keydown.enter)="toggle()"
+  (keydown.space)="toggle()"
+  role="button"
+  [attr.aria-haspopup]="'listbox'"
+  [attr.aria-expanded]="isOpen()"
+  [attr.aria-controls]="selectId + '-options'"
+  [attr.aria-label]="labelKey | translate"
+  [attr.id]="selectId"
+>
+  <span
+    class="selected-value"
+    [class.placeholder]="!model()"
+    [attr.aria-label]="selectedLabelKey | translate"
+  >
     {{ selectedLabelKey | translate }}
   </span>
-  <mat-icon svgIcon="arrow" class="arrow"></mat-icon>
+  <mat-icon svgIcon="arrow" class="arrow" aria-hidden="true"></mat-icon>
 </div>
 
-<ul class="custom-options" *ngIf="isOpen()">
+<ul
+  class="custom-options"
+  *ngIf="isOpen()"
+  role="listbox"
+  [attr.id]="selectId + '-options'"
+  [attr.aria-labelledby]="selectId"
+>
   @for (opt of options; track opt.value) {
-    <li class="custom-option" [class.selected]="opt.value === model()" (click)="select(opt.value)">
+    <li
+      class="custom-option"
+      role="option"
+      [attr.aria-selected]="opt.value === model()"
+      [class.selected]="opt.value === model()"
+      (click)="select(opt.value)"
+      (keydown.enter)="select(opt.value)"
+      (keydown.space)="select(opt.value)"
+      tabindex="0"
+    >
       {{ opt.labelKey | translate }}
     </li>
   }
 </ul>
 
-<div class="error-message" *ngIf="hasError">
+<div class="error-message" *ngIf="hasError" role="alert">
   {{ 'fieldRequired' | translate }}
 </div>

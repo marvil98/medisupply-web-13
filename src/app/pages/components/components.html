@@ -1,0 +1,242 @@
+<app-page-header [pageTitle]="pageTitle" [backRoute]="'/dashboard'"></app-page-header>
+<div>
+  <section class="component-doc">
+    <h2>ActionCard</h2>
+    <p>
+      <strong>ActionCardComponent</strong> es un componente reutilizable que representa una tarjeta
+      interactiva con ícono, título y subtítulo. Está diseñada para funcionar como botón de
+      navegación dentro de la aplicación, permitiendo redirección a una ruta específica al hacer
+      clic.
+    </p>
+
+    <h3>Ejemplo</h3>
+    <app-action-card
+      [titleKey]="'dashboardTitle'"
+      [subtitleKey]="'dashboardSubtitle'"
+      [icon]="'chart'"
+      [ariaLabelKey]="'dashboardCardLabel'"
+      [routerPath]="'/dashboard'"
+    ></app-action-card>
+
+    <h3>Inputs</h3>
+    <ul>
+      <li>
+        <strong>ariaLabelKey</strong>: <em>string</em> — Clave de traducción para accesibilidad
+        (atributo <code>aria-label</code>).
+      </li>
+      <li>
+        <strong>icon</strong>: <em>string</em> — Nombre del ícono SVG registrado que se mostrará en
+        la tarjeta.
+      </li>
+      <li>
+        <strong>titleKey</strong>: <em>string</em> — Clave de traducción para el título principal de
+        la tarjeta.
+      </li>
+      <li>
+        <strong>subtitleKey</strong>: <em>string</em> — Clave de traducción para el subtítulo
+        descriptivo.
+      </li>
+      <li>
+        <strong>routerPath</strong>: <em>string</em> — Ruta a la que se navega al hacer clic en la
+        tarjeta.
+      </li>
+    </ul>
+
+    <h3>Comportamiento</h3>
+    <p>
+      Al hacer clic en la tarjeta, se ejecuta el método <code>navigateTo()</code>, que redirige al
+      usuario mediante el <code>Router</code> de Angular. El componente está optimizado para
+      accesibilidad y traducción dinámica usando <code>translate</code>.
+    </p>
+  </section>
+  <hr />
+  <section class="component-doc">
+    <h2>PageHeaderComponent</h2>
+    <p>
+      <strong>PageHeaderComponent</strong> es un componente de encabezado reutilizable que se
+      muestra en la parte superior de cada vista. Incluye el título de la página, un botón opcional
+      de "volver", y un bloque de información del usuario con acceso rápido a configuración regional
+      y cierre de sesión.
+    </p>
+
+    <h3>Ejemplo</h3>
+    <app-page-header [pageTitle]="pageTitle" [backRoute]="'/dashboard'"></app-page-header>
+
+    <h3>Inputs</h3>
+    <ul>
+      <li>
+        <strong>pageTitle</strong>: <em>string</em> — Clave de traducción para el título de la
+        página.
+      </li>
+      <li>
+        <strong>backRoute</strong>: <em>string</em> — Ruta a la que se navega al hacer clic en el
+        botón de "volver". Si no se proporciona, el botón no se muestra.
+      </li>
+    </ul>
+
+    <h3>Contenido interno</h3>
+    <ul>
+      <li>
+        <strong>Botón de volver</strong>: Se muestra solo si <code>backRoute</code> está definido.
+        Usa <code>mat-icon-button</code> con el ícono <code>arrow_back</code>.
+      </li>
+      <li>
+        <strong>Título de la página</strong>: Traducido dinámicamente con <code>translate</code>.
+      </li>
+      <li>
+        <strong>Bloque de usuario</strong>: Muestra nombre, rol y un botón flotante con ícono de
+        usuario.
+      </li>
+      <li>
+        <strong>Menú desplegable</strong>: Aparece al hacer clic en el botón de usuario. Incluye
+        nombre, rol y opción de cierre de sesión.
+      </li>
+    </ul>
+
+    <h3>Accesibilidad</h3>
+    <p>
+      Todos los elementos clave incluyen atributos <code>aria-label</code> traducibles para
+      compatibilidad con lectores de pantalla. El botón de volver usa
+      <code>aria-label="Back"</code> y el menú desplegable se describe con
+      <code>aria-label="userMenuLabel"</code>.
+    </p>
+
+    <h3>Comportamiento</h3>
+    <ul>
+      <li><code>goBack()</code>: Navega a la ruta definida en <code>backRoute</code>.</li>
+      <li><code>toggleMenu()</code>: Muestra u oculta el menú de usuario.</li>
+      <li><code>logout()</code>: Ejecuta la lógica de cierre de sesión.</li>
+    </ul>
+  </section>
+  <hr />
+  <section class="component-doc">
+    <h2>Botón de acción (mat-flat-button)</h2>
+    <p>
+      Este botón representa una acción principal dentro de una vista, como guardar configuraciones.
+      Utiliza <code>mat-flat-button</code> de Angular Material con estilo plano, color primario, y
+      soporte para traducción dinámica del texto. También puede deshabilitarse mediante una
+      condición lógica.
+    </p>
+
+    <h3>Ejemplo</h3>
+    <button mat-flat-button color="primary" (click)="methodClick()">
+      {{ 'saveButton' | translate }}
+    </button>
+
+    <h3>Ejemplo con estado deshabilitado</h3>
+    <button mat-flat-button color="primary" [disabled]="true" (click)="methodClick()">
+      {{ 'saveButton' | translate }}
+    </button>
+
+    <h3>Propiedades</h3>
+    <ul>
+      <li><strong>mat-flat-button</strong>: Aplica estilo plano sin sombra ni elevación.</li>
+      <li><strong>color="primary"</strong>: Usa el color primario del tema.</li>
+      <li><strong>(click)="method()"</strong>: Ejecuta una acción al hacer clic.</li>
+      <li><strong>[disabled]</strong>: Desactiva el botón.</li>
+      <li>
+        <strong>{{ 'saveButton' | translate }}</strong
+        >: Traduce dinámicamente el texto del botón.
+      </li>
+    </ul>
+
+    <h3>Comportamiento</h3>
+    <p>
+      El botón ejecuta el método <code>method()</code> definido en el componente. Puede
+      deshabilitarse para evitar múltiples envíos o mientras se realiza una operación.
+    </p>
+  </section>
+  <hr />
+  <section class="component-doc">
+    <h2>Botón plano con ícono (mat-button)</h2>
+    <p>
+      Este botón utiliza <code>mat-button</code> de Angular Material, con estilo plano y fondo
+      transparente. Incluye un ícono SVG decorativo y texto traducible. Es ideal para acciones
+      secundarias como descargar, compartir o abrir enlaces.
+    </p>
+
+    <h3>Ejemplo</h3>
+    <button mat-button (click)="methodClick()">
+      <mat-icon aria-hidden="true">download</mat-icon>
+      {{ 'standardTemplateLabel' | translate }}
+    </button>
+
+    <h3>Características</h3>
+    <ul>
+      <li><strong>mat-button</strong>: Botón plano sin fondo ni sombra.</li>
+      <li><strong>Ícono SVG</strong>: Se muestra antes del texto, decorativo.</li>
+      <li><strong>Texto traducible</strong>: Compatible con <code>translate</code>.</li>
+      <li><strong>Estado deshabilitado</strong>: Controlado con <code>[disabled]</code>.</li>
+    </ul>
+  </section>
+  <hr />
+  <section class="component-doc">
+    <h2>StatusMessageComponent (uso en mensajes de estado)</h2>
+    <p>
+      Este componente se utiliza para mostrar mensajes de éxito o error en la interfaz. Puede
+      integrarse de forma embebida en el layout o mostrarse como mensaje flotante (toast) en la
+      esquina inferior centrada. A continuación se muestran ejemplos de uso y los atributos
+      disponibles.
+    </p>
+
+    <h3>Estado: mensaje exitoso embebido</h3>
+    <app-status-message type="success" messageKey="reportSuccessMessage"></app-status-message>
+
+    <h3>Estado: mensaje de error flotante</h3>
+    <app-status-message
+      type="error"
+      messageKey="reportErrorMessage"
+      [float]="true"
+      style="margin-top: 20px"
+    ></app-status-message>
+
+    <h3>Estado: mensaje temporal (desaparece automáticamente)</h3>
+    <app-status-message
+      type="success"
+      messageKey="reportSuccessMessage"
+      [duration]="4000"
+      style="margin-top: 20px"
+    ></app-status-message>
+
+    <h3>Inputs disponibles</h3>
+    <ul>
+      <li>
+        <strong>type</strong>: Define el tipo de mensaje. Puede ser <code>'success'</code> o
+        <code>'error'</code>.
+      </li>
+      <li><strong>messageKey</strong>: Clave de traducción para el contenido del mensaje.</li>
+      <li>
+        <strong>float</strong>: Si es <code>true</code>, el mensaje se muestra como toast flotante
+        centrado. Si es <code>false</code> (por defecto), se muestra embebido.
+      </li>
+      <li>
+        <strong>duration</strong>: Tiempo en milisegundos que el mensaje permanece visible. Si no se
+        define, el mensaje queda estático.
+      </li>
+    </ul>
+
+    <h3>Estados visuales esperados</h3>
+    <ul>
+      <li>
+        <strong>Success</strong>: fondo <code>#e6f4ea</code>, texto <code>#09A794</code>, ícono
+        <code>check</code> al final.
+      </li>
+      <li>
+        <strong>Error</strong>: fondo <code>#fbe9e7</code>, texto <code>#EB5757</code>, ícono
+        <code>close</code> al final.
+      </li>
+    </ul>
+
+    <h3>Accesibilidad</h3>
+    <ul>
+      <li>Usa <code>role="status"</code> para éxito y <code>role="alert"</code> para error.</li>
+      <li>
+        Incluye <code>aria-live</code> para que el mensaje sea anunciado automáticamente por
+        lectores de pantalla.
+      </li>
+      <li>
+        Los íconos están marcados como <code>aria-hidden="true"</code> para evitar redundancia.
+      </li>
+    </ul>
+  </section>
+</div>

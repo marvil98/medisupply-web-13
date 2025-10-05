@@ -15,17 +15,13 @@
   width: 460px;
 }
 
-/* Pendiente */
 .custom-select.error {
-  border-color: #dc2626; /* rojo */
+  border-color: #eb5757;
 }
 
-.selected-value {
+.selected-value,
+.selected-value.selected-value.placeholder {
   color: #1e1e1e;
-}
-
-.selected-value.placeholder {
-  color: #9ca3af;
 }
 
 .arrow {
@@ -74,5 +70,5 @@
 .error-message {
   margin-top: 0.25rem;
   font-size: 0.75rem;
-  color: #dc2626;
+  color: #eb5757;
 }

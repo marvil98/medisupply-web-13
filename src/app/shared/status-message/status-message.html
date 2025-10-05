@@ -1,0 +1,12 @@
+<div
+  *ngIf="visible()"
+  class="status-message"
+  [ngClass]="[type, float ? 'float' : 'inline']"
+  [attr.role]="type === 'error' ? 'alert' : 'status'"
+  [attr.aria-live]="type === 'error' ? 'assertive' : 'polite'"
+>
+  <span class="message-text">{{ messageKey | translate }}</span>
+  <mat-icon aria-hidden="true">
+    {{ type === 'error' ? 'close' : 'check' }}
+  </mat-icon>
+</div>

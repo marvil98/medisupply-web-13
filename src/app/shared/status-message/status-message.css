@@ -1,0 +1,51 @@
+.status-message {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 280px;
+  max-width: 100%;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.status-message.success {
+  background-color: #e6f4ea;
+  color: #09a794;
+}
+
+.status-message.error {
+  background-color: #fbe9e7;
+  color: #eb5757;
+}
+
+.status-message.float {
+  position: fixed;
+  top: 180px;
+  left: 50%;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.status-message.inline {
+  position: static;
+  box-shadow: none;
+}
+
+.message-text {
+  flex-grow: 1;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

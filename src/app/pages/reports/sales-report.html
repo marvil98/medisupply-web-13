@@ -1,0 +1,62 @@
+<app-page-header [pageTitle]="pageTitle" [backRoute]="'/reportes'"></app-page-header>
+
+<div class="report-container">
+  <app-custom-select
+    [labelKey]="'Vendedor'"
+    [options]="vendedores"
+    [model]="vendedor"
+    [required]="true"
+  ></app-custom-select>
+
+  <app-custom-select
+    [labelKey]="'Período'"
+    [options]="periodos"
+    [model]="periodo"
+    [required]="true"
+    style="margin-top: 20px"
+  ></app-custom-select>
+
+  <div class="button-container">
+    <button mat-flat-button color="primary" [disabled]="isButtonDisabled" (click)="generarReporte()">
+      Generar un reporte
+    </button>
+  </div>
+
+  <app-status-message
+    *ngIf="showMessage()"
+    [type]="messageType()"
+    [messageKey]="messageText()"
+    [float]="true"
+    [duration]="4000"
+  ></app-status-message>
+
+  <div *ngIf="reportData()" class="report-result">
+    <div class="summary">
+      <div class="box">
+        <h3>Ventas totales</h3>
+        <p>{{ reportData().ventasTotales | currency:'USD' }}</p>
+      </div>
+      <div class="box">
+        <h3>Pedidos atendidos</h3>
+        <p>{{ reportData().pedidos }}</p>
+      </div>
+    </div>
+
+    <table class="sales-table">
+      <thead>
+        <tr><th>Producto</th><th>Ventas ($)</th></tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of reportData().productos">
+          <td>{{ p.nombre }}</td>
+          <td>{{ p.ventas | currency:'USD' }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="chart">
+      <h3>Desglose de ventas en el tiempo</h3>
+      <img src="assets/mock-chart.png" alt="Gráfico de ventas mock" />
+    </div>
+  </div>
+</div>

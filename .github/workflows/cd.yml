@@ -1,0 +1,171 @@
+name: CD - Deploy
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  # Job para despliegue en staging
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'staging')
+    environment: staging
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build for staging
+        run: npm run build
+        env:
+          NODE_ENV: staging
+          
+      - name: Deploy to staging server
+        run: |
+          echo "Deploying to staging environment..."
+          # Aquí puedes agregar comandos específicos para tu servidor de staging
+          # Por ejemplo: rsync, scp, docker push, etc.
+          
+      - name: Run smoke tests
+        run: |
+          echo "Running smoke tests on staging..."
+          # Agregar tests de humo para verificar que el despliegue funcionó
+          
+      - name: Notify deployment status
+        if: always()
+        run: |
+          if [ ${{ job.status }} == 'success' ]; then
+            echo "✅ Staging deployment successful"
+          else
+            echo "❌ Staging deployment failed"
+          fi
+
+  # Job para despliegue en producción
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')
+    environment: production
+    needs: deploy-staging
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build for production
+        run: npm run build
+        env:
+          NODE_ENV: production
+          
+      - name: Create release archive
+        run: |
+          tar -czf medisupply-production.tar.gz -C dist/medisupply .
+          
+      - name: Upload production build
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-build
+          path: medisupply-production.tar.gz
+          retention-days: 30
+          
+      - name: Deploy to production server
+        run: |
+          echo "Deploying to production environment..."
+          # Aquí puedes agregar comandos específicos para tu servidor de producción
+          # Por ejemplo: rsync, scp, docker push, etc.
+          
+      - name: Run health checks
+        run: |
+          echo "Running health checks on production..."
+          # Agregar verificaciones de salud del sistema
+          
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            ## Medisupply Release ${{ github.ref }}
+            
+            ### Changes
+            - Automated deployment to production
+            - Build artifacts included
+            
+            ### Deployment Details
+            - Environment: Production
+            - Build Date: ${{ github.event.head_commit.timestamp }}
+            - Commit: ${{ github.sha }}
+          draft: false
+          prerelease: false
+          
+      - name: Notify deployment status
+        if: always()
+        run: |
+          if [ ${{ job.status }} == 'success' ]; then
+            echo "✅ Production deployment successful"
+          else
+            echo "❌ Production deployment failed"
+          fi
+
+  # Job para rollback en caso de fallo
+  rollback:
+    name: Rollback Deployment
+    runs-on: ubuntu-latest
+    if: failure() && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    needs: [deploy-staging, deploy-production]
+    
+    steps:
+      - name: Rollback to previous version
+        run: |
+          echo "Rolling back deployment..."
+          # Implementar lógica de rollback aquí
+          
+      - name: Notify rollback
+        run: |
+          echo "🔄 Rollback completed"
+
+
+
+
+
+
+
+
+
+

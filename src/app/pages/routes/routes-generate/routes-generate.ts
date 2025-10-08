@@ -43,8 +43,8 @@ export class RoutesGenerate {
   ngOnInit() {
     this.tryGeolocation();
     // Cargar datos desde assets
-    this.data.getClients().subscribe((c) => (this.clients = c));
-    this.data.getVehicles().subscribe((v) => (this.availableVehicles = v));
+    this.data.getClients().subscribe((c: any) => (this.clients = c));
+    this.data.getVehicles().subscribe((v: any) => (this.availableVehicles = v));
   }
 
   private tryGeolocation() {

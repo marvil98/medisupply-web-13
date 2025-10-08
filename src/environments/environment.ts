@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  baseUrl: 'https://api.medisupply.example/v1/'
+  baseUrl: 'https://api.medisupply.example/'
 };
 
 

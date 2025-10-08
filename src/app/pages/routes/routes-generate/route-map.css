@@ -1,0 +1,20 @@
+.map-container {
+  position: relative;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,.1);
+  overflow: hidden;
+}
+
+.map-svg { display: block; }
+
+.tooltip {
+  position: absolute;
+  background: rgba(255,255,255,.95);
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  pointer-events: none;
+}

@@ -1,0 +1,17 @@
+{
+  "pageRoutesTitle": "Routes",
+  "generateRoutesTitle": "Generate Routes",
+  "vehiclesLabel": "Number of vehicles",
+  "vehiclesPlaceholder": "Select amount",
+  "vehiclesOption1": "1 vehicle",
+  "vehiclesOption2": "2 vehicles",
+  "vehiclesOption3": "3 vehicles",
+  "generateButton": "Generate",
+  "geoDeniedMessage": "Could not access your location. Enable it to generate routes from your position",
+  "routesSuccess": "Routes generated correctly",
+  "notEnoughForSelected": "Oops! Not enough vehicles available for the selected amount",
+  "notEnoughForAll": "Oops! Not enough vehicles available to cover all deliveries.",
+  "genericGenerationError": "Oops! Could not generate the route, please try again",
+  "vehicleLabel": "Vehicle",
+  "stopsLabel": "stops"
+}

@@ -1,0 +1,142 @@
+import { Component, computed, signal } from '@angular/core';
+import { PageHeader } from '../../../shared/page-header/page-header';
+import { CustomSelect } from '../../../shared/custom-select/custom-select';
+import { MatButtonModule } from '@angular/material/button';
+import { CommonModule } from '@angular/common';
+import { StatusMessage } from '../../../shared/status-message/status-message';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { ClientStop, VehicleRoute } from '../../../shared/types/route-types';
+import { RouteMap } from './route-map';
+import { RouteOptimizerService } from './route-optimizer.service';
+import { DISTRIBUTION_CENTER } from './mock-data';
+import { RoutesDataService } from '../../../services/routes-data.service';
+
+@Component({
+  selector: 'app-routes-generate',
+  standalone: true,
+  imports: [CommonModule, PageHeader, CustomSelect, MatButtonModule, StatusMessage, TranslatePipe, RouteMap],
+  templateUrl: './routes-generate.html',
+  styleUrls: ['./routes-generate.css'],
+})
+export class RoutesGenerate {
+  pageTitle = 'pageRoutesTitle';
+  center = DISTRIBUTION_CENTER;
+  clients = [] as any[];
+  availableVehicles = [] as any[]; // mock via service
+  userLocationAllowed = signal(true);
+
+  vehicleOptions = [
+    { value: '1', labelKey: 'vehiclesOption1' },
+    { value: '2', labelKey: 'vehiclesOption2' },
+    { value: '3', labelKey: 'vehiclesOption3' },
+  ];
+  selectedVehicles = signal<string>('');
+
+  generating = signal(false);
+  message: { type: 'success' | 'error'; key: string } | null = null;
+
+  routes = signal<VehicleRoute[] | null>(null);
+  usedVehiclesCount = computed(() => this.routes()?.length ?? 0);
+
+  constructor(private optimizer: RouteOptimizerService, private data: RoutesDataService) {}
+
+  ngOnInit() {
+    this.tryGeolocation();
+    // Cargar datos desde assets
+    this.data.getClients().subscribe((c: any) => (this.clients = c));
+    this.data.getVehicles().subscribe((v: any) => (this.availableVehicles = v));
+  }
+
+  private tryGeolocation() {
+    if (!('geolocation' in navigator)) {
+      this.userLocationAllowed.set(false);
+      this.setMessage('error', 'geoDeniedMessage');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      () => {
+        this.userLocationAllowed.set(true);
+      },
+      () => {
+        this.userLocationAllowed.set(false);
+        this.setMessage('error', 'geoDeniedMessage');
+      },
+      { enableHighAccuracy: true, timeout: 3000 }
+    );
+  }
+
+  private setMessage(type: 'success' | 'error', key: string) {
+    this.message = { type, key };
+    const duration = type === 'success' ? 3000 : 5000;
+    window.setTimeout(() => {
+      // Evitar borrar si cambió a otro mensaje
+      if (this.message && this.message.key === key && this.message.type === type) {
+        this.message = null;
+      }
+    }, duration);
+  }
+
+  get isGenerateDisabled() {
+    // Deshabilitar hasta que el usuario seleccione 1–3 vehículos
+    return !this.selectedVehicles() || this.generating();
+  }
+
+  generate() {
+    if (this.isGenerateDisabled) return;
+    this.generating.set(true);
+    this.message = null;
+
+    const start = performance.now();
+    try {
+      // Validaciones de disponibilidad
+      const req = Number(this.selectedVehicles());
+      if (req > this.availableVehicles.length) {
+        this.setMessage('error', 'notEnoughForSelected');
+        this.generating.set(false);
+        this.routes.set(null);
+        return;
+      }
+
+      const totalDemand = this.clients.reduce((a, c) => a + c.demand, 0);
+      const perVehicleCap = this.availableVehicles[0].capacity;
+      const minByDemand = Math.ceil(totalDemand / perVehicleCap);
+      if (minByDemand > this.availableVehicles.length) {
+        this.setMessage('error', 'notEnoughForAll');
+        this.generating.set(false);
+        this.routes.set(null);
+        return;
+      }
+
+      const result = this.optimizer.optimize({
+        center: this.center,
+        clients: this.clients,
+        availableVehicles: this.availableVehicles,
+        requestedVehicles: req,
+      });
+
+      // Si hay no asignados por capacidad, continúa y muestra rutas igualmente (sin error).
+
+      const duration = performance.now() - start;
+      // Forzar el cumplimiento <= 5s (nuestro cálculo es inmediato, sólo verificamos)
+      if (duration > 5000) {
+        this.setMessage('error', 'genericGenerationError');
+        this.generating.set(false);
+        this.routes.set(null);
+        return;
+      }
+
+      this.routes.set(result.usedRoutes);
+      if (!this.message) {
+        this.setMessage('success', 'routesSuccess');
+      }
+    } catch (e) {
+      console.error(e);
+      this.setMessage('error', 'genericGenerationError');
+      this.routes.set(null);
+    } finally {
+      this.generating.set(false);
+    }
+  }
+
+  trackStopById(_: number, s: ClientStop) { return s.id; }
+}

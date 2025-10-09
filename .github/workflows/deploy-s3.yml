@@ -132,8 +132,10 @@ jobs:
             fi
           fi
 
-      - name: Build application
-        run: npx ng build --configuration production
+      - name: Build application for production
+        run: |
+          echo "🏗️  Building Angular application for production..."
+          npx ng build --configuration production --optimization --source-map=false
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

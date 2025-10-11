@@ -119,7 +119,6 @@ export class RoutesGenerate {
   private tryGeolocation() {
     if (!('geolocation' in navigator)) {
       this.userLocationAllowed.set(false);
-      this.setMessage('error', 'geoDeniedMessage');
       return;
     }
     navigator.geolocation.getCurrentPosition(
@@ -128,7 +127,7 @@ export class RoutesGenerate {
       },
       () => {
         this.userLocationAllowed.set(false);
-        this.setMessage('error', 'geoDeniedMessage');
+        // No mostrar error - las rutas se generan desde el centro de distribución
       },
       { enableHighAccuracy: true, timeout: 3000 }
     );

@@ -78,6 +78,21 @@ export class RouteMap implements OnInit, OnChanges {
     this.infoWindow?.open(marker);
   }
 
+  getOriginMarkerOptions(): any {
+    return {
+      icon: {
+        url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+          <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="20" cy="20" r="18" fill="#1976d2" stroke="#fff" stroke-width="3"/>
+            <text x="20" y="26" text-anchor="middle" fill="#fff" font-family="Arial" font-size="18" font-weight="bold">🏢</text>
+          </svg>
+        `),
+        scaledSize: new google.maps.Size(40, 40),
+        anchor: new google.maps.Point(20, 20)
+      }
+    };
+  }
+
   ngOnInit(): void {
     // Initialize map center from provided center
     if (this.center) {

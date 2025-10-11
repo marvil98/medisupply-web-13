@@ -4,7 +4,7 @@
     <map-marker *ngIf="userMarker" [position]="userMarker" [title]="'Tu ubicación'"></map-marker>
 
     <!-- Centro de distribución -->
-    <map-marker [position]="{ lat: center.lat, lng: center.lng }" [title]="'Centro de distribución'"></map-marker>
+    <map-marker [position]="{ lat: center.lat, lng: center.lng }" [title]="'Centro de Distribución - ORIGEN'" [options]="getOriginMarkerOptions()"></map-marker>
 
     <!-- Clientes -->
     <map-marker *ngFor="let c of clients" #m="mapMarker" [position]="{ lat: c.lat, lng: c.lng }" [title]="c.name" (mapClick)="openInfo(c, m)"></map-marker>

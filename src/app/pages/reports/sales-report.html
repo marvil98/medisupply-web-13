@@ -1,0 +1,80 @@
+<app-page-header [pageTitle]="pageTitle" [backRoute]="'/reportes'"></app-page-header>
+
+<div class="report-container">
+  <app-custom-select
+    [labelKey]="'salesReportVendorLabel'"
+    [options]="vendedores"
+    [model]="vendedor"
+    [required]="true"
+  ></app-custom-select>
+
+  <app-custom-select
+    [labelKey]="'salesReportPeriodLabel'"
+    [options]="periodos"
+    [model]="periodo"
+    [required]="true"
+    style="margin-top: 20px"
+  ></app-custom-select>
+
+  <div class="button-container">
+    <button mat-flat-button color="primary" [disabled]="isButtonDisabled" (click)="generarReporte()">
+      {{ 'salesReportButton' | translate }}
+    </button>
+  </div>
+
+  <app-status-message
+    *ngIf="showMessage()"
+    [type]="messageType()"
+    [messageKey]="messageText()"
+    [float]="true"
+    [duration]="4000"
+  ></app-status-message>
+
+  <div *ngIf="reportData()" class="report-result">
+    <div class="summary">
+      <div class="box">
+        <h3>{{ 'salesReportTotalSales' | translate }}</h3>
+        <p>{{ reportData().ventasTotales | currency:'USD' }}</p>
+      </div>
+      <div class="box">
+        <h3>{{ 'salesReportOrders' | translate }}</h3>
+        <p>{{ reportData().pedidos }}</p>
+      </div>
+    </div>
+
+    <table class="sales-table">
+      <thead>
+        <tr>
+          <th>{{ 'salesReportProduct' | translate }}</th>
+          <th>{{ 'salesReportAmount' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of reportData().productos">
+          <td>{{ p.nombre }}</td>
+          <td>{{ p.ventas | currency:'USD' }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="chart">
+      <h3>{{ 'salesReportTrend' | translate }}</h3>
+    
+      <ngx-charts-line-chart
+        [view]="[600, 300]"
+        [scheme]="'cool'"
+        [results]="getChartData()"
+        [xAxis]="true"
+        [yAxis]="true"
+        [legend]="false"
+        [showXAxisLabel]="true"
+        [showYAxisLabel]="true"
+        [xAxisLabel]="'salesReportChartXAxisLabel' | translate"
+        [yAxisLabel]="'salesReportChartYAxisLabel' | translate"
+        [animations]="true">
+      </ngx-charts-line-chart>
+    </div>
+    
+    
+  </div>
+</div>

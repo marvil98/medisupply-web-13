@@ -43,6 +43,12 @@ export class SalesReport {
     return !this.vendedor() || !this.periodo();
   }
 
+  // Limpiar estado cuando cambian los selectores
+  onSelectionChange() {
+    this.showMessage.set(false);
+    this.reportData.set(null);
+  }
+
   
   getChartData() {
     const data = this.reportData();
@@ -61,28 +67,36 @@ export class SalesReport {
   
 
   generarReporte() {
-    try {
-      const vendedorKey = this.vendedor() as keyof typeof mockSalesData;
-      const periodoKey = this.periodo() as keyof typeof mockSalesData[typeof vendedorKey];
-      const data = mockSalesData[vendedorKey]?.[periodoKey] ?? null;
-      if (!data) {
+    // Limpiar mensaje anterior y datos
+    this.showMessage.set(false);
+    this.reportData.set(null);
+    
+    // Pequeño delay para asegurar que el mensaje anterior se oculte
+    setTimeout(() => {
+      try {
+        const vendedorKey = this.vendedor() as keyof typeof mockSalesData;
+        const periodoKey = this.periodo() as keyof typeof mockSalesData[typeof vendedorKey];
+        const data = mockSalesData[vendedorKey]?.[periodoKey] ?? null;
+        
+        if (!data) {
+          this.messageType.set('error');
+          this.messageText.set('salesReportNoData');
+          this.showMessage.set(true);
+          this.reportData.set(null);
+          return;
+        }
+    
+        this.messageType.set('success');
+        this.messageText.set('salesReportSuccess');
+        this.showMessage.set(true);
+        this.reportData.set(data);
+      } catch {
         this.messageType.set('error');
-        this.messageText.set('salesReportNoData');
+        this.messageText.set('salesReportError');
         this.showMessage.set(true);
         this.reportData.set(null);
-        return;
       }
-  
-      this.messageType.set('success');
-      this.messageText.set('salesReportSuccess');
-      this.showMessage.set(true);
-      this.reportData.set(data);
-    } catch {
-      this.messageType.set('error');
-      this.messageText.set('salesReportError');
-      this.showMessage.set(true);
-      this.reportData.set(null);
-    }
+    }, 100);
   }
   
 }

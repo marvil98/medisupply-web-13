@@ -6,6 +6,7 @@
     [options]="vendedores"
     [model]="vendedor"
     [required]="true"
+    (modelChange)="onSelectionChange()"
   ></app-custom-select>
 
   <app-custom-select
@@ -13,6 +14,7 @@
     [options]="periodos"
     [model]="periodo"
     [required]="true"
+    (modelChange)="onSelectionChange()"
     style="margin-top: 20px"
   ></app-custom-select>
 
@@ -27,7 +29,7 @@
     [type]="messageType()"
     [messageKey]="messageText()"
     [float]="true"
-    [duration]="4000"
+    [duration]="messageType() === 'error' ? 8000 : 4000"
   ></app-status-message>
 
   <div *ngIf="reportData()" class="report-result">
@@ -71,7 +73,7 @@
         [showYAxisLabel]="true"
         [xAxisLabel]="'salesReportChartXAxisLabel' | translate"
         [yAxisLabel]="'salesReportChartYAxisLabel' | translate"
-        [animations]="true">
+        [animations]="false">
       </ngx-charts-line-chart>
     </div>
     

@@ -85,7 +85,7 @@ describe('Reports Component - High Coverage Tests', () => {
       const requiredKeys = ['titleKey', 'subtitleKey', 'icon', 'ariaLabelKey', 'path'];
       component.cards.forEach((card, index) => {
         requiredKeys.forEach(key => {
-          expect(card.hasOwnProperty(key)).toBe(true);
+          expect(Object.prototype.hasOwnProperty.call(card, key)).toBe(true);
           expect((card as any)[key]).toBeDefined();
           expect((card as any)[key]).not.toBe('');
         });
@@ -213,8 +213,8 @@ describe('Reports Component - High Coverage Tests', () => {
 
     it('should validate component structure integrity', () => {
       // Verificar que no hay propiedades faltantes
-      expect(component.hasOwnProperty('pageTitle')).toBe(true);
-      expect(component.hasOwnProperty('cards')).toBe(true);
+      expect(Object.prototype.hasOwnProperty.call(component, 'pageTitle')).toBe(true);
+      expect(Object.prototype.hasOwnProperty.call(component, 'cards')).toBe(true);
       
       // Verificar tipos de propiedades
       expect(typeof component.pageTitle).toBe('string');

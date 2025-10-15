@@ -65,6 +65,7 @@
   "salesReportPeriodLabel": "Período",
   "salesReportButton": "Generar un reporte",
   "salesReportNoData": "¡Ups! No se encontraron datos para este período",
+  "salesReportNoDataForParams": "No se encontraron datos para los parámetros seleccionados",
   "salesReportError": "¡Ups! Hubo un error al generar el reporte. Intenta nuevamente",
   "salesReportSuccess": "Reporte generado correctamente",
 

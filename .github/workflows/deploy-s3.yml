@@ -21,6 +21,15 @@ jobs:
       coverage: ${{ steps.coverage-check.outputs.coverage }}
       branch-type: ${{ steps.branch-info.outputs.type }}
     steps:
+      - name: Install Chrome for testing
+        run: |
+          echo "🔧 Instalando Chrome para pruebas..."
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+          google-chrome --version
+          
       - name: Branch Information
         id: branch-info
         run: |
@@ -58,7 +67,25 @@ jobs:
           echo "📊 Configuración:"
           echo "   - Tipo: Pruebas básicas para CI/CD"
           echo "   - Cobertura mínima: ${MIN_COVERAGE}%"
-          npx ng test --watch=false --browsers=ChromeHeadless --code-coverage
+          
+          # Verificar que Chrome esté disponible
+          echo "🔍 Verificando Chrome Headless..."
+          which google-chrome || which chromium-browser || echo "Chrome no encontrado"
+          
+          # Ejecutar pruebas con más verbosidad
+          echo "🚀 Iniciando pruebas..."
+          npx ng test --watch=false --browsers=ChromeHeadless --code-coverage --progress=false || {
+            echo "❌ Las pruebas fallaron, intentando sin headless..."
+            npx ng test --watch=false --browsers=Chrome --code-coverage --progress=false || {
+              echo "❌ Las pruebas fallaron completamente"
+              exit 1
+            }
+          }
+          
+          echo "✅ Pruebas completadas"
+          echo "📁 Verificando archivos de cobertura generados..."
+          find . -name "*coverage*" -type f 2>/dev/null || echo "No se encontraron archivos de cobertura"
+          ls -la coverage/ 2>/dev/null || echo "Directorio coverage no existe"
 
       - name: Check test coverage
         id: coverage-check

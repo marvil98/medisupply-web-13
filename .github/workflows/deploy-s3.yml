@@ -2,9 +2,9 @@ name: Deploy Angular App to S3
 
 on:
   push:
-    branches: [ develop, main, 'feature/*' ]
+    branches: [ develop, master, 'feature/*' ]
   pull_request:
-    branches: [ develop, main ]
+    branches: [ develop, master ]
     types: [opened, synchronize, reopened]
 
 env:
@@ -30,9 +30,9 @@ jobs:
           elif [[ "${{ github.ref_name }}" == develop ]]; then
             echo "type=develop" >> $GITHUB_OUTPUT
             echo "🚀 Branch type: DEVELOP"
-          elif [[ "${{ github.ref_name }}" == main ]]; then
-            echo "type=main" >> $GITHUB_OUTPUT
-            echo "🏭 Branch type: MAIN"
+          elif [[ "${{ github.ref_name }}" == master ]]; then
+            echo "type=master" >> $GITHUB_OUTPUT
+            echo "🏭 Branch type: MASTER"
           else
             echo "type=other" >> $GITHUB_OUTPUT
             echo "📝 Branch type: OTHER"
@@ -123,7 +123,7 @@ jobs:
               echo "✅ Cobertura de código aprobada (${COVERAGE}%)"
               echo "🚀 Listo para integrar a develop"
             fi
-          elif [[ "$BRANCH_TYPE" == "develop" ]] || [[ "$BRANCH_TYPE" == "main" ]]; then
+                  elif [[ "$BRANCH_TYPE" == "develop" ]] || [[ "$BRANCH_TYPE" == "master" ]]; then
             if (( $(echo "$COVERAGE < $MIN_COVERAGE" | bc -l) )); then
               echo "❌ BLOQUEADO: La cobertura de código (${COVERAGE}%) es menor al mínimo requerido (${MIN_COVERAGE}%)"
               exit 1
@@ -155,7 +155,7 @@ jobs:
   deploy-prod:
     needs: build-and-test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master'
     environment: 
       name: production
       url: http://${{ env.S3_BUCKET_PROD }}.s3-website-${{ env.AWS_REGION }}.amazonaws.com

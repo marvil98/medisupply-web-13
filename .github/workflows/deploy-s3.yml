@@ -11,7 +11,7 @@ env:
   AWS_REGION: us-east-1
   S3_BUCKET_PROD: medisupply-frontend-120569610818-us-east-1
   CLOUDFRONT_DISTRIBUTION_ID: E31ZNDPOLDZPSV
-  MIN_COVERAGE: 70
+  MIN_COVERAGE: 80
 
 jobs:
   # Job para builds y tests
@@ -111,17 +111,10 @@ jobs:
             COVERAGE_FILE="dist/coverage/coverage-summary.json"
           fi
           
-          if [ -z "$COVERAGE_FILE" ]; then
-            echo "❌ No se encontró archivo de cobertura en ninguna ubicación"
-            echo "📁 Contenido del directorio actual:"
-            ls -la
-          echo "📁 Contenido del directorio coverage (si existe):"
-          ls -la coverage/ 2>/dev/null || echo "Directorio coverage no existe"
-          echo "📁 Contenido del directorio coverage/medisupply (si existe):"
-          ls -la coverage/medisupply/ 2>/dev/null || echo "Directorio coverage/medisupply no existe"
-            echo "⚠️  Asumiendo cobertura del 100% para continuar"
-            COVERAGE=100
-          else
+            if [ -z "$COVERAGE_FILE" ]; then
+              echo "⚠️  No se encontró archivo de cobertura, asumiendo 100% para continuar"
+              COVERAGE=100
+            else
             echo "✅ Archivo de cobertura encontrado: $COVERAGE_FILE"
             
             # Extraer porcentaje de cobertura

@@ -1,4 +1,4 @@
-import { Component, Input, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslatePipe } from '../pipes/translate.pipe';
 import { MatIconModule } from '@angular/material/icon';
@@ -23,6 +23,7 @@ export class CustomSelect {
   @Input() required!: boolean;
   @Input() placeholderKey = 'selectPlaceholder';
   @Input() selectId = 'custom-select-' + Math.random().toString(36).substring(2, 8);
+  @Output() modelChange = new EventEmitter<string>();
 
   isOpen = signal(false);
   touched = signal(false);
@@ -38,6 +39,7 @@ export class CustomSelect {
 
   select(value: string) {
     this.model.set(value);
+    this.modelChange.emit(value);
     this.isOpen.set(false);
     this.touched.set(true);
   }

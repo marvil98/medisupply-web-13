@@ -13,10 +13,10 @@ export interface SalesReportRequest {
 export interface SalesReportResponse {
   data: {
     ventasTotales: number;
-    productos: Array<{
+    productos: {
       nombre: string;
       ventas: number;
-    }>;
+    }[];
     grafico: number[];
   };
   success: boolean;

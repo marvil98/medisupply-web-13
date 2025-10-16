@@ -1,0 +1,38 @@
+<app-page-header [pageTitle]="pageTitle" [backRoute]="'/dashboard'"></app-page-header>
+
+<section class="content">
+  <h2 class="title">{{ 'generateRoutesTitle' | translate }}</h2>
+
+  <app-status-message
+    *ngIf="message"
+    [type]="message.type"
+    [messageKey]="message.key"
+    [float]="true">
+  </app-status-message>
+
+  <div class="form-row">
+    <app-custom-select
+      [labelKey]="'vehiclesLabel'"
+      [placeholderKey]="'vehiclesPlaceholder'"
+      [options]="vehicleOptions"
+      [model]="selectedVehicles"
+      name="vehicles"
+      [required]="true">
+    </app-custom-select>
+
+    <button mat-flat-button color="primary" (click)="generate()" [disabled]="isGenerateDisabled">
+      {{ 'generateButton' | translate }}
+    </button>
+  </div>
+
+  <section *ngIf="routes() as r" class="map-section">
+    <app-route-map [center]="center" [clients]="clients" [routes]="r"></app-route-map>
+
+    <ul class="legend">
+      <li *ngFor="let rt of r">
+        <span class="dot" [style.background]="rt.vehicle.color"></span>
+        {{ 'vehicleLabel' | translate }} {{ rt.vehicle.id }} ({{ rt.stops.length }} {{ 'stopsLabel' | translate }})
+      </li>
+    </ul>
+  </section>
+</section>

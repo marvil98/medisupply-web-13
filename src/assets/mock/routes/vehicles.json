@@ -1,0 +1,7 @@
+[
+  { "id": "V-01", "capacity": 8, "color": "#3f51b5", "label": "Vehículo 1" },
+  { "id": "V-02", "capacity": 8, "color": "#e91e63", "label": "Vehículo 2" },
+  { "id": "V-03", "capacity": 8, "color": "#009688", "label": "Vehículo 3" }
+]
+
+

@@ -1,0 +1,49 @@
+{
+  "pageReportsTitle": "Reportes",
+  "generateSalesReport": "Generar reporte de ventas",
+  "generateSalesReportSubtitle": "Crea reportes de ventas por vendedor",
+  "generateSalesReportAria": "Botón para generar reporte de ventas",
+  "viewGoalReports": "Ver reportes de metas",
+  "viewGoalReportsSubtitle": "Consulta los reportes de objetivos de ventas",
+  "viewGoalReportsAria": "Botón para ver reportes de metas",
+  
+  "salesReportVendorLabel": "Vendedor",
+  "salesReportPeriodLabel": "Período",
+  "salesReportButton": "Generar un reporte",
+  "salesReportNoData": "¡Ups! No se encontraron datos para este período",
+  "salesReportError": "¡Ups! Hubo un error al generar el reporte. Intenta nuevamente",
+  "salesReportSuccess": "Reporte generado correctamente",
+  
+  "salesReportTotalSales": "Ventas totales",
+  "salesReportOrders": "Pedidos atendidos",
+  "salesReportProduct": "Producto",
+  "salesReportAmount": "Ventas ($)",
+  "salesReportTrend": "Desglose de ventas en el tiempo",
+  
+  "salesReportPeriodOptions": {
+    "bimestral": "Bimestral",
+    "trimestral": "Trimestral",
+    "semestral": "Semestral",
+    "anual": "Anual"
+  },
+  
+  "salesReportVendorOptions": {
+    "v1": "Vendedor 1",
+    "v2": "Vendedor 2",
+    "v3": "Vendedor 3",
+    "v4": "Vendedor 4",
+    "v5": "Vendedor 5"
+  },
+  
+  "salesReportChartLabels": {
+    "xAxisLabel": "Período",
+    "yAxisLabel": "Ventas",
+    "legendLabel": "Tendencia de Ventas"
+  },
+  
+  "salesReportValidation": {
+    "requiredField": "Campo obligatorio",
+    "selectVendor": "Por favor selecciona un vendedor",
+    "selectPeriod": "Por favor selecciona un período"
+  }
+}

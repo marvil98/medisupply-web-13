@@ -51,5 +51,48 @@
   "cardUsersAria": "Users card",
   "cardReportsTitle": "Reports",
   "cardReportsSubtitle": "List and Generate Metrics",
-  "cardReportsAria": "Reports card"
+  "cardReportsAria": "Reports card",
+
+  "pageReportsTitle": "Reports",
+  "generateSalesReport": "Generate sales report",
+  "generateSalesReportSubtitle": "Create sales reports by seller",
+  "generateSalesReportAria": "Button to generate sales report",
+  "viewGoalReports": "View goal reports",
+  "viewGoalReportsSubtitle": "See goal and sales performance reports",
+  "viewGoalReportsAria": "Button to view goal reports",
+
+  "salesReportVendorLabel": "Vendor",
+  "salesReportPeriodLabel": "Period",
+  "salesReportButton": "Generate report",
+  "salesReportNoData": "Oops! No data found for this period",
+  "salesReportNoDataForParams": "No data found for the selected parameters",
+  "salesReportError": "Oops! There was an error generating the report. Please try again.",
+  "salesReportSuccess": "Report generated successfully",
+
+  "salesReportTotalSales": "Total sales",
+  "salesReportOrders": "Orders handled",
+  "salesReportProduct": "Product",
+  "salesReportAmount": "Sales ($)",
+  "salesReportTrend": "Sales trend over time",
+
+  "salesReportPeriodBimestral": "Bimonthly",
+  "salesReportPeriodTrimestral": "Quarterly",
+  "salesReportPeriodSemestral": "Semiannual",
+  "salesReportPeriodAnual": "Annual",
+
+  "salesReportVendor1": "Vendor 1",
+  "salesReportVendor2": "Vendor 2",
+  "salesReportVendor3": "Vendor 3",
+  "salesReportVendor4": "Vendor 4",
+  "salesReportVendor5": "Vendor 5",
+
+  "salesReportChartXAxisLabel": "Period",
+  "salesReportChartYAxisLabel": "Sales",
+  "salesReportChartLegendLabel": "Sales Trend",
+
+  "salesReportValidationRequiredField": "Required field",
+  "salesReportValidationSelectVendor": "Please select a vendor",
+  "salesReportValidationSelectPeriod": "Please select a period",
+  "selectPlaceholder": "Select...",
+  "fieldRequired": "Required field"
 }

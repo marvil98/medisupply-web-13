@@ -3,6 +3,9 @@ import { Component } from '@angular/core';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { RegionalSettings } from './pages/regional-settings/regional-settings';
 import { Components } from './pages/components/components';
+import { Reports } from './pages/reports/reports';
+import { SalesReport } from './pages/reports/sales-report';
+import { RoutesGenerate } from './pages/routes/routes-generate/routes-generate';
 
 @Component({
   standalone: true,
@@ -15,15 +18,15 @@ export const routes: Routes = [
   { path: 'dashboard', component: Dashboard },
   { path: 'productos', component: EmptyComponent },
   { path: 'usuarios', component: EmptyComponent },
-  { path: 'reportes', component: EmptyComponent },
+  { path: 'reportes', component: Reports },
+  { path: 'reportes/generar-venta', component: SalesReport },
   { path: 'ventas', component: EmptyComponent },
-  { path: 'rutas', component: EmptyComponent },
+  { path: 'rutas', redirectTo: 'rutas/generar', pathMatch: 'full' },
   { path: 'settings/region', component: RegionalSettings },
   { path: 'productos/cargar', component: EmptyComponent },
-  { path: 'rutas/generar', component: EmptyComponent },
+  { path: 'rutas/generar', component: RoutesGenerate },
   { path: 'ventas/crear-plan', component: EmptyComponent },
   { path: 'usuarios/registro', component: EmptyComponent },
   { path: 'reportes', component: EmptyComponent },
-  // El path de componentes muestra la guía de componentes para la web
   { path: 'componentes', component: Components },
 ];

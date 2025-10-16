@@ -101,18 +101,24 @@ jobs:
           COVERAGE_FILE=""
           if [ -f "coverage/coverage-summary.json" ]; then
             COVERAGE_FILE="coverage/coverage-summary.json"
+          elif [ -f "coverage/medisupply/coverage-summary.json" ]; then
+            COVERAGE_FILE="coverage/medisupply/coverage-summary.json"
           elif [ -f "coverage/lcov.info" ]; then
             COVERAGE_FILE="coverage/lcov.info"
           elif [ -f "coverage/coverage-final.json" ]; then
             COVERAGE_FILE="coverage/coverage-final.json"
+          elif [ -f "dist/coverage/coverage-summary.json" ]; then
+            COVERAGE_FILE="dist/coverage/coverage-summary.json"
           fi
           
           if [ -z "$COVERAGE_FILE" ]; then
             echo "❌ No se encontró archivo de cobertura en ninguna ubicación"
             echo "📁 Contenido del directorio actual:"
             ls -la
-            echo "📁 Contenido del directorio coverage (si existe):"
-            ls -la coverage/ 2>/dev/null || echo "Directorio coverage no existe"
+          echo "📁 Contenido del directorio coverage (si existe):"
+          ls -la coverage/ 2>/dev/null || echo "Directorio coverage no existe"
+          echo "📁 Contenido del directorio coverage/medisupply (si existe):"
+          ls -la coverage/medisupply/ 2>/dev/null || echo "Directorio coverage/medisupply no existe"
             echo "⚠️  Asumiendo cobertura del 100% para continuar"
             COVERAGE=100
           else

@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PageHeader } from '../../shared/page-header/page-header';
 import { CustomSelect } from '../../shared/custom-select/custom-select';
@@ -35,12 +35,12 @@ export class SalesReport {
     return Math.round(value * (rates[country] || 1));
   }
 
-  // Función para obtener el símbolo de moneda según el país
-  getCurrencySymbol(): string {
+  // Computed signal para obtener el símbolo de moneda según el país
+  currencySymbol = computed(() => {
     const country = localStorage.getItem('userCountry') || 'CO';
     const symbols: Record<string, string> = { 'CO': 'COP', 'PE': 'PEN', 'EC': 'USD', 'MX': 'MXN' };
     return symbols[country] || 'USD';
-  }
+  });
 
   vendedores = [
     { value: 'v1', labelKey: 'salesReportVendor1' },

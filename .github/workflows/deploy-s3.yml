@@ -58,7 +58,7 @@ jobs:
           echo "📊 Configuración:"
           echo "   - Tipo: Pruebas básicas para CI/CD"
           echo "   - Cobertura mínima: ${MIN_COVERAGE}%"
-          npx ng test --include="**/coverage-test.spec.ts" --watch=false --browsers=ChromeHeadless --code-coverage
+          npx ng test --watch=false --browsers=ChromeHeadless --code-coverage
 
       - name: Check test coverage
         id: coverage-check
@@ -107,6 +107,24 @@ jobs:
           
           echo "📊 Cobertura actual: ${COVERAGE}%"
           echo "🎯 Cobertura mínima requerida: ${MIN_COVERAGE}%"
+          
+          # Mostrar detalles adicionales de cobertura si están disponibles
+          if [ -f "coverage/coverage-summary.json" ]; then
+            echo "📋 Detalles de cobertura:"
+            node -e "
+              try {
+                const fs = require('fs');
+                const data = JSON.parse(fs.readFileSync('coverage/coverage-summary.json', 'utf8'));
+                const total = data.total;
+                console.log('   - Líneas: ' + total.lines.covered + '/' + total.lines.total + ' (' + Math.round((total.lines.covered / total.lines.total) * 100) + '%)');
+                console.log('   - Funciones: ' + total.functions.covered + '/' + total.functions.total + ' (' + Math.round((total.functions.covered / total.functions.total) * 100) + '%)');
+                console.log('   - Ramas: ' + total.branches.covered + '/' + total.branches.total + ' (' + Math.round((total.branches.covered / total.branches.total) * 100) + '%)');
+                console.log('   - Declaraciones: ' + total.statements.covered + '/' + total.statements.total + ' (' + Math.round((total.statements.covered / total.statements.total) * 100) + '%)');
+              } catch (e) {
+                console.log('   - No se pudieron obtener detalles adicionales');
+              }
+            " 2>/dev/null || echo "   - No se pudieron obtener detalles adicionales"
+          fi
           
           # Guardar cobertura como output
           echo "coverage=${COVERAGE}" >> $GITHUB_OUTPUT
@@ -195,6 +213,7 @@ jobs:
           echo "📦 Build: ${{ github.sha }}"
           echo "🌿 Branch: ${{ github.ref_name }}"
           echo "⏰ Timestamp: $(date)"
+          echo "📊 Cobertura de código: ${{ steps.coverage-check.outputs.coverage }}%"
 
       # - name: Create GitHub Release
       #   uses: softprops/action-gh-release@v1

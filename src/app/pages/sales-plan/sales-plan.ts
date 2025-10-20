@@ -24,16 +24,6 @@ import { Router } from '@angular/router';
 interface Product {
   id: string;
   name: string;
-  maxUnits: number;
-  selectedUnits: number;
-}
-
-interface SalesPlanForm {
-  product: string;
-  region: string;
-  quarter: string;
-  totalGoal: number;
-  products: Product[];
 }
 
 @Component({
@@ -88,10 +78,10 @@ export class SalesPlan {
 
   // Productos de ejemplo (en un caso real vendrían de un servicio)
   products: Product[] = [
-    { id: '1', name: 'Producto A', maxUnits: 1000, selectedUnits: 0 },
-    { id: '2', name: 'Producto B', maxUnits: 500, selectedUnits: 0 },
-    { id: '3', name: 'Producto C', maxUnits: 800, selectedUnits: 0 },
-    { id: '4', name: 'Producto D', maxUnits: 1200, selectedUnits: 0 },
+    { id: '1', name: 'Producto A' },
+    { id: '2', name: 'Producto B' },
+    { id: '3', name: 'Producto C' },
+    { id: '4', name: 'Producto D' },
   ];
 
   // Estados del formulario
@@ -100,13 +90,7 @@ export class SalesPlan {
 
   // Computed para validar si el formulario está completo
   isFormValid = computed(() => {
-    const form = this.salesPlanForm;
-    return form.valid && this.products.some(p => p.selectedUnits > 0);
-  });
-
-  // Computed para calcular la meta total
-  totalGoal = computed(() => {
-    return this.products.reduce((sum, product) => sum + product.selectedUnits, 0);
+    return this.salesPlanForm.valid;
   });
 
   constructor() {
@@ -114,31 +98,11 @@ export class SalesPlan {
       product: ['', Validators.required],
       region: ['', Validators.required],
       quarter: ['', Validators.required],
-      totalGoal: [0, [Validators.required, Validators.min(1)]],
+      totalGoal: ['', Validators.required],
     });
-
-    // Actualizar la meta total cuando cambien los productos
-    this.salesPlanForm.get('totalGoal')?.setValue(this.totalGoal());
   }
 
-  onProductUnitsChange(productId: string, units: number) {
-    const product = this.products.find(p => p.id === productId);
-    if (product) {
-      if (units > product.maxUnits) {
-        this.formErrors.set({
-          ...this.formErrors(),
-          [`product_${productId}`]: 'La cantidad no puede exceder el tope máximo'
-        });
-        return;
-      }
-      
-      product.selectedUnits = units;
-      this.salesPlanForm.get('totalGoal')?.setValue(this.totalGoal());
-      this.clearError(`product_${productId}`);
-    }
-  }
-
-  onTotalGoalChange(totalGoal: number) {
+  onTotalGoalChange(totalGoal: string) {
     this.salesPlanForm.get('totalGoal')?.setValue(totalGoal);
   }
 

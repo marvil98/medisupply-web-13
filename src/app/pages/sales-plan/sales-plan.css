@@ -1,0 +1,157 @@
+.sales-plan-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.form-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 32px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.products-section {
+  margin: 24px 0;
+}
+
+.products-section h3 {
+  color: #1976d2;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+.product-details {
+  padding: 16px 0;
+}
+
+.units-input {
+  width: 200px;
+}
+
+.total-goal-section {
+  margin: 24px 0;
+  padding: 16px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  border-left: 4px solid #1976d2;
+}
+
+.total-goal-section h3 {
+  color: #1976d2;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+.goal-description {
+  color: #666;
+  font-size: 14px;
+  margin-top: 8px;
+  font-style: italic;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.create-button {
+  min-width: 160px;
+}
+
+.cancel-button {
+  min-width: 100px;
+}
+
+.status-messages {
+  margin-top: 24px;
+  padding: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.saving-message {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.success-message {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .sales-plan-container {
+    padding: 16px;
+  }
+  
+  .form-container {
+    padding: 24px 16px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .create-button,
+  .cancel-button {
+    width: 100%;
+  }
+}
+
+/* Material Design enhancements */
+mat-expansion-panel {
+  margin-bottom: 8px;
+}
+
+mat-expansion-panel-header {
+  background-color: #f8f9fa;
+}
+
+mat-expansion-panel.mat-expanded mat-expansion-panel-header {
+  background-color: #e3f2fd;
+}
+
+mat-form-field {
+  margin-bottom: 8px;
+}
+
+mat-divider {
+  margin: 24px 0;
+}
+
+/* Animation for status messages */
+.status-messages {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

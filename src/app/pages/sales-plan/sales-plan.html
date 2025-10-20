@@ -1,0 +1,143 @@
+<app-page-header 
+  [pageTitle]="pageTitle" 
+  [backRoute]="backRoute">
+</app-page-header>
+
+<div class="sales-plan-container">
+  <div class="form-container">
+    <form [formGroup]="salesPlanForm" (ngSubmit)="createSalesPlan()">
+      
+      <!-- Selector de Región -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ 'region_label' | translate }}</mat-label>
+        <mat-select 
+          formControlName="region" 
+          (blur)="validateField('region')"
+          required>
+          <mat-option 
+            *ngFor="let region of regionOptions" 
+            [value]="region.value">
+            {{ region.labelKey | translate }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="getErrorMessage('region')">
+          {{ getErrorMessage('region') }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Selector de Período Trimestral -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ 'quarter_label' | translate }}</mat-label>
+        <mat-select 
+          formControlName="quarter" 
+          (blur)="validateField('quarter')"
+          required>
+          <mat-option 
+            *ngFor="let quarter of quarterOptions" 
+            [value]="quarter.value">
+            {{ quarter.labelKey | translate }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="getErrorMessage('quarter')">
+          {{ getErrorMessage('quarter') }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Selector de Productos con Acordeón -->
+      <div class="products-section">
+        <h3>{{ 'products_section_title' | translate }}</h3>
+        <mat-accordion multi="true">
+          <mat-expansion-panel *ngFor="let product of products; let i = index">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                {{ product.name }}
+              </mat-panel-title>
+              <mat-panel-description>
+                {{ 'max_units' | translate }}: {{ product.maxUnits }}
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            
+            <div class="product-details">
+              <mat-form-field appearance="outline" class="units-input">
+                <mat-label>{{ 'units_goal' | translate }}</mat-label>
+                <input 
+                  matInput 
+                  type="number" 
+                  [value]="product.selectedUnits"
+                  (input)="onProductUnitsChange(product.id, +$event.target.value)"
+                  [max]="product.maxUnits"
+                  min="0">
+                <mat-error *ngIf="getErrorMessage('product_' + product.id)">
+                  {{ getErrorMessage('product_' + product.id) }}
+                </mat-error>
+              </mat-form-field>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Meta Total -->
+      <div class="total-goal-section">
+        <h3>{{ 'total_goal_section_title' | translate }}</h3>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>{{ 'total_goal_label' | translate }}</mat-label>
+          <input 
+            matInput 
+            type="number" 
+            formControlName="totalGoal"
+            (input)="onTotalGoalChange(+$event.target.value)"
+            (blur)="validateField('totalGoal')"
+            min="1"
+            readonly>
+          <mat-error *ngIf="getErrorMessage('totalGoal')">
+            {{ getErrorMessage('totalGoal') }}
+          </mat-error>
+        </mat-form-field>
+        <p class="goal-description">
+          {{ 'total_goal_description' | translate }}
+        </p>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="action-buttons">
+        <button 
+          mat-raised-button 
+          color="primary" 
+          type="submit"
+          [disabled]="!isFormValid() || saveStatus() === 'saving'"
+          class="create-button">
+          <mat-icon>add</mat-icon>
+          {{ 'create_plan_button' | translate }}
+        </button>
+        
+        <button 
+          mat-button 
+          type="button"
+          (click)="router.navigate(['/dashboard'])"
+          class="cancel-button">
+          {{ 'cancel_button' | translate }}
+        </button>
+      </div>
+
+      <!-- Mensajes de Estado -->
+      <div class="status-messages" *ngIf="saveStatus() !== 'idle'">
+        <div *ngIf="saveStatus() === 'saving'" class="saving-message">
+          <mat-icon>hourglass_empty</mat-icon>
+          {{ 'saving_plan' | translate }}
+        </div>
+        
+        <div *ngIf="saveStatus() === 'success'" class="success-message">
+          <mat-icon>check_circle</mat-icon>
+          {{ 'plan_created_success' | translate }}
+        </div>
+        
+        <div *ngIf="saveStatus() === 'error'" class="error-message">
+          <mat-icon>error</mat-icon>
+          {{ 'plan_creation_error' | translate }}
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

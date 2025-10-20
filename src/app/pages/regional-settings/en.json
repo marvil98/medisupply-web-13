@@ -94,5 +94,31 @@
   "salesReportValidationSelectVendor": "Please select a vendor",
   "salesReportValidationSelectPeriod": "Please select a period",
   "selectPlaceholder": "Select...",
-  "fieldRequired": "Required field"
+  "fieldRequired": "Required field",
+
+  "pageSalesPlanTitle": "Create Sales Plan",
+  "region_label": "Region",
+  "quarter_label": "Quarterly Period",
+  "products_section_title": "Products and Goals",
+  "max_units": "Maximum",
+  "units_goal": "Goal in units",
+  "total_goal_section_title": "Total Goal",
+  "total_goal_label": "Total goal in units",
+  "total_goal_description": "The total goal is automatically calculated as the sum of goals per product",
+  "create_plan_button": "Create Plan",
+  "cancel_button": "Cancel",
+  "saving_plan": "Saving plan...",
+  "plan_created_success": "Sales plan created successfully!",
+  "plan_creation_error": "Oops! There was a problem creating the plan. Please try again in a few minutes",
+  
+  "region_norte": "North",
+  "region_centro": "Center", 
+  "region_sur": "South",
+  "region_caribe": "Caribbean",
+  "region_pacifico": "Pacific",
+  
+  "quarter_q1": "Q1 - First Quarter",
+  "quarter_q2": "Q2 - Second Quarter", 
+  "quarter_q3": "Q3 - Third Quarter",
+  "quarter_q4": "Q4 - Fourth Quarter"
 }

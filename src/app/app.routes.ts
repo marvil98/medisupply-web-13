@@ -6,6 +6,7 @@ import { Components } from './pages/components/components';
 import { Reports } from './pages/reports/reports';
 import { SalesReport } from './pages/reports/sales-report';
 import { RoutesGenerate } from './pages/routes/routes-generate/routes-generate';
+import { SalesPlan } from './pages/sales-plan/sales-plan';
 
 @Component({
   standalone: true,
@@ -25,7 +26,7 @@ export const routes: Routes = [
   { path: 'settings/region', component: RegionalSettings },
   { path: 'productos/cargar', component: EmptyComponent },
   { path: 'rutas/generar', component: RoutesGenerate },
-  { path: 'ventas/crear-plan', component: EmptyComponent },
+  { path: 'ventas/crear-plan', component: SalesPlan },
   { path: 'usuarios/registro', component: EmptyComponent },
   { path: 'reportes', component: EmptyComponent },
   { path: 'componentes', component: Components },

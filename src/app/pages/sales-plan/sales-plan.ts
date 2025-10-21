@@ -224,11 +224,11 @@ export class SalesPlan {
 
   getSelectedProductsText(): string {
     if (this.selectedProducts.length === 0) {
-      return 'Seleccionar productos';
+      return 'select_products';
     } else if (this.selectedProducts.length === 1) {
       return this.selectedProducts[0].name;
     } else {
-      return `${this.selectedProducts.length} productos seleccionados`;
+      return `${this.selectedProducts.length} products_selected`;
     }
   }
 

@@ -97,6 +97,8 @@
   "fieldRequired": "Required field",
 
   "pageSalesPlanTitle": "Create Sales Plan",
+  "select_products": "Select products",
+  "products_selected": "products selected",
   "product_label": "Product",
   "region_label": "Region",
   "period_label": "Period",

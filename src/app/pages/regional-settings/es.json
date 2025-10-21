@@ -97,6 +97,8 @@
   "fieldRequired": "Campo obligatorio",
 
   "pageSalesPlanTitle": "Crear Plan de Venta",
+  "select_products": "Seleccionar productos",
+  "products_selected": "productos seleccionados",
   "product_label": "Producto",
   "region_label": "Región",
   "period_label": "Período",

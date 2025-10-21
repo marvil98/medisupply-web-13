@@ -12,7 +12,7 @@
         <label class="product-label">{{ 'product_label' | translate }}</label>
         <div class="product-selector-container" (click)="toggleProductSelector()">
           <span class="selector-text">
-            {{ getSelectedProductsText() }}
+            {{ getSelectedProductsText() | translate }}
           </span>
           <mat-icon class="selector-icon">{{ isProductSelectorOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
         </div>

@@ -25,6 +25,7 @@ interface Product {
   id: string;
   name: string;
   price: number;
+  image?: string;
   goal?: number;
 }
 
@@ -80,17 +81,20 @@ export class SalesPlan {
 
   // Productos de ejemplo (en un caso real vendrían de un servicio)
   products: Product[] = [
-    { id: '1', name: 'Producto A', price: 1.00 },
-    { id: '2', name: 'Producto B', price: 1.00 },
-    { id: '3', name: 'Producto C', price: 1.00 },
-    { id: '4', name: 'Producto D', price: 1.00 },
-    { id: '5', name: 'Producto E', price: 1.00 },
-    { id: '6', name: 'Producto F', price: 1.00 },
+    { id: '1', name: 'Producto A', price: 1.00, image: 'producto-a.jpg' },
+    { id: '2', name: 'Producto B', price: 1.00, image: 'producto-b.jpg' },
+    { id: '3', name: 'Producto C', price: 1.00, image: 'producto-c.jpg' },
+    { id: '4', name: 'Producto D', price: 1.00, image: 'producto-d.jpg' },
+    { id: '5', name: 'Producto E', price: 1.00, image: 'producto-e.jpg' },
+    { id: '6', name: 'Producto F', price: 1.00, image: 'producto-f.jpg' },
   ];
+
+  // Imagen por defecto
+  defaultImage = 'assets/images/products/por-defecto.png';
 
   // Estados del selector de productos
   isProductSelectorOpen = false;
-  selectedProductName = '';
+  selectedProducts: Product[] = [];
 
   // Estados del formulario
   saveStatus = signal<'idle' | 'saving' | 'success' | 'error'>('idle');
@@ -98,7 +102,7 @@ export class SalesPlan {
 
   // Computed para validar si el formulario está completo
   isFormValid = computed(() => {
-    return this.salesPlanForm.valid;
+    return this.salesPlanForm.valid && this.selectedProducts.length > 0;
   });
 
   constructor() {
@@ -119,9 +123,28 @@ export class SalesPlan {
   }
 
   selectProduct(product: Product) {
-    this.selectedProductName = product.name;
-    this.salesPlanForm.get('product')?.setValue(product.id);
-    this.isProductSelectorOpen = false;
+    const index = this.selectedProducts.findIndex(p => p.id === product.id);
+    if (index > -1) {
+      // Si ya está seleccionado, lo removemos
+      this.selectedProducts.splice(index, 1);
+    } else {
+      // Si no está seleccionado, lo agregamos
+      this.selectedProducts.push(product);
+    }
+  }
+
+  isProductSelected(product: Product): boolean {
+    return this.selectedProducts.some(p => p.id === product.id);
+  }
+
+  getSelectedProductsText(): string {
+    if (this.selectedProducts.length === 0) {
+      return 'Seleccionar productos';
+    } else if (this.selectedProducts.length === 1) {
+      return this.selectedProducts[0].name;
+    } else {
+      return `${this.selectedProducts.length} productos seleccionados`;
+    }
   }
 
   setProductGoal(product: Product, event: Event) {
@@ -131,6 +154,18 @@ export class SalesPlan {
     if (goal && !isNaN(Number(goal))) {
       product.goal = Number(goal);
     }
+  }
+
+  getProductImage(product: Product): string {
+    if (product.image) {
+      return `assets/images/products/${product.image}`;
+    }
+    return this.defaultImage;
+  }
+
+  onImageError(event: any, product: Product) {
+    // Si la imagen falla al cargar, usar la imagen por defecto
+    event.target.src = this.defaultImage;
   }
 
   clearError(field: string) {
@@ -154,6 +189,20 @@ export class SalesPlan {
   createSalesPlan() {
     if (this.isFormValid()) {
       this.saveStatus.set('saving');
+      
+      // Preparar datos del plan de venta
+      const salesPlanData = {
+        region: this.salesPlanForm.get('region')?.value,
+        quarter: this.salesPlanForm.get('quarter')?.value,
+        totalGoal: this.salesPlanForm.get('totalGoal')?.value,
+        products: this.selectedProducts.map(product => ({
+          id: product.id,
+          name: product.name,
+          goal: product.goal || 0
+        }))
+      };
+      
+      console.log('Plan de venta creado:', salesPlanData);
       
       // Simular llamada al servicio
       setTimeout(() => {

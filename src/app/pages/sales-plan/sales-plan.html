@@ -12,20 +12,42 @@
         <label class="product-label">{{ 'product_label' | translate }}</label>
         <div class="product-selector-container" (click)="toggleProductSelector()">
           <span class="selector-text">
-            {{ selectedProductName || 'Seleccionar producto' }}
+            {{ getSelectedProductsText() }}
           </span>
           <mat-icon class="selector-icon">{{ isProductSelectorOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
         </div>
         
         <!-- Grid de Productos -->
         <div class="products-grid" *ngIf="isProductSelectorOpen">
-          <div class="product-card" *ngFor="let product of products" (click)="selectProduct(product)">
-            <div class="product-image">
-              <mat-icon>inventory</mat-icon>
+          <div class="product-card" 
+               *ngFor="let product of products" 
+               (click)="selectProduct(product)"
+               [class.selected]="isProductSelected(product)">
+            
+            <!-- Indicador de selección -->
+            <div class="selection-indicator" *ngIf="isProductSelected(product)">
+              <mat-icon>check_circle</mat-icon>
             </div>
-            <div class="product-name">{{ product.name }}</div>
-            <div class="product-price">${{ product.price }}</div>
-            <button class="meta-button" (click)="setProductGoal(product, $event)">
+            
+            <!-- Columna 1: Imagen -->
+            <div class="product-image">
+              <img 
+                [src]="getProductImage(product)" 
+                [alt]="product.name"
+                (error)="onImageError($event, product)"
+                class="product-img">
+            </div>
+            
+            <!-- Columna 2: Detalles del producto -->
+            <div class="product-details">
+              <div class="product-name">{{ product.name }}</div>
+              <div class="product-price">${{ product.price }}</div>
+            </div>
+            
+            <!-- Columna 3: Botón Meta -->
+            <button class="meta-button" 
+                    (click)="setProductGoal(product, $event)"
+                    [disabled]="!isProductSelected(product)">
               {{ 'goal_button' | translate }}
             </button>
           </div>

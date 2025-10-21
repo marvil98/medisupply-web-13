@@ -94,5 +94,27 @@
   "salesReportValidationSelectVendor": "Please select a vendor",
   "salesReportValidationSelectPeriod": "Please select a period",
   "selectPlaceholder": "Select...",
-  "fieldRequired": "Required field"
+  "fieldRequired": "Required field",
+
+  "pageProductUploadTitle": "Bulk product upload",
+  "uploadTemplateTitle": "Download template",
+  "uploadTemplateDescription": "Download the standard template for bulk product upload. Make sure to follow the correct format.",
+  "downloadTemplateButton": "Download template",
+  "downloadTemplateAria": "Download CSV template for bulk upload",
+  "uploadFilesTitle": "Upload files",
+  "uploadDropZoneTitle": "Drag and drop your files here",
+  "uploadDropZoneDescription": "Or click to select CSV or XLSX files",
+  "selectFilesButton": "Select files",
+  "selectFilesAria": "Select files to upload",
+  "uploadedFilesTitle": "Uploaded files",
+  "removeFileAria": "Remove file",
+  "uploadProductsButton": "Upload products",
+  "uploadProductsAria": "Upload products to system",
+  "uploadingMessage": "Processing files...",
+  "uploadSuccessMessage": "File uploaded successfully!",
+  "uploadInvalidFormat": "Oops! The file format is not valid",
+  "uploadFileTooLarge": "Oops! The file is too large",
+  "uploadNoValidFiles": "Oops! No valid files to upload",
+  "uploadMissingFields": "Oops! Missing fields in the file, check and upload again",
+  "uploadSystemError": "Oops! There was a problem, try again in a few minutes"
 }

@@ -94,5 +94,27 @@
   "salesReportValidationSelectVendor": "Por favor selecciona un vendedor",
   "salesReportValidationSelectPeriod": "Por favor selecciona un período",
   "selectPlaceholder": "Seleccionar...",
-  "fieldRequired": "Campo obligatorio"
+  "fieldRequired": "Campo obligatorio",
+
+  "pageProductUploadTitle": "Carga masiva de productos",
+  "uploadTemplateTitle": "Descargar plantilla",
+  "uploadTemplateDescription": "Descarga la plantilla estándar para cargar productos masivamente. Asegúrate de seguir el formato correcto.",
+  "downloadTemplateButton": "Descargar plantilla",
+  "downloadTemplateAria": "Descargar plantilla CSV para carga masiva",
+  "uploadFilesTitle": "Cargar archivos",
+  "uploadDropZoneTitle": "Arrastra y suelta tus archivos aquí",
+  "uploadDropZoneDescription": "O haz clic para seleccionar archivos CSV o XLSX",
+  "selectFilesButton": "Seleccionar archivos",
+  "selectFilesAria": "Seleccionar archivos para cargar",
+  "uploadedFilesTitle": "Archivos cargados",
+  "removeFileAria": "Eliminar archivo",
+  "uploadProductsButton": "Subir productos",
+  "uploadProductsAria": "Subir productos al sistema",
+  "uploadingMessage": "Procesando archivos...",
+  "uploadSuccessMessage": "¡El archivo se ha cargado exitosamente!",
+  "uploadInvalidFormat": "¡Ups! El formato del archivo no es válido",
+  "uploadFileTooLarge": "¡Ups! El archivo es demasiado grande",
+  "uploadNoValidFiles": "¡Ups! No hay archivos válidos para subir",
+  "uploadMissingFields": "¡Ups! Faltan campos en el archivo, revisa y sube nuevamente",
+  "uploadSystemError": "¡Ups! Hubo un problema, intenta nuevamente en unos minutos"
 }

@@ -6,6 +6,7 @@ import { Components } from './pages/components/components';
 import { Reports } from './pages/reports/reports';
 import { SalesReport } from './pages/reports/sales-report';
 import { RoutesGenerate } from './pages/routes/routes-generate/routes-generate';
+import { ProductUpload } from './pages/products/product-upload/product-upload';
 
 @Component({
   standalone: true,
@@ -23,7 +24,7 @@ export const routes: Routes = [
   { path: 'ventas', component: EmptyComponent },
   { path: 'rutas', redirectTo: 'rutas/generar', pathMatch: 'full' },
   { path: 'settings/region', component: RegionalSettings },
-  { path: 'productos/cargar', component: EmptyComponent },
+  { path: 'productos/cargar', component: ProductUpload },
   { path: 'rutas/generar', component: RoutesGenerate },
   { path: 'ventas/crear-plan', component: EmptyComponent },
   { path: 'usuarios/registro', component: EmptyComponent },

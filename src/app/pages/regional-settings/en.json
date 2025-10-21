@@ -107,6 +107,12 @@
   "plan_created_success": "Sales plan created successfully!",
   "plan_creation_error": "Oops! There was a problem creating the plan. Please try again in a few minutes",
   
+  "set_goal_title": "Set Goal",
+  "set_goal_for": "Set goal for",
+  "goal_value_label": "Goal value",
+  "goal_validation_error": "Goal must be a number greater than 0",
+  "save_goal_button": "Save Goal",
+  
   "region_norte": "North",
   "region_centro": "Center", 
   "region_sur": "South",

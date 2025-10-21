@@ -95,6 +95,11 @@ export class SalesPlan {
   // Estados del selector de productos
   isProductSelectorOpen = false;
   selectedProducts: Product[] = [];
+  
+  // Estados del modal de meta
+  showGoalModal = false;
+  currentProduct: Product | null = null;
+  goalValue = '';
 
   // Estados del formulario
   saveStatus = signal<'idle' | 'saving' | 'success' | 'error'>('idle');
@@ -149,11 +154,22 @@ export class SalesPlan {
 
   setProductGoal(product: Product, event: Event) {
     event.stopPropagation();
-    // Aquí se podría abrir un modal o input para establecer la meta del producto
-    const goal = prompt(`Establecer meta para ${product.name}:`);
-    if (goal && !isNaN(Number(goal))) {
-      product.goal = Number(goal);
+    this.currentProduct = product;
+    this.goalValue = product.goal ? product.goal.toString() : '';
+    this.showGoalModal = true;
+  }
+
+  saveGoal() {
+    if (this.currentProduct && this.goalValue && !isNaN(Number(this.goalValue)) && Number(this.goalValue) > 0) {
+      this.currentProduct.goal = Number(this.goalValue);
+      this.closeGoalModal();
     }
+  }
+
+  closeGoalModal() {
+    this.showGoalModal = false;
+    this.currentProduct = null;
+    this.goalValue = '';
   }
 
   getProductImage(product: Product): string {

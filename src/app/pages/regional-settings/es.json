@@ -107,6 +107,12 @@
   "plan_created_success": "¡Plan de venta creado exitosamente!",
   "plan_creation_error": "¡Ups! Hubo un problema al crear el plan. Intenta nuevamente en unos minutos",
   
+  "set_goal_title": "Establecer Meta",
+  "set_goal_for": "Establecer meta para",
+  "goal_value_label": "Valor de la meta",
+  "goal_validation_error": "La meta debe ser un número mayor a 0",
+  "save_goal_button": "Guardar Meta",
+  
   "region_norte": "Norte",
   "region_centro": "Centro", 
   "region_sur": "Sur",

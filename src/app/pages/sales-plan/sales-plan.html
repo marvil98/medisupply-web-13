@@ -137,3 +137,49 @@
     </form>
   </div>
 </div>
+
+<!-- Modal para establecer meta -->
+<div class="modal-overlay" *ngIf="showGoalModal" (click)="closeGoalModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ 'set_goal_title' | translate }}</h3>
+      <button class="close-button" (click)="closeGoalModal()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <p class="product-info">
+        {{ 'set_goal_for' | translate }} <strong>{{ currentProduct?.name }}</strong>
+      </p>
+      
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ 'goal_value_label' | translate }}</mat-label>
+        <input 
+          matInput 
+          type="number" 
+          [(ngModel)]="goalValue"
+          placeholder="0"
+          min="1"
+          required>
+        <mat-error *ngIf="!goalValue || +goalValue <= 0">
+          {{ 'goal_validation_error' | translate }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+    
+    <div class="modal-footer">
+      <button mat-button (click)="closeGoalModal()" class="cancel-button">
+        {{ 'cancel_button' | translate }}
+      </button>
+      <button 
+        mat-raised-button 
+        color="primary" 
+        (click)="saveGoal()"
+        [disabled]="!goalValue || +goalValue <= 0"
+        class="save-button">
+        {{ 'save_goal_button' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

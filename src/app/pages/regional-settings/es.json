@@ -116,5 +116,27 @@
   "uploadFileTooLarge": "¡Ups! El archivo es demasiado grande",
   "uploadNoValidFiles": "¡Ups! No hay archivos válidos para subir",
   "uploadMissingFields": "¡Ups! Faltan campos en el archivo, revisa y sube nuevamente",
-  "uploadSystemError": "¡Ups! Hubo un problema, intenta nuevamente en unos minutos"
+  "uploadSystemError": "¡Ups! Hubo un problema, intenta nuevamente en unos minutos",
+
+  "pageProductListTitle": "Listado de productos",
+  "productListTitle": "Productos",
+  "productListSubtitle": "Gestiona tu inventario de productos",
+  "productNameColumn": "Nombre",
+  "productDescriptionColumn": "Descripción",
+  "productPriceColumn": "Precio",
+  "productCategoryColumn": "Categoría",
+  "productMinStockColumn": "Stock Mínimo",
+  "productUnitColumn": "Unidad",
+  "productStatusColumn": "Estado",
+  "productActionsColumn": "Acciones",
+  "statusActive": "Activo",
+  "statusInactive": "Inactivo",
+  "editProductAction": "Editar",
+  "activateProductAction": "Activar",
+  "deactivateProductAction": "Desactivar",
+  "deleteProductAction": "Eliminar",
+  "productActionsAria": "Acciones del producto",
+  "noProductsTitle": "No hay productos",
+  "noProductsMessage": "Aún no has cargado ningún producto. Comienza subiendo una plantilla con tus productos.",
+  "uploadFirstProductsButton": "Cargar productos"
 }

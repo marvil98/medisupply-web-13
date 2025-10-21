@@ -116,5 +116,27 @@
   "uploadFileTooLarge": "Oops! The file is too large",
   "uploadNoValidFiles": "Oops! No valid files to upload",
   "uploadMissingFields": "Oops! Missing fields in the file, check and upload again",
-  "uploadSystemError": "Oops! There was a problem, try again in a few minutes"
+  "uploadSystemError": "Oops! There was a problem, try again in a few minutes",
+
+  "pageProductListTitle": "Product list",
+  "productListTitle": "Products",
+  "productListSubtitle": "Manage your product inventory",
+  "productNameColumn": "Name",
+  "productDescriptionColumn": "Description",
+  "productPriceColumn": "Price",
+  "productCategoryColumn": "Category",
+  "productMinStockColumn": "Min Stock",
+  "productUnitColumn": "Unit",
+  "productStatusColumn": "Status",
+  "productActionsColumn": "Actions",
+  "statusActive": "Active",
+  "statusInactive": "Inactive",
+  "editProductAction": "Edit",
+  "activateProductAction": "Activate",
+  "deactivateProductAction": "Deactivate",
+  "deleteProductAction": "Delete",
+  "productActionsAria": "Product actions",
+  "noProductsTitle": "No products",
+  "noProductsMessage": "You haven't uploaded any products yet. Start by uploading a template with your products.",
+  "uploadFirstProductsButton": "Upload products"
 }

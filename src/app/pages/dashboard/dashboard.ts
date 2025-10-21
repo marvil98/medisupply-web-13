@@ -20,7 +20,7 @@ export class Dashboard {
       subtitleKey: 'cardProductsSubtitle',
       icon: 'upload',
       ariaLabelKey: 'cardProductsAria',
-      path: '/productos/cargar',
+      path: '/productos',
     },
     {
       titleKey: 'cardRoutesTitle',

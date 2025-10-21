@@ -101,6 +101,20 @@ export class SalesPlan {
   // Imagen por defecto
   defaultImage = 'assets/images/products/por-defecto.png';
 
+  // Función para convertir valores según el país
+  private convertValue(value: number): number {
+    const country = localStorage.getItem('userCountry') || 'CO';
+    const rates: Record<string, number> = { 'CO': 4100, 'PE': 3.7, 'EC': 1, 'MX': 17.5 };
+    return Math.round(value * (rates[country] || 1));
+  }
+
+  // Computed signal para obtener el símbolo de moneda según el país
+  currencySymbol = computed(() => {
+    const country = localStorage.getItem('userCountry') || 'CO';
+    const symbols: Record<string, string> = { 'CO': '$', 'PE': 'S/', 'EC': '$', 'MX': '$' };
+    return symbols[country] || '$';
+  });
+
   // Estados del selector de productos
   isProductSelectorOpen = false;
   selectedProducts: Product[] = [];
@@ -306,6 +320,11 @@ export class SalesPlan {
   onImageError(event: any, product: Product) {
     // Si la imagen falla al cargar, usar la imagen por defecto
     event.target.src = this.defaultImage;
+  }
+
+  // Método para obtener el precio convertido de un producto
+  getConvertedPrice(product: Product): number {
+    return this.convertValue(product.price);
   }
 
   clearError(field: string) {

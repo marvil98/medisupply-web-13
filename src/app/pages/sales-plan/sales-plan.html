@@ -128,7 +128,7 @@
             <!-- Columna 2: Detalles del producto -->
             <div class="product-details">
               <div class="product-name">{{ product.name }}</div>
-              <div class="product-price">${{ product.price }}</div>
+              <div class="product-price">{{ getConvertedPrice(product) | currency:currencySymbol():'symbol':'1.0-0' }}</div>
             </div>
             
             <!-- Columna 3: Botón Meta -->

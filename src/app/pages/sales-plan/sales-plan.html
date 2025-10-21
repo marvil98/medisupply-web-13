@@ -8,22 +8,29 @@
     <form [formGroup]="salesPlanForm" (ngSubmit)="createSalesPlan()">
       
       <!-- Selector de Producto -->
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{ 'product_label' | translate }}</mat-label>
-        <mat-select 
-          formControlName="product" 
-          (blur)="validateField('product')"
-          required>
-          <mat-option 
-            *ngFor="let product of products" 
-            [value]="product.id">
-            {{ product.name }}
-          </mat-option>
-        </mat-select>
-        <mat-error *ngIf="getErrorMessage('product')">
-          {{ getErrorMessage('product') }}
-        </mat-error>
-      </mat-form-field>
+      <div class="product-selector-section">
+        <label class="product-label">{{ 'product_label' | translate }}</label>
+        <div class="product-selector-container" (click)="toggleProductSelector()">
+          <span class="selector-text">
+            {{ selectedProductName || 'Seleccionar producto' }}
+          </span>
+          <mat-icon class="selector-icon">{{ isProductSelectorOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
+        </div>
+        
+        <!-- Grid de Productos -->
+        <div class="products-grid" *ngIf="isProductSelectorOpen">
+          <div class="product-card" *ngFor="let product of products" (click)="selectProduct(product)">
+            <div class="product-image">
+              <mat-icon>inventory</mat-icon>
+            </div>
+            <div class="product-name">{{ product.name }}</div>
+            <div class="product-price">${{ product.price }}</div>
+            <button class="meta-button" (click)="setProductGoal(product, $event)">
+              {{ 'goal_button' | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
 
       <!-- Selector de Región -->
       <mat-form-field appearance="outline" class="full-width">

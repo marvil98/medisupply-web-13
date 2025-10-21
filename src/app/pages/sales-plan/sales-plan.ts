@@ -24,6 +24,8 @@ import { Router } from '@angular/router';
 interface Product {
   id: string;
   name: string;
+  price: number;
+  goal?: number;
 }
 
 @Component({
@@ -78,11 +80,17 @@ export class SalesPlan {
 
   // Productos de ejemplo (en un caso real vendrían de un servicio)
   products: Product[] = [
-    { id: '1', name: 'Producto A' },
-    { id: '2', name: 'Producto B' },
-    { id: '3', name: 'Producto C' },
-    { id: '4', name: 'Producto D' },
+    { id: '1', name: 'Producto A', price: 1.00 },
+    { id: '2', name: 'Producto B', price: 1.00 },
+    { id: '3', name: 'Producto C', price: 1.00 },
+    { id: '4', name: 'Producto D', price: 1.00 },
+    { id: '5', name: 'Producto E', price: 1.00 },
+    { id: '6', name: 'Producto F', price: 1.00 },
   ];
+
+  // Estados del selector de productos
+  isProductSelectorOpen = false;
+  selectedProductName = '';
 
   // Estados del formulario
   saveStatus = signal<'idle' | 'saving' | 'success' | 'error'>('idle');
@@ -104,6 +112,25 @@ export class SalesPlan {
 
   onTotalGoalChange(totalGoal: string) {
     this.salesPlanForm.get('totalGoal')?.setValue(totalGoal);
+  }
+
+  toggleProductSelector() {
+    this.isProductSelectorOpen = !this.isProductSelectorOpen;
+  }
+
+  selectProduct(product: Product) {
+    this.selectedProductName = product.name;
+    this.salesPlanForm.get('product')?.setValue(product.id);
+    this.isProductSelectorOpen = false;
+  }
+
+  setProductGoal(product: Product, event: Event) {
+    event.stopPropagation();
+    // Aquí se podría abrir un modal o input para establecer la meta del producto
+    const goal = prompt(`Establecer meta para ${product.name}:`);
+    if (goal && !isNaN(Number(goal))) {
+      product.goal = Number(goal);
+    }
   }
 
   clearError(field: string) {

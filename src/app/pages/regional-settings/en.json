@@ -113,6 +113,11 @@
   "goal_validation_error": "Goal must be a number greater than 0",
   "save_goal_button": "Save Goal",
   
+  "search_products_label": "Search products",
+  "search_products_placeholder": "Type product name...",
+  "no_products_found": "No products found",
+  "clear_filter_button": "Clear filter",
+  
   "region_norte": "North",
   "region_centro": "Center", 
   "region_sur": "South",

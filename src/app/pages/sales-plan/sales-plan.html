@@ -17,10 +17,43 @@
           <mat-icon class="selector-icon">{{ isProductSelectorOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
         </div>
         
+        <!-- Filtro de búsqueda -->
+        <div class="product-search-container" *ngIf="isProductSelectorOpen">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>{{ 'search_products_label' | translate }}</mat-label>
+                    <input 
+                      matInput 
+                      [ngModel]="productSearchFilter()"
+                      (ngModelChange)="onSearchChange($event)"
+                      [ngModelOptions]="{standalone: true}"
+                      [placeholder]="'search_products_placeholder' | translate"
+                      class="search-input">
+            <mat-icon matSuffix>search</mat-icon>
+            <button 
+              mat-icon-button 
+              matSuffix 
+              *ngIf="productSearchFilter()"
+              (click)="clearProductFilter()"
+              class="clear-button">
+              <mat-icon>clear</mat-icon>
+            </button>
+          </mat-form-field>
+        </div>
+
         <!-- Grid de Productos -->
         <div class="products-grid" *ngIf="isProductSelectorOpen">
+          <!-- Mensaje cuando no hay productos -->
+          <div class="no-products-message" *ngIf="filteredProducts().length === 0">
+            <mat-icon>search_off</mat-icon>
+            <p>{{ 'no_products_found' | translate }}</p>
+            <button mat-button (click)="clearProductFilter()" class="clear-filter-button">
+              {{ 'clear_filter_button' | translate }}
+            </button>
+          </div>
+          
+          <!-- Lista de productos -->
           <div class="product-card" 
-               *ngFor="let product of products" 
+               *ngFor="let product of filteredProducts()" 
                (click)="selectProduct(product)"
                [class.selected]="isProductSelected(product)">
             
@@ -159,6 +192,7 @@
           matInput 
           type="number" 
           [(ngModel)]="goalValue"
+          [ngModelOptions]="{standalone: true}"
           placeholder="0"
           min="1"
           required>

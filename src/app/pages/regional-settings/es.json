@@ -113,6 +113,11 @@
   "goal_validation_error": "La meta debe ser un número mayor a 0",
   "save_goal_button": "Guardar Meta",
   
+  "search_products_label": "Buscar productos",
+  "search_products_placeholder": "Escribe el nombre del producto...",
+  "no_products_found": "No se encontraron productos",
+  "clear_filter_button": "Limpiar filtro",
+  
   "region_norte": "Norte",
   "region_centro": "Centro", 
   "region_sur": "Sur",

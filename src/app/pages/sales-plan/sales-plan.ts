@@ -81,12 +81,21 @@ export class SalesPlan {
 
   // Productos de ejemplo (en un caso real vendrían de un servicio)
   products: Product[] = [
-    { id: '1', name: 'Producto A', price: 1.00, image: 'producto-a.jpg' },
-    { id: '2', name: 'Producto B', price: 1.00, image: 'producto-b.jpg' },
-    { id: '3', name: 'Producto C', price: 1.00, image: 'producto-c.jpg' },
-    { id: '4', name: 'Producto D', price: 1.00, image: 'producto-d.jpg' },
-    { id: '5', name: 'Producto E', price: 1.00, image: 'producto-e.jpg' },
-    { id: '6', name: 'Producto F', price: 1.00, image: 'producto-f.jpg' },
+    { id: '1', name: 'Aspirina 500mg', price: 2.50 },
+    { id: '2', name: 'Paracetamol 1g', price: 3.20 },
+    { id: '3', name: 'Ibuprofeno 400mg', price: 4.80 },
+    { id: '4', name: 'Omeprazol 20mg', price: 5.60 },
+    { id: '5', name: 'Loratadina 10mg', price: 3.90 },
+    { id: '6', name: 'Vitamina C 1000mg', price: 6.40 },
+    { id: '7', name: 'Calcio + Vitamina D', price: 8.20 },
+    { id: '8', name: 'Magnesio 400mg', price: 7.50 },
+    { id: '9', name: 'Omega 3 1000mg', price: 12.80 },
+    { id: '10', name: 'Probióticos', price: 15.60 },
+    { id: '11', name: 'Melatonina 3mg', price: 9.40 },
+    { id: '12', name: 'Jarabe para la Tos', price: 4.20 },
+    { id: '13', name: 'Crema Hidratante', price: 6.80 },
+    { id: '14', name: 'Protector Solar FPS 50', price: 8.90 },
+    { id: '15', name: 'Shampoo Anticaspa', price: 5.30 },
   ];
 
   // Imagen por defecto
@@ -95,6 +104,7 @@ export class SalesPlan {
   // Estados del selector de productos
   isProductSelectorOpen = false;
   selectedProducts: Product[] = [];
+  productSearchFilter = signal('');
   
   // Estados del modal de meta
   showGoalModal = false;
@@ -108,6 +118,19 @@ export class SalesPlan {
   // Computed para validar si el formulario está completo
   isFormValid = computed(() => {
     return this.salesPlanForm.valid && this.selectedProducts.length > 0;
+  });
+
+  // Computed para filtrar productos
+  filteredProducts = computed(() => {
+    const filter = this.productSearchFilter().trim();
+    if (!filter) {
+      return this.products;
+    }
+    
+    const filterLower = filter.toLowerCase();
+    return this.products.filter(product => 
+      product.name.toLowerCase().includes(filterLower)
+    );
   });
 
   constructor() {
@@ -170,6 +193,14 @@ export class SalesPlan {
     this.showGoalModal = false;
     this.currentProduct = null;
     this.goalValue = '';
+  }
+
+  clearProductFilter() {
+    this.productSearchFilter.set('');
+  }
+
+  onSearchChange(value: string) {
+    this.productSearchFilter.set(value);
   }
 
   getProductImage(product: Product): string {

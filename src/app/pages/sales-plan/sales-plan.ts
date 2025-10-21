@@ -82,10 +82,10 @@ export class SalesPlan {
   // Productos de ejemplo (en un caso real vendrían de un servicio)
   products: Product[] = [
     { id: '1', name: 'Aspirina 500mg', price: 2.50 },
-    { id: '2', name: 'Paracetamol 1g', price: 3.20 },
-    { id: '3', name: 'Ibuprofeno 400mg', price: 4.80 },
+    { id: '2', name: 'Paracetamol 1g', price: 3.20, image: 'assets/images/products/acetaminofen.png' },
+    { id: '3', name: 'Ibuprofeno 400mg', price: 4.80, image: 'assets/images/products/ibuprofeno.png' },
     { id: '4', name: 'Omeprazol 20mg', price: 5.60 },
-    { id: '5', name: 'Loratadina 10mg', price: 3.90 },
+    { id: '5', name: 'Loratadina 10mg', price: 3.90, image: 'assets/images/products/dolex.png' },
     { id: '6', name: 'Vitamina C 1000mg', price: 6.40 },
     { id: '7', name: 'Calcio + Vitamina D', price: 8.20 },
     { id: '8', name: 'Magnesio 400mg', price: 7.50 },
@@ -298,7 +298,7 @@ export class SalesPlan {
 
   getProductImage(product: Product): string {
     if (product.image) {
-      return `assets/images/products/${product.image}`;
+      return product.image;
     }
     return this.defaultImage;
   }

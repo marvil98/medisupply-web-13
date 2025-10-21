@@ -511,10 +511,11 @@ mat-divider {
 .product-sort-pagination {
   display: flex;
   align-items: center;
-  gap: 20px;
+  justify-content: center;
+  gap: 24px;
   margin-bottom: 20px;
   background: white;
-  padding: 16px 20px;
+  padding: 20px 24px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   transform: perspective(1000px) rotateY(-1deg);
@@ -529,15 +530,13 @@ mat-divider {
 .sort-controls {
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex: 0 0 45%;
-  min-width: 0;
+  gap: 16px;
+  flex: 0 0 auto;
 }
 
 .sort-field {
-  flex: 1;
-  min-width: 120px;
-  max-width: 200px;
+  min-width: 140px;
+  max-width: 180px;
 }
 
 .sort-field .mat-form-field-wrapper {
@@ -549,12 +548,15 @@ mat-divider {
   border: 2px solid #1976d2;
   background: white;
   border-radius: 50%;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   box-shadow: 0 4px 12px rgba(25, 118, 210, 0.2);
   transform: perspective(1000px) rotateY(1deg);
   transition: all 0.3s ease;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sort-order-button:hover {
@@ -567,14 +569,12 @@ mat-divider {
 .items-per-page {
   display: flex;
   align-items: center;
-  flex: 0 0 45%;
-  gap: 12px;
-  min-width: 0;
+  flex: 0 0 auto;
+  gap: 16px;
 }
 
 .items-field {
-  flex: 1;
-  min-width: 120px;
+  min-width: 140px;
   max-width: 180px;
 }
 
@@ -585,37 +585,39 @@ mat-divider {
 /* Responsive design para controles */
 @media (max-width: 1024px) {
   .product-sort-pagination {
-    gap: 16px;
-  }
-  
-  .sort-controls,
-  .items-per-page {
-    flex: 0 0 40%;
+    gap: 20px;
+    padding: 16px 20px;
   }
   
   .sort-field,
   .items-field {
-    min-width: 100px;
+    min-width: 120px;
     max-width: 160px;
+  }
+  
+  .sort-order-button {
+    width: 44px;
+    height: 44px;
   }
 }
 
 @media (max-width: 768px) {
   .product-sort-pagination {
     flex-direction: column;
-    gap: 16px;
+    gap: 20px;
+    padding: 16px 20px;
   }
   
   .sort-controls,
   .items-per-page {
-    flex: 1;
+    justify-content: center;
     width: 100%;
   }
   
   .sort-field,
   .items-field {
-    min-width: 120px;
-    max-width: none;
+    min-width: 140px;
+    max-width: 200px;
   }
   
   .results-info {

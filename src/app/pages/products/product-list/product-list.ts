@@ -9,6 +9,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { PageHeader } from '../../../shared/page-header/page-header';
 import { StatusMessage } from '../../../shared/status-message/status-message';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
@@ -50,6 +51,7 @@ interface UploadedFile {
     MatDividerModule,
     MatProgressBarModule,
     MatSnackBarModule,
+    MatPaginatorModule,
     PageHeader,
     StatusMessage,
     TranslatePipe
@@ -71,6 +73,11 @@ export class ProductList {
 
   private readonly allowedTypes = ['.csv', '.xlsx'];
   private readonly maxFileSize = 10 * 1024 * 1024; // 10MB
+
+  // Propiedades para paginación
+  pageSize = 10;
+  pageIndex = 0;
+  totalProducts = signal(0);
 
   // Datos mock de productos (simulando los productos cargados)
   products = signal<Product[]>([
@@ -134,6 +141,14 @@ export class ProductList {
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
   private fileValidationService = inject(FileValidationService);
+
+  // Computed signal para productos paginados
+  paginatedProducts = signal<Product[]>([]);
+
+  constructor() {
+    // Inicializar productos paginados
+    this.updatePaginatedProducts();
+  }
 
   toggleUploadSection(): void {
     this.showUploadSection.set(!this.showUploadSection());
@@ -271,20 +286,31 @@ export class ProductList {
   }
 
   private addProductsFromFiles(files: UploadedFile[]): void {
-    // Simular agregar productos basados en los archivos cargados
-    const newProducts: Product[] = files.map((file, index) => ({
-      id: (this.products().length + index + 1).toString(),
-      nombre: `Producto desde ${file.file.name}`,
-      descripcion: `Producto cargado desde ${file.file.name}`,
-      precio: 10000 + (index * 5000),
-      categoria: `Categoría ${String.fromCharCode(65 + index)}`,
-      stock_minimo: 10 + index,
-      unidad_medida: 'unidad',
-      estado: 'activo' as const,
-      fecha_creacion: new Date()
-    }));
+    const newProducts: Product[] = [];
+    
+    files.forEach(file => {
+      if (file.validationResult?.data) {
+        // Usar los datos reales del archivo CSV
+        const csvProducts = file.validationResult.data.map((productData, index) => ({
+          id: (this.products().length + newProducts.length + index + 1).toString(),
+          nombre: productData.nombre,
+          descripcion: productData.descripcion,
+          precio: productData.precio,
+          categoria: productData.categoria,
+          stock_minimo: productData.stock_minimo,
+          unidad_medida: productData.unidad_medida,
+          estado: 'activo' as const,
+          fecha_creacion: new Date()
+        }));
+        
+        newProducts.push(...csvProducts);
+      }
+    });
 
     this.products.update(current => [...current, ...newProducts]);
+    
+    // Actualizar paginación después de agregar productos
+    this.updatePaginatedProducts();
   }
 
   private showError(messageKey: string): void {
@@ -311,6 +337,21 @@ export class ProductList {
 
   get validFilesCount(): number {
     return this.uploadedFiles().filter(file => file.isValid).length;
+  }
+
+  // Métodos para paginación
+  onPageChange(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.updatePaginatedProducts();
+  }
+
+  private updatePaginatedProducts(): void {
+    const startIndex = this.pageIndex * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    const paginated = this.products().slice(startIndex, endIndex);
+    this.paginatedProducts.set(paginated);
+    this.totalProducts.set(this.products().length);
   }
 
   editProduct(product: Product): void {

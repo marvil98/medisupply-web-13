@@ -437,6 +437,27 @@ mat-card-content {
   padding: 24px;
 }
 
+/* Paginador */
+mat-paginator {
+  margin-top: 16px;
+  background-color: transparent;
+}
+
+mat-paginator .mat-mdc-paginator-page-size-label,
+mat-paginator .mat-mdc-paginator-range-label {
+  color: #666;
+  font-size: 0.875rem;
+}
+
+mat-paginator .mat-mdc-paginator-navigation-previous,
+mat-paginator .mat-mdc-paginator-navigation-next {
+  color: var(--mat-sys-primary);
+}
+
+mat-paginator .mat-mdc-paginator-page-size-select {
+  margin: 0 8px;
+}
+
 /* Tabla responsive */
 @media (max-width: 1200px) {
   .table-container {

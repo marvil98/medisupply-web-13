@@ -138,5 +138,12 @@
   "productActionsAria": "Product actions",
   "noProductsTitle": "No products",
   "noProductsMessage": "You haven't uploaded any products yet. Start by uploading a template with your products.",
-  "uploadFirstProductsButton": "Upload products"
+  "uploadFirstProductsButton": "Upload products",
+  "productPaginationAria": "Product pagination",
+  "itemsPerPageLabel": "Items per page:",
+  "nextPageLabel": "Next page",
+  "previousPageLabel": "Previous page",
+  "firstPageLabel": "First page",
+  "lastPageLabel": "Last page",
+  "rangeLabel": "{{startIndex}} - {{endIndex}} of {{length}}"
 }

@@ -138,5 +138,12 @@
   "productActionsAria": "Acciones del producto",
   "noProductsTitle": "No hay productos",
   "noProductsMessage": "Aún no has cargado ningún producto. Comienza subiendo una plantilla con tus productos.",
-  "uploadFirstProductsButton": "Cargar productos"
+  "uploadFirstProductsButton": "Cargar productos",
+  "productPaginationAria": "Paginación de productos",
+  "itemsPerPageLabel": "Elementos por página:",
+  "nextPageLabel": "Siguiente página",
+  "previousPageLabel": "Página anterior",
+  "firstPageLabel": "Primera página",
+  "lastPageLabel": "Última página",
+  "rangeLabel": "{{startIndex}} - {{endIndex}} de {{length}}"
 }

@@ -105,6 +105,10 @@ export class SalesPlan {
   isProductSelectorOpen = false;
   selectedProducts: Product[] = [];
   productSearchFilter = signal('');
+  sortBy = signal<'name' | 'price' | 'popularity'>('name');
+  sortOrder = signal<'asc' | 'desc'>('asc');
+  itemsPerPage = signal(20);
+  currentPage = signal(1);
   
   // Estados del modal de meta
   showGoalModal = false;
@@ -120,17 +124,70 @@ export class SalesPlan {
     return this.salesPlanForm.valid && this.selectedProducts.length > 0;
   });
 
-  // Computed para filtrar productos
+  // Computed para filtrar, ordenar y paginar productos
   filteredProducts = computed(() => {
     const filter = this.productSearchFilter().trim();
-    if (!filter) {
-      return this.products;
+    let filtered = this.products;
+    
+    // Aplicar filtro de búsqueda
+    if (filter) {
+      const filterLower = filter.toLowerCase();
+      filtered = this.products.filter(product => 
+        product.name.toLowerCase().includes(filterLower)
+      );
     }
     
-    const filterLower = filter.toLowerCase();
-    return this.products.filter(product => 
-      product.name.toLowerCase().includes(filterLower)
-    );
+    // Aplicar ordenamiento
+    const sortByValue = this.sortBy();
+    const sortOrderValue = this.sortOrder();
+    
+    filtered = [...filtered].sort((a, b) => {
+      let comparison = 0;
+      
+      switch (sortByValue) {
+        case 'name':
+          comparison = a.name.localeCompare(b.name);
+          break;
+        case 'price':
+          comparison = a.price - b.price;
+          break;
+        case 'popularity':
+          // Simular popularidad basada en el ID (en un caso real vendría de datos)
+          comparison = parseInt(a.id) - parseInt(b.id);
+          break;
+      }
+      
+      return sortOrderValue === 'desc' ? -comparison : comparison;
+    });
+    
+    return filtered;
+  });
+
+  // Computed para productos paginados
+  paginatedProducts = computed(() => {
+    const allFiltered = this.filteredProducts();
+    const page = this.currentPage();
+    const perPage = this.itemsPerPage();
+    const startIndex = (page - 1) * perPage;
+    const endIndex = startIndex + perPage;
+    
+    return allFiltered.slice(startIndex, endIndex);
+  });
+
+  // Computed para información de paginación
+  paginationInfo = computed(() => {
+    const total = this.filteredProducts().length;
+    const perPage = this.itemsPerPage();
+    const current = this.currentPage();
+    const totalPages = Math.ceil(total / perPage);
+    
+    return {
+      total,
+      current,
+      totalPages,
+      startItem: (current - 1) * perPage + 1,
+      endItem: Math.min(current * perPage, total)
+    };
   });
 
   constructor() {
@@ -201,6 +258,42 @@ export class SalesPlan {
 
   onSearchChange(value: string) {
     this.productSearchFilter.set(value);
+    this.currentPage.set(1); // Reset a la primera página al buscar
+  }
+
+  // Métodos para ordenamiento
+  setSortBy(sortBy: 'name' | 'price' | 'popularity') {
+    this.sortBy.set(sortBy);
+  }
+
+  toggleSortOrder() {
+    this.sortOrder.set(this.sortOrder() === 'asc' ? 'desc' : 'asc');
+  }
+
+  // Métodos para paginación
+  setItemsPerPage(items: number) {
+    this.itemsPerPage.set(items);
+    this.currentPage.set(1); // Reset a la primera página
+  }
+
+  goToPage(page: number) {
+    const totalPages = this.paginationInfo().totalPages;
+    if (page >= 1 && page <= totalPages) {
+      this.currentPage.set(page);
+    }
+  }
+
+  nextPage() {
+    const totalPages = this.paginationInfo().totalPages;
+    if (this.currentPage() < totalPages) {
+      this.currentPage.set(this.currentPage() + 1);
+    }
+  }
+
+  previousPage() {
+    if (this.currentPage() > 1) {
+      this.currentPage.set(this.currentPage() - 1);
+    }
   }
 
   getProductImage(product: Product): string {

@@ -444,3 +444,126 @@ mat-divider {
 .save-button {
   min-width: 100px;
 }
+
+/* Estilos para controles avanzados de productos */
+.product-controls-container {
+  margin-bottom: 16px;
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.product-sort-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sort-field {
+  min-width: 150px;
+}
+
+.sort-order-button {
+  color: #1976d2;
+  border: 1px solid #1976d2;
+  background: white;
+}
+
+.sort-order-button:hover {
+  background-color: #1976d2;
+  color: white;
+}
+
+.items-per-page {
+  display: flex;
+  align-items: center;
+}
+
+.items-field {
+  min-width: 120px;
+}
+
+/* Información de resultados */
+.results-info {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.results-text {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Controles de paginación */
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  margin-top: 16px;
+}
+
+.pagination-info {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.pagination-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pagination-button {
+  color: #1976d2;
+}
+
+.pagination-button:hover:not(:disabled) {
+  background-color: #1976d2;
+  color: white;
+}
+
+.pagination-button:disabled {
+  color: #bdbdbd;
+  cursor: not-allowed;
+}
+
+.page-numbers {
+  display: flex;
+  gap: 4px;
+  margin: 0 8px;
+}
+
+.page-button {
+  min-width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: #666;
+  font-weight: 500;
+}
+
+.page-button:hover {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.page-button.active {
+  background-color: #1976d2;
+  color: white;
+}

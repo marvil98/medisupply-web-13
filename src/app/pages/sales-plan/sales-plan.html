@@ -17,28 +17,82 @@
           <mat-icon class="selector-icon">{{ isProductSelectorOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
         </div>
         
-        <!-- Filtro de búsqueda -->
-        <div class="product-search-container" *ngIf="isProductSelectorOpen">
-          <mat-form-field appearance="outline" class="search-field">
-            <mat-label>{{ 'search_products_label' | translate }}</mat-label>
-                    <input 
-                      matInput 
-                      [ngModel]="productSearchFilter()"
-                      (ngModelChange)="onSearchChange($event)"
-                      [ngModelOptions]="{standalone: true}"
-                      [placeholder]="'search_products_placeholder' | translate"
-                      class="search-input">
-            <mat-icon matSuffix>search</mat-icon>
-            <button 
-              mat-icon-button 
-              matSuffix 
-              *ngIf="productSearchFilter()"
-              (click)="clearProductFilter()"
-              class="clear-button">
-              <mat-icon>clear</mat-icon>
-            </button>
-          </mat-form-field>
-        </div>
+                <!-- Controles de búsqueda y ordenamiento -->
+                <div class="product-controls-container" *ngIf="isProductSelectorOpen">
+                  <!-- Filtro de búsqueda -->
+                  <div class="product-search-container">
+                    <mat-form-field appearance="outline" class="search-field">
+                      <mat-label>{{ 'search_products_label' | translate }}</mat-label>
+                      <input 
+                        matInput 
+                        [ngModel]="productSearchFilter()"
+                        (ngModelChange)="onSearchChange($event)"
+                        [ngModelOptions]="{standalone: true}"
+                        [placeholder]="'search_products_placeholder' | translate"
+                        class="search-input">
+                      <mat-icon matSuffix>search</mat-icon>
+                      <button 
+                        mat-icon-button 
+                        matSuffix 
+                        *ngIf="productSearchFilter()"
+                        (click)="clearProductFilter()"
+                        class="clear-button">
+                        <mat-icon>clear</mat-icon>
+                      </button>
+                    </mat-form-field>
+                  </div>
+
+                  <!-- Controles de ordenamiento y paginación -->
+                  <div class="product-sort-pagination">
+                    <!-- Ordenamiento -->
+                    <div class="sort-controls">
+                      <mat-form-field appearance="outline" class="sort-field">
+                        <mat-label>{{ 'sort_by_label' | translate }}</mat-label>
+                        <mat-select 
+                          [ngModel]="sortBy()"
+                          (ngModelChange)="setSortBy($event)"
+                          [ngModelOptions]="{standalone: true}">
+                          <mat-option value="name">{{ 'sort_name' | translate }}</mat-option>
+                          <mat-option value="price">{{ 'sort_price' | translate }}</mat-option>
+                          <mat-option value="popularity">{{ 'sort_popularity' | translate }}</mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                      
+                      <button 
+                        mat-icon-button 
+                        (click)="toggleSortOrder()"
+                        class="sort-order-button"
+                        [title]="sortOrder() === 'asc' ? 'sort_desc' : 'sort_asc'">
+                        <mat-icon>{{ sortOrder() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+                      </button>
+                    </div>
+
+                    <!-- Items por página -->
+                    <div class="items-per-page">
+                      <mat-form-field appearance="outline" class="items-field">
+                        <mat-label>{{ 'items_per_page' | translate }}</mat-label>
+                        <mat-select 
+                          [ngModel]="itemsPerPage()"
+                          (ngModelChange)="setItemsPerPage($event)"
+                          [ngModelOptions]="{standalone: true}">
+                          <mat-option value="10">10</mat-option>
+                          <mat-option value="20">20</mat-option>
+                          <mat-option value="50">50</mat-option>
+                          <mat-option value="100">100</mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <!-- Información de resultados -->
+                  <div class="results-info" *ngIf="paginationInfo().total > 0">
+                    <span class="results-text">
+                      {{ 'showing_results' | translate }}: 
+                      {{ paginationInfo().startItem }}-{{ paginationInfo().endItem }} 
+                      {{ 'of' | translate }} {{ paginationInfo().total }}
+                    </span>
+                  </div>
+                </div>
 
         <!-- Grid de Productos -->
         <div class="products-grid" *ngIf="isProductSelectorOpen">
@@ -51,9 +105,9 @@
             </button>
           </div>
           
-          <!-- Lista de productos -->
+          <!-- Lista de productos paginados -->
           <div class="product-card" 
-               *ngFor="let product of filteredProducts()" 
+               *ngFor="let product of paginatedProducts()" 
                (click)="selectProduct(product)"
                [class.selected]="isProductSelected(product)">
             
@@ -82,6 +136,43 @@
                     (click)="setProductGoal(product, $event)"
                     [disabled]="!isProductSelected(product)">
               {{ 'goal_button' | translate }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Controles de paginación -->
+        <div class="pagination-controls" *ngIf="isProductSelectorOpen && paginationInfo().totalPages > 1">
+          <div class="pagination-info">
+            <span>{{ 'page' | translate }} {{ paginationInfo().current }} {{ 'of' | translate }} {{ paginationInfo().totalPages }}</span>
+          </div>
+          
+          <div class="pagination-buttons">
+            <button 
+              mat-icon-button 
+              (click)="previousPage()"
+              [disabled]="paginationInfo().current === 1"
+              class="pagination-button">
+              <mat-icon>chevron_left</mat-icon>
+            </button>
+            
+            <!-- Números de página -->
+            <div class="page-numbers">
+              <button 
+                mat-button 
+                *ngFor="let page of [].constructor(paginationInfo().totalPages); let i = index"
+                (click)="goToPage(i + 1)"
+                [class.active]="paginationInfo().current === (i + 1)"
+                class="page-button">
+                {{ i + 1 }}
+              </button>
+            </div>
+            
+            <button 
+              mat-icon-button 
+              (click)="nextPage()"
+              [disabled]="paginationInfo().current === paginationInfo().totalPages"
+              class="pagination-button">
+              <mat-icon>chevron_right</mat-icon>
             </button>
           </div>
         </div>

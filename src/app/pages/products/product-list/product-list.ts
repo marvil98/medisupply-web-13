@@ -10,11 +10,18 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { FormsModule } from '@angular/forms';
 import { PageHeader } from '../../../shared/page-header/page-header';
 import { StatusMessage } from '../../../shared/status-message/status-message';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { Router } from '@angular/router';
 import { FileValidationService, ValidationResult } from '../../../services/file-validation.service';
+import { ConfirmDialog } from './confirm-dialog.component';
+import { EditProductDialog } from './edit-product-dialog.component';
 
 export interface Product {
   id: string;
@@ -52,6 +59,11 @@ interface UploadedFile {
     MatProgressBarModule,
     MatSnackBarModule,
     MatPaginatorModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    FormsModule,
     PageHeader,
     StatusMessage,
     TranslatePipe
@@ -141,6 +153,13 @@ export class ProductList {
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
   private fileValidationService = inject(FileValidationService);
+  private dialog = inject(MatDialog);
+
+  // Categorías disponibles para los productos
+  availableCategories = ['Categoría A', 'Categoría B', 'Categoría C', 'Medicamentos', 'Equipos', 'Suministros'];
+  
+  // Unidades de medida disponibles
+  availableUnits = ['unidad', 'kg', 'litro', 'ml', 'mg', 'g', 'caja', 'paquete'];
 
   // Computed signal para productos paginados
   paginatedProducts = signal<Product[]>([]);
@@ -355,18 +374,91 @@ export class ProductList {
   }
 
   editProduct(product: Product): void {
-    // TODO: Implementar edición de producto
-    console.log('Editar producto:', product);
+    const dialogRef = this.dialog.open(EditProductDialog, {
+      width: '500px',
+      data: { 
+        product: { ...product },
+        categories: this.availableCategories,
+        units: this.availableUnits
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Actualizar el producto en la lista
+        this.products.update(products => 
+          products.map(p => p.id === product.id ? { ...result, id: product.id, fecha_creacion: product.fecha_creacion } : p)
+        );
+        this.updatePaginatedProducts();
+        
+        this.snackBar.open('Producto actualizado exitosamente', 'Cerrar', {
+          duration: 3000,
+          horizontalPosition: 'end',
+          verticalPosition: 'top'
+        });
+      }
+    });
   }
 
   deleteProduct(product: Product): void {
-    // TODO: Implementar eliminación de producto
-    console.log('Eliminar producto:', product);
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      width: '400px',
+      data: {
+        title: 'Confirmar eliminación',
+        message: `¿Estás seguro de que deseas eliminar el producto "${product.nombre}"? Esta acción no se puede deshacer.`,
+        confirmText: 'Eliminar',
+        cancelText: 'Cancelar',
+        isDestructive: true
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        // Eliminar el producto de la lista
+        this.products.update(products => 
+          products.filter(p => p.id !== product.id)
+        );
+        this.updatePaginatedProducts();
+        
+        this.snackBar.open('Producto eliminado exitosamente', 'Cerrar', {
+          duration: 3000,
+          horizontalPosition: 'end',
+          verticalPosition: 'top'
+        });
+      }
+    });
   }
 
   toggleProductStatus(product: Product): void {
-    // TODO: Implementar cambio de estado
-    console.log('Cambiar estado de producto:', product);
+    const newStatus = product.estado === 'activo' ? 'inactivo' : 'activo';
+    const actionText = newStatus === 'activo' ? 'activar' : 'desactivar';
+    
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      width: '400px',
+      data: {
+        title: `Confirmar ${actionText}`,
+        message: `¿Estás seguro de que deseas ${actionText} el producto "${product.nombre}"?`,
+        confirmText: actionText.charAt(0).toUpperCase() + actionText.slice(1),
+        cancelText: 'Cancelar',
+        isDestructive: false
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        // Cambiar el estado del producto
+        this.products.update(products => 
+          products.map(p => p.id === product.id ? { ...p, estado: newStatus } : p)
+        );
+        this.updatePaginatedProducts();
+        
+        this.snackBar.open(`Producto ${actionText}do exitosamente`, 'Cerrar', {
+          duration: 3000,
+          horizontalPosition: 'end',
+          verticalPosition: 'top'
+        });
+      }
+    });
   }
 
   formatPrice(price: number): string {

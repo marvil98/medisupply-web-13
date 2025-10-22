@@ -104,7 +104,8 @@ export class SalesPlan {
   // Función para convertir valores según el país
   private convertValue(value: number): number {
     const country = localStorage.getItem('userCountry') || 'CO';
-    const rates: Record<string, number> = { 'CO': 4100, 'PE': 3.7, 'EC': 1, 'MX': 17.5 };
+    // Para Colombia, el backend ya devuelve valores en pesos, no necesitamos convertir
+    const rates: Record<string, number> = { 'CO': 1, 'PE': 3.7, 'EC': 1, 'MX': 17.5 };
     return Math.round(value * (rates[country] || 1));
   }
 

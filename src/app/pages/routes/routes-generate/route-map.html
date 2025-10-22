@@ -6,20 +6,63 @@
     <!-- Centro de distribución -->
     <map-marker [position]="{ lat: center.lat, lng: center.lng }" [title]="'Centro de Distribución - ORIGEN'" [options]="getOriginMarkerOptions()"></map-marker>
 
-    <!-- Clientes -->
-    <map-marker *ngFor="let c of clients" #m="mapMarker" [position]="{ lat: c.lat, lng: c.lng }" [title]="c.name" (mapClick)="openInfo(c, m)"></map-marker>
+    <!-- Clientes con numeración por orden de visita -->
+    <map-marker 
+      *ngFor="let c of clients; let clientIndex = index" 
+      #m="mapMarker" 
+      [position]="{ lat: c.lat, lng: c.lng }" 
+      [title]="getClientTitle(c, clientIndex)" 
+      [options]="getClientMarkerOptions(c)"
+      (mapClick)="openInfo(c, m)">
+    </map-marker>
+    
     <map-info-window>
       <ng-container *ngIf="selectedStop() as s">
         <div><strong>{{ s.name }}</strong></div>
         <div>{{ s.address }}</div>
         <div>ID: {{ s.id }}</div>
         <div *ngIf="vehicleForStop(s) as v">Vehículo: {{ v }}</div>
+        <div *ngIf="getStopOrder(s) as order">Orden de visita: {{ order }}</div>
       </ng-container>
     </map-info-window>
 
-    <!-- Rutas por vehículo como polilíneas -->
-    <map-polyline *ngFor="let r of routes" [path]="r.path" [options]="{ strokeColor: r.vehicle.color, strokeWeight: 3 }"></map-polyline>
+    <!-- Rutas por vehículo como polilíneas con flechas direccionales -->
+    <map-polyline 
+      *ngFor="let r of routes; let routeIndex = index" 
+      [path]="r.path" 
+      [options]="getRouteOptions(r, routeIndex)">
+    </map-polyline>
   </google-map>
 
-  <!-- Tooltip fuera de mapa eliminado en favor de InfoWindow -->
+  <!-- Información de rutas -->
+  <div class="routes-info" *ngIf="routes.length > 0">
+    <h3>Rutas Optimizadas</h3>
+    <div class="route-card" *ngFor="let route of routes; let i = index">
+      <div class="route-header" [style.color]="route.vehicle.color">
+        <h4>{{ route.vehicle.label || route.vehicle.id }}</h4>
+        <span>Capacidad: {{ route.vehicle.capacity }} productos</span>
+      </div>
+      <div class="route-sequence">
+        <div class="route-step">
+          <span class="step-number">0</span>
+          <span class="step-location">Centro de Distribución</span>
+          <span class="step-type">🏢 ORIGEN</span>
+        </div>
+        <div class="route-step" *ngFor="let stop of route.stops; let j = index">
+          <span class="step-number">{{ j + 1 }}</span>
+          <span class="step-location">{{ stop.name }}</span>
+          <span class="step-type">📦 Demanda: {{ stop.demand }}</span>
+        </div>
+        <div class="route-step final">
+          <span class="step-number">🏁</span>
+          <span class="step-location">Centro de Distribución</span>
+          <span class="step-type">🏢 DESTINO</span>
+        </div>
+      </div>
+      <div class="route-stats">
+        <span>Total clientes: {{ route.stops.length }}</span>
+        <span>Demanda total: {{ getTotalDemand(route) }} productos</span>
+      </div>
+    </div>
+  </div>
 </div>

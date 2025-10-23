@@ -104,15 +104,90 @@ export class SalesReport {
     const data = this.reportData();
     if (!data || !data.grafico) return [];
   
+    // Generar etiquetas más descriptivas basadas en el tipo de período
+    const periodLabels = this.generatePeriodLabels(data.period_type, data.grafico.length);
+  
     return [
       {
         name: 'Ventas',
         series: data.grafico.map((valor: number, index: number) => ({
-          name: `T${index + 1}`,
-          value: valor,
+          name: periodLabels[index] || `Período ${index + 1}`,
+          value: this.convertValue(valor), // Aplicar conversión de moneda
         })),
       },
     ];
+  }
+
+  private generatePeriodLabels(periodType: string, dataLength: number): string[] {
+    const labels: string[] = [];
+    
+    // Validar coherencia entre tipo de período y cantidad de datos
+    const expectedLength = this.getExpectedDataLength(periodType);
+    if (expectedLength && dataLength !== expectedLength) {
+      console.warn(`⚠️ Inconsistencia detectada: ${periodType} esperaba ${expectedLength} puntos, pero recibió ${dataLength}`);
+    }
+    
+    switch (periodType) {
+      case 'bimestral':
+        // Bimestral: Desglose por semanas (6-8 semanas en 2 meses)
+        for (let i = 0; i < dataLength; i++) {
+          labels.push(`Semana ${i + 1}`);
+        }
+        break;
+      case 'trimestral':
+        // Trimestral: Desglose por semanas (12-13 semanas en 3 meses)
+        for (let i = 0; i < dataLength; i++) {
+          labels.push(`Semana ${i + 1}`);
+        }
+        break;
+      case 'semestral':
+        // Semestral: Desglose por meses (6 meses)
+        if (dataLength === 6) {
+          const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'];
+          labels.push(...monthNames);
+        } else {
+          // Si no son exactamente 6, usar genérico
+          for (let i = 0; i < dataLength; i++) {
+            labels.push(`Mes ${i + 1}`);
+          }
+        }
+        break;
+      case 'anual':
+        // Anual: Desglose por meses (12 meses)
+        if (dataLength === 12) {
+          const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 
+                             'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+          labels.push(...monthNames);
+        } else {
+          // Para otros casos, usar genérico
+          for (let i = 0; i < dataLength; i++) {
+            labels.push(`Mes ${i + 1}`);
+          }
+        }
+        break;
+      default:
+        // Fallback genérico
+        for (let i = 0; i < dataLength; i++) {
+          labels.push(`Período ${i + 1}`);
+        }
+    }
+    
+    return labels;
+  }
+
+  private getExpectedDataLength(periodType: string): number | null {
+    switch (periodType) {
+      case 'bimestral':
+        return 6; // 6-8 semanas en 2 meses (promedio 6)
+      case 'trimestral':
+        return 12; // 12-13 semanas en 3 meses (promedio 12)
+      case 'semestral':
+        return 6; // 6 meses
+      case 'anual':
+        return 12; // 12 meses
+      default:
+        return null; // No hay expectativa definida
+    }
   }
   
 

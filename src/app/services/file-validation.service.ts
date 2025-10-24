@@ -52,6 +52,17 @@ export class FileValidationService {
       }
 
       const headers = this.parseCSVLine(lines[0]);
+      
+      // Debug: Log los headers encontrados
+      console.log('Headers encontrados:', headers);
+      console.log('Headers normalizados:', headers.map(h => 
+        h.toLowerCase()
+          .trim()
+          .replace(/[^a-z0-9_]/g, '_')
+          .replace(/_+/g, '_')
+          .replace(/^_|_$/g, '')
+      ));
+      
       const validationResult = this.validateHeaders(headers);
       
       if (!validationResult.isValid) {
@@ -67,13 +78,13 @@ export class FileValidationService {
         const rowValidation = this.validateRow(rowData, i + 1);
         
         if (rowValidation.isValid) {
-          data.push(this.mapRowToProduct(rowData));
+          data.push(this.mapRowToProduct(rowData, headers));
         } else {
           errors.push(...rowValidation.errors);
         }
       }
 
-      // Validar duplicados
+      // Validar duplicados (siempre ejecutar, independientemente de otros errores)
       const duplicates = this.findDuplicates(data);
       if (duplicates.length > 0) {
         errors.push(`Se encontraron productos duplicados: ${duplicates.join(', ')}`);
@@ -140,20 +151,70 @@ export class FileValidationService {
     const errors: string[] = [];
     const warnings: string[] = [];
 
-    // Normalizar headers (minúsculas, sin espacios)
-    const normalizedHeaders = headers.map(h => h.toLowerCase().trim());
+    // Normalizar headers (minúsculas, sin espacios, sin caracteres especiales)
+    const normalizedHeaders = headers.map(h => 
+      h.toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9_]/g, '_') // Reemplazar caracteres especiales con _
+        .replace(/_+/g, '_') // Reemplazar múltiples _ con uno solo
+        .replace(/^_|_$/g, '') // Quitar _ del inicio y final
+    );
 
-    // Verificar campos obligatorios
+    // Mapeo de variaciones de nombres de campos
+    const fieldVariations: { [key: string]: string[] } = {
+      'nombre': ['nombre', 'name', 'producto', 'product', 'item'],
+      'descripcion': ['descripcion', 'description', 'desc', 'detalle', 'detail'],
+      'precio': ['precio', 'price', 'costo', 'cost', 'valor'],
+      'categoria': ['categoria', 'category', 'categ', 'tipo', 'type'],
+      'stock_minimo': ['stock_minimo', 'stock_min', 'minimo', 'minimum', 'min_stock'],
+      'unidad_medida': ['unidad_medida', 'unidad', 'unit', 'medida', 'measure', 'uom']
+    };
+
+    // Verificar campos obligatorios con variaciones
+    const missingFields: string[] = [];
+    const foundFields: string[] = [];
+    
     for (const field of this.requiredFields) {
-      if (!normalizedHeaders.includes(field)) {
-        errors.push(`Campo obligatorio faltante: ${field}`);
+      let found = false;
+      
+      // Buscar el campo exacto
+      if (normalizedHeaders.includes(field)) {
+        found = true;
+        foundFields.push(field);
+      } else {
+        // Buscar variaciones
+        const variations = fieldVariations[field] || [];
+        for (const variation of variations) {
+          if (normalizedHeaders.includes(variation)) {
+            found = true;
+            foundFields.push(field);
+            break;
+          }
+        }
+      }
+      
+      if (!found) {
+        missingFields.push(field);
       }
     }
 
-    // Verificar campos adicionales
-    const additionalFields = normalizedHeaders.filter(h => !this.requiredFields.includes(h));
-    if (additionalFields.length > 0) {
-      warnings.push(`Campos adicionales encontrados: ${additionalFields.join(', ')}`);
+    if (missingFields.length > 0) {
+      errors.push(`Campos obligatorios faltantes: ${missingFields.join(', ')}`);
+      errors.push(`Headers encontrados: ${normalizedHeaders.join(', ')}`);
+    }
+
+    // Verificar campos adicionales (solo si no hay campos faltantes)
+    if (missingFields.length === 0) {
+      const additionalFields = normalizedHeaders.filter(h => !foundFields.includes(h));
+      if (additionalFields.length > 0) {
+        warnings.push(`Campos adicionales encontrados: ${additionalFields.join(', ')}`);
+      }
+    }
+
+    // Verificar headers duplicados
+    const duplicateHeaders = this.findDuplicateHeaders(normalizedHeaders);
+    if (duplicateHeaders.length > 0) {
+      errors.push(`Headers duplicados encontrados: ${duplicateHeaders.join(', ')}`);
     }
 
     return {
@@ -201,15 +262,45 @@ export class FileValidationService {
     };
   }
 
-  private mapRowToProduct(rowData: string[]): ProductTemplate {
+  private mapRowToProduct(rowData: string[], headers: string[]): ProductTemplate {
+    // Normalizar headers para hacer el mapeo
+    const normalizedHeaders = headers.map(h => 
+      h.toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9_]/g, '_')
+        .replace(/_+/g, '_')
+        .replace(/^_|_$/g, '')
+    );
+
+    // Crear un mapa de headers normalizados a índices
+    const headerMap: { [key: string]: number } = {};
+    normalizedHeaders.forEach((header, index) => {
+      headerMap[header] = index;
+    });
+
     return {
-      nombre: rowData[0]?.trim() || '',
-      descripcion: rowData[1]?.trim() || '',
-      precio: parseFloat(rowData[2]?.trim() || '0'),
-      categoria: rowData[3]?.trim() || '',
-      stock_minimo: parseInt(rowData[4]?.trim() || '0'),
-      unidad_medida: rowData[5]?.trim() || ''
+      nombre: rowData[headerMap['nombre']]?.trim() || '',
+      descripcion: rowData[headerMap['descripcion']]?.trim() || '',
+      precio: parseFloat(rowData[headerMap['precio']]?.trim() || '0'),
+      categoria: rowData[headerMap['categoria']]?.trim() || '',
+      stock_minimo: parseInt(rowData[headerMap['stock_minimo']]?.trim() || '0'),
+      unidad_medida: rowData[headerMap['unidad_medida']]?.trim() || ''
     };
+  }
+
+  private findDuplicateHeaders(headers: string[]): string[] {
+    const seen = new Set<string>();
+    const duplicates: string[] = [];
+    
+    for (const header of headers) {
+      if (seen.has(header)) {
+        duplicates.push(header);
+      } else {
+        seen.add(header);
+      }
+    }
+    
+    return duplicates;
   }
 
   private findDuplicates(data: ProductTemplate[]): string[] {
@@ -217,7 +308,9 @@ export class FileValidationService {
     const duplicates: string[] = [];
     
     for (const product of data) {
-      const key = product.nombre.toLowerCase();
+      // Crear una clave única basada en nombre y código (si existe)
+      const key = `${product.nombre.toLowerCase().trim()}`;
+      
       if (seen.has(key)) {
         duplicates.push(product.nombre);
       } else {
@@ -239,3 +332,4 @@ export class FileValidationService {
     return `${headers}\n${sampleData}`;
   }
 }
+

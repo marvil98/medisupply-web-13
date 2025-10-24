@@ -19,6 +19,16 @@
   margin-bottom: 20px;
 }
 
+.button-group {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.refresh-button {
+  min-width: 120px;
+}
+
 .map-section {
   display: grid;
   justify-content: center;

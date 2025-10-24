@@ -53,8 +53,12 @@ export class RoutesGenerate {
     console.log('🔧 RoutesGenerate: Servicio data disponible:', !!this.data);
     this.tryGeolocation();
     
-    // Cargar datos SOLO desde el backend real
-    console.log('📡 RoutesGenerate: Cargando datos desde backend real...');
+    // Cargar datos iniciales
+    this.loadData();
+  }
+
+  loadData() {
+    console.log('📡 RoutesGenerate: Cargando datos desde backend...');
     
     // Cargar clientes desde backend
     console.log('📡 RoutesGenerate: Cargando clientes desde backend...');
@@ -113,6 +117,63 @@ export class RoutesGenerate {
         this.setMessage('error', 'backendConnectionError');
       }
     });
+  }
+
+  loadDataAndRegenerate() {
+    console.log('📡 RoutesGenerate: Cargando datos y regenerando rutas...');
+    
+    // Cargar clientes desde backend
+    this.data.getClients().subscribe({
+      next: (c: any) => {
+        if (c && c.length > 0) {
+          this.clients = c.map((client: any) => ({
+            id: client.id,
+            name: client.nombre,
+            address: client.direccion,
+            lat: client.latitud,
+            lng: client.longitud,
+            demand: client.demanda
+          }));
+          
+          // Cargar vehículos y regenerar rutas
+          this.data.getVehicles().subscribe({
+            next: (v: any) => {
+              if (v && v.length > 0) {
+                this.availableVehicles = v.map((vehicle: any) => ({
+                  id: vehicle.id,
+                  capacity: vehicle.capacidad,
+                  color: vehicle.color,
+                  label: vehicle.etiqueta
+                }));
+                
+                // Regenerar rutas automáticamente si hay selección de vehículos
+                if (this.selectedVehicles()) {
+                  console.log('🔄 RoutesGenerate: Regenerando rutas automáticamente...');
+                  this.generate();
+                }
+              }
+            },
+            error: (error) => {
+              console.error('❌ RoutesGenerate: Error cargando vehículos:', error);
+              this.setMessage('error', 'backendConnectionError');
+            }
+          });
+        }
+      },
+      error: (error) => {
+        console.error('❌ RoutesGenerate: Error cargando clientes:', error);
+        this.setMessage('error', 'backendConnectionError');
+      }
+    });
+  }
+
+  refreshData() {
+    console.log('🔄 RoutesGenerate: Actualizando datos...');
+    this.setMessage('success', 'dataRefreshed');
+    // Limpiar rutas para forzar recálculo
+    this.routes.set(null);
+    // Cargar datos y regenerar automáticamente si hay selección
+    this.loadDataAndRegenerate();
   }
 
 

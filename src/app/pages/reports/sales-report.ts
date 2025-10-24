@@ -112,7 +112,7 @@ export class SalesReport {
         name: 'Ventas',
         series: data.grafico.map((valor: number, index: number) => ({
           name: periodLabels[index] || `Período ${index + 1}`,
-          value: this.convertValue(valor), // Aplicar conversión de moneda
+          value: valor,
         })),
       },
     ];

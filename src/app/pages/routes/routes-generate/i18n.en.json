@@ -7,6 +7,8 @@
   "vehiclesOption2": "2 vehicles",
   "vehiclesOption3": "3 vehicles",
   "generateButton": "Generate",
+  "refreshDataButton": "Refresh Data",
+  "dataRefreshed": "Data refreshed successfully",
   "geoDeniedMessage": "Could not access your location. Enable it to generate routes from your position",
   "routesSuccess": "Routes generated correctly",
   "notEnoughForSelected": "Oops! Not enough vehicles available for the selected amount",

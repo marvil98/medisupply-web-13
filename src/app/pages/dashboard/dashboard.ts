@@ -18,7 +18,7 @@ export class Dashboard {
     {
       titleKey: 'cardProductsTitle',
       subtitleKey: 'cardProductsSubtitle',
-      icon: 'upload',
+      icon: 'box',
       ariaLabelKey: 'cardProductsAria',
       path: '/productos',
     },

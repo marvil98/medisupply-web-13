@@ -6,6 +6,9 @@ import { Components } from './pages/components/components';
 import { Reports } from './pages/reports/reports';
 import { SalesReport } from './pages/reports/sales-report';
 import { RoutesGenerate } from './pages/routes/routes-generate/routes-generate';
+import { SalesPlan } from './pages/sales-plan/sales-plan';
+import { Productos } from './pages/productos/productos';
+import { UbicacionComponent } from './pages/productos/ubicacion/ubicacion';
 import { ProductList } from './pages/products/product-list/product-list';
 
 @Component({
@@ -17,6 +20,7 @@ class EmptyComponent {}
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: 'dashboard', component: Dashboard },
+  { path: 'productos', component: Productos },
   { path: 'productos', component: ProductList },
   { path: 'usuarios', component: EmptyComponent },
   { path: 'reportes', component: Reports },
@@ -24,8 +28,10 @@ export const routes: Routes = [
   { path: 'ventas', component: EmptyComponent },
   { path: 'rutas', redirectTo: 'rutas/generar', pathMatch: 'full' },
   { path: 'settings/region', component: RegionalSettings },
+  { path: 'productos/cargar', component: EmptyComponent },
+  { path: 'productos/ubicacion', component: UbicacionComponent },
   { path: 'rutas/generar', component: RoutesGenerate },
-  { path: 'ventas/crear-plan', component: EmptyComponent },
+  { path: 'ventas/crear-plan', component: SalesPlan },
   { path: 'usuarios/registro', component: EmptyComponent },
   { path: 'reportes', component: EmptyComponent },
   { path: 'componentes', component: Components },

@@ -72,6 +72,7 @@
 
 .product-card {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 8px;
 }
 
 .product-card:hover {
@@ -82,7 +83,7 @@
 .product-image {
   width: 50px;
   height: 50px;
-  border-radius: 50%;
+  border-radius: 8px;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -110,7 +111,7 @@
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  border-radius: 20px;
+  border-radius: 6px;
   font-weight: 500;
   font-size: 14px;
 }

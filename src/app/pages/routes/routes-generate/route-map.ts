@@ -93,6 +93,75 @@ export class RouteMap implements OnInit, OnChanges {
     };
   }
 
+  getClientMarkerOptions(client: ClientStop): any {
+    const vehicle = this.vehicleForStop(client);
+    const order = this.getStopOrder(client);
+    const color = this.getVehicleColor(vehicle);
+    
+    return {
+      icon: {
+        url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+          <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="15" cy="15" r="14" fill="${color}" stroke="#fff" stroke-width="2"/>
+            <text x="15" y="20" text-anchor="middle" fill="#fff" font-family="Arial" font-size="12" font-weight="bold">${order}</text>
+          </svg>
+        `),
+        scaledSize: new google.maps.Size(30, 30),
+        anchor: new google.maps.Point(15, 15)
+      }
+    };
+  }
+
+  getClientTitle(client: ClientStop, index: number): string {
+    const vehicle = this.vehicleForStop(client);
+    const order = this.getStopOrder(client);
+    return `${client.name} - Vehículo: ${vehicle || 'No asignado'} - Orden: ${order || 'N/A'}`;
+  }
+
+  getStopOrder(stop: ClientStop): number | null {
+    for (const route of this.routes) {
+      const index = route.stops.findIndex(s => s.id === stop.id);
+      if (index !== -1) {
+        return index + 1; // Orden de visita (1, 2, 3, etc.)
+      }
+    }
+    return null;
+  }
+
+  getVehicleColor(vehicleLabel: string | null): string {
+    if (!vehicleLabel) return '#666';
+    
+    for (const route of this.routes) {
+      if (route.vehicle.label === vehicleLabel || route.vehicle.id === vehicleLabel) {
+        return route.vehicle.color || '#666';
+      }
+    }
+    return '#666';
+  }
+
+  getRouteOptions(route: VehicleRoute, routeIndex: number): any {
+    return {
+      strokeColor: route.vehicle.color || '#666',
+      strokeWeight: 4,
+      strokeOpacity: 0.8,
+      icons: [{
+        icon: {
+          path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+          scale: 3,
+          strokeColor: route.vehicle.color || '#666',
+          fillColor: route.vehicle.color || '#666',
+          fillOpacity: 1
+        },
+        offset: '50%',
+        repeat: '100px'
+      }]
+    };
+  }
+
+  getTotalDemand(route: VehicleRoute): number {
+    return route.stops.reduce((sum, stop) => sum + stop.demand, 0);
+  }
+
   ngOnInit(): void {
     // Initialize map center from provided center
     if (this.center) {

@@ -1,0 +1,13 @@
+📋 HU28: Consultar localización de producto en bodega
+Identificador	HU28
+Nombre	Consultar localización de producto en bodega
+Descripción	Como usuario de logística, quiero consultar la localización de un producto dentro de una bodega para conocer su ubicación física y cantidades y así preparar el despacho con precisión.
+Criterios de aceptación	* Debe existir una barra de búsqueda por nombre de producto o por código. Al presionar Enter o el ícono de búsqueda, se ejecuta la consulta.
+* De acuerdo al País seleccionado en la configuración regional de la aplicación se cargarán las ciudades en un filtro y de acuerdo a la ciudad se cargarán las bodegas.
+*La pantalla debe permitir filtrar únicamente por Bodega (código/serie) mediante un selector.
+*Los resultados se muestran en formato lista; cada tarjeta representa un producto e incluye: imagen, nombre, SKU/código, Total disponible (en verde) o “Sin disponibilidad” (en rojo), y botón “Ver ubicaciones”.
+* Al hacer clic en “Ver ubicaciones”, se abre un pop‑up informativo (con botón X para cerrar) que muestra, para la bodega seleccionada: Ciudad > Bodega (código), nombre y SKU del producto, ubicación física (Sección, Pasillo, Mueble, Nivel) y tabla de lotes con columnas Lote, Vence, Disponible y Reservada.
+* La información de ubicaciones y cantidades mostrada en el pop‑up corresponde solo a la bodega seleccionada en el filtro.
+* Si el listado contiene más de 20 productos, se debe habilitar paginación.
+*Si no hay productos cargados, mostrar el mensaje "¡Ups! No hay productos disponibles en este momento".
+*Si existe un error cargando los productos, mostrar el mensaje "¡Ups! Error al cargar los productos. Intente nuevamente.".

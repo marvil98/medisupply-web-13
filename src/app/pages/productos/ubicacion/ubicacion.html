@@ -1,0 +1,129 @@
+<app-page-header [pageTitle]="pageTitle" [backRoute]="'/productos'"></app-page-header>
+
+<section class="content">
+  <h2 class="title">{{ 'productLocationTitle' | translate }}</h2>
+
+  <app-status-message
+    *ngIf="message"
+    [type]="message.type"
+    [messageKey]="message.key"
+    [float]="true">
+  </app-status-message>
+
+  <!-- Barra de búsqueda -->
+  <div class="search-section">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>{{ 'searchProductLabel' | translate }}</mat-label>
+      <input 
+        matInput 
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="onSearch()"
+        [placeholder]="'searchProductPlaceholder' | translate">
+      <mat-icon matSuffix (click)="onSearch()" class="search-icon">search</mat-icon>
+    </mat-form-field>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters-section">
+    <div class="filter-row">
+      <app-custom-select
+        [labelKey]="'countryLabel'"
+        [placeholderKey]="'countryPlaceholder'"
+        [options]="countryOptions"
+        [model]="selectedCountry"
+        (modelChange)="onCountryChange()"
+        name="country">
+      </app-custom-select>
+
+      <app-custom-select
+        [labelKey]="'cityLabel'"
+        [placeholderKey]="'cityPlaceholder'"
+        [options]="cityOptions"
+        [model]="selectedCity"
+        (modelChange)="onCityChange()"
+        name="city">
+      </app-custom-select>
+
+      <app-custom-select
+        [labelKey]="'warehouseLabel'"
+        [placeholderKey]="'warehousePlaceholder'"
+        [options]="warehouseOptions"
+        [model]="selectedWarehouse"
+        name="warehouse">
+      </app-custom-select>
+    </div>
+  </div>
+
+  <!-- Resultados -->
+  <div class="results-section" *ngIf="filteredProducts.length > 0">
+    <div class="products-grid">
+      <mat-card *ngFor="let product of filteredProducts" class="product-card">
+        <mat-card-header>
+          <div mat-card-avatar class="product-image">
+            <img [src]="product.image" [alt]="product.name" *ngIf="product.image">
+            <mat-icon *ngIf="!product.image">inventory</mat-icon>
+          </div>
+          <mat-card-title>{{ product.name }}</mat-card-title>
+          <mat-card-subtitle>{{ product.sku }}</mat-card-subtitle>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <div class="availability-info">
+            <span 
+              class="availability-badge"
+              [class.available]="product.hasAvailability"
+              [class.unavailable]="!product.hasAvailability">
+              <mat-icon>{{ product.hasAvailability ? 'check_circle' : 'cancel' }}</mat-icon>
+              <span *ngIf="product.hasAvailability">
+                {{ 'totalAvailable' | translate }}: {{ product.totalAvailable }}
+              </span>
+              <span *ngIf="!product.hasAvailability">
+                {{ 'noAvailability' | translate }}
+              </span>
+            </span>
+          </div>
+        </mat-card-content>
+        
+        <mat-card-actions>
+          <button 
+            mat-flat-button 
+            color="primary" 
+            (click)="onViewLocations(product)"
+            [disabled]="!product.hasAvailability">
+            <mat-icon>location_on</mat-icon>
+            {{ 'viewLocations' | translate }}
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+
+    <!-- Paginación -->
+    <mat-paginator
+      *ngIf="totalProducts > pageSize"
+      [length]="totalProducts"
+      [pageSize]="pageSize"
+      [pageIndex]="currentPage"
+      (page)="onPageChange($event)"
+      [pageSizeOptions]="[10, 20, 50]">
+    </mat-paginator>
+  </div>
+
+  <!-- Estados vacíos -->
+  <div class="empty-state" *ngIf="!loading && filteredProducts.length === 0 && searchQuery">
+    <mat-icon class="empty-icon">inventory_2</mat-icon>
+    <h3>{{ 'noProductsFound' | translate }}</h3>
+    <p>{{ 'noProductsMessage' | translate }}</p>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && filteredProducts.length === 0 && !searchQuery">
+    <mat-icon class="empty-icon">search</mat-icon>
+    <h3>{{ 'searchProductsTitle' | translate }}</h3>
+    <p>{{ 'searchProductsMessage' | translate }}</p>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="loading">
+    <mat-spinner></mat-spinner>
+    <p>{{ 'loadingProducts' | translate }}</p>
+  </div>
+</section>

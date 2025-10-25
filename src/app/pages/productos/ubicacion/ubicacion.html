@@ -1,7 +1,6 @@
 <app-page-header [pageTitle]="pageTitle" [backRoute]="'/productos'"></app-page-header>
 
 <section class="content">
-  <h2 class="title">{{ 'productLocationTitle' | translate }}</h2>
 
   <app-status-message
     *ngIf="message"
@@ -99,8 +98,11 @@
         [class.unavailable]="!product.hasAvailability">
         
         <div class="product-image-container">
-          <img [src]="product.image" [alt]="product.name" *ngIf="product.image" class="product-image">
-          <mat-icon *ngIf="!product.image" class="product-icon">inventory</mat-icon>
+          <img 
+            [src]="product.image || '/assets/images/products/por-defecto.png'" 
+            [alt]="product.name" 
+            class="product-image"
+            (error)="onImageError($event)">
           <div class="product-status-indicator" [class.available]="product.hasAvailability"></div>
         </div>
         

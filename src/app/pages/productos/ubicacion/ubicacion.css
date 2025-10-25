@@ -290,10 +290,6 @@
   object-fit: cover;
 }
 
-.product-icon {
-  font-size: 32px;
-  color: #ccc;
-}
 
 .product-status-indicator {
   position: absolute;

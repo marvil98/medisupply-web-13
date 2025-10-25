@@ -1,0 +1,234 @@
+<app-page-header [pageTitle]="pageTitle" [backRoute]="'/productos'"></app-page-header>
+
+<section class="content">
+
+  <app-status-message
+    *ngIf="message"
+    [type]="message.type"
+    [messageKey]="message.key"
+    [float]="true">
+  </app-status-message>
+
+  <!-- Barra de búsqueda -->
+  <div class="search-section">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>{{ 'searchProductLabel' | translate }}</mat-label>
+      <input 
+        matInput 
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="onSearch()"
+        [placeholder]="'searchProductPlaceholder' | translate">
+      <mat-icon matSuffix (click)="onSearch()" class="search-icon">search</mat-icon>
+    </mat-form-field>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters-section">
+    <div class="filter-row">
+      <app-custom-select
+        [labelKey]="'cityLabel'"
+        [placeholderKey]="'cityPlaceholder'"
+        [options]="cityOptions"
+        [model]="selectedCity"
+        (modelChange)="onCityChange()"
+        name="city">
+      </app-custom-select>
+
+      <app-custom-select
+        [labelKey]="'warehouseLabel'"
+        [placeholderKey]="'warehousePlaceholder'"
+        [options]="warehouseOptions"
+        [model]="selectedWarehouse"
+        (modelChange)="onWarehouseChange()"
+        name="warehouse">
+      </app-custom-select>
+    </div>
+  </div>
+
+  <!-- Panel de Resultados -->
+  <div class="results-panel" *ngIf="filteredProducts.length > 0">
+    <!-- Header del Panel -->
+    <div class="panel-header">
+      <div class="panel-title">
+        <mat-icon>inventory_2</mat-icon>
+        <h3>Productos Encontrados ({{ getTotalFilteredProducts() }})</h3>
+        <span class="sort-indicator" *ngIf="sortBy !== 'none'">
+          <mat-icon>{{ getSortIcon() }}</mat-icon>
+          <span>{{ getSortLabel() }}</span>
+        </span>
+      </div>
+      <div class="panel-actions">
+        <button mat-icon-button (click)="toggleViewMode()" [title]="viewMode === 'grid' ? 'Vista Lista' : 'Vista Cuadrícula'">
+          <mat-icon>{{ viewMode === 'grid' ? 'view_list' : 'view_module' }}</mat-icon>
+        </button>
+        <button mat-icon-button (click)="toggleSort()" [title]="getSortTooltip()">
+          <mat-icon>{{ getSortIcon() }}</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Filtros Rápidos -->
+    <div class="quick-filters">
+      <button 
+        mat-stroked-button 
+        [class.active]="availabilityFilter === 'all'"
+        (click)="setAvailabilityFilter('all')">
+        Todos ({{ getTotalFilteredProducts() }})
+      </button>
+      <button 
+        mat-stroked-button 
+        [class.active]="availabilityFilter === 'available'"
+        (click)="setAvailabilityFilter('available')">
+        Disponibles ({{ getAvailableCount() }})
+      </button>
+      <button 
+        mat-stroked-button 
+        [class.active]="availabilityFilter === 'unavailable'"
+        (click)="setAvailabilityFilter('unavailable')">
+        Sin Stock ({{ getUnavailableCount() }})
+      </button>
+    </div>
+
+    <!-- Grid de Productos -->
+    <div class="products-container" [class.list-view]="viewMode === 'list'">
+      <div 
+        *ngFor="let product of getFilteredProducts(); trackBy: trackByProductId" 
+        class="product-item"
+        [class.list-item]="viewMode === 'list'"
+        [class.unavailable]="!product.hasAvailability">
+        
+        <div class="product-image-container">
+          <img 
+            [src]="product.image || '/assets/images/products/por-defecto.png'" 
+            [alt]="product.name" 
+            class="product-image"
+            (error)="onImageError($event)">
+          <div class="product-status-indicator" [class.available]="product.hasAvailability"></div>
+        </div>
+        
+        <div class="product-info">
+          <h4 class="product-name">{{ product.name }}</h4>
+          <p class="product-sku">{{ product.sku }}</p>
+          <div class="product-meta">
+            <span class="warehouse-info">
+              <mat-icon>warehouse</mat-icon>
+              {{ getWarehouseName(product.warehouse) }}
+            </span>
+          </div>
+        </div>
+        
+        <div class="product-availability">
+          <div class="availability-badge" [class.available]="product.hasAvailability" [class.unavailable]="!product.hasAvailability">
+            <mat-icon>{{ product.hasAvailability ? 'check_circle' : 'cancel' }}</mat-icon>
+            <span *ngIf="product.hasAvailability" class="available-text">
+              {{ product.totalAvailable }} unidades
+            </span>
+            <span *ngIf="!product.hasAvailability" class="unavailable-text">
+              Sin stock
+            </span>
+          </div>
+        </div>
+        
+        <div class="product-actions">
+          <button 
+            mat-flat-button 
+            color="primary" 
+            (click)="onViewLocations(product)"
+            [disabled]="!product.hasAvailability"
+            class="action-button">
+            <mat-icon>location_on</mat-icon>
+            Ver Ubicaciones
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paginación -->
+    <mat-paginator
+      *ngIf="getTotalFilteredProducts() > pageSize"
+      [length]="getTotalFilteredProducts()"
+      [pageSize]="pageSize"
+      [pageIndex]="currentPage"
+      (page)="onPageChange($event)"
+      [pageSizeOptions]="paginationOptions">
+    </mat-paginator>
+  </div>
+
+  <!-- Estados vacíos -->
+  <div class="empty-state" *ngIf="!loading && filteredProducts.length === 0 && searchQuery">
+    <mat-icon class="empty-icon">inventory_2</mat-icon>
+    <h3>{{ 'noProductsFound' | translate }}</h3>
+    <p>{{ 'noProductsMessage' | translate }}</p>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && filteredProducts.length === 0 && !searchQuery">
+    <mat-icon class="empty-icon">search</mat-icon>
+    <h3>{{ 'searchProductsTitle' | translate }}</h3>
+    <p>{{ 'searchProductsMessage' | translate }}</p>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="loading">
+    <mat-spinner></mat-spinner>
+    <p>{{ 'loadingProducts' | translate }}</p>
+  </div>
+</section>
+
+<!-- Popup de ubicaciones -->
+<div class="popup-overlay" *ngIf="showLocationPopup" (click)="closeLocationPopup()">
+  <div class="popup-content" (click)="$event.stopPropagation()" *ngIf="selectedProduct">
+    <div class="popup-header">
+      <h3 class="popup-title">{{ getCityName(selectedProduct.city) }} > {{ getWarehouseName(selectedProduct.warehouse) }}</h3>
+      <button class="close-button" (click)="closeLocationPopup()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    
+    <div class="popup-body">
+      <div class="product-info">
+        <h4 class="product-name">{{ selectedProduct.name }}</h4>
+        <p class="product-sku">SKU {{ selectedProduct.sku }} • Total: {{ selectedProduct.totalAvailable }}</p>
+      </div>
+      
+      <div class="location-details" *ngIf="selectedProduct.locations && selectedProduct.locations.length > 0">
+        <h5 class="location-title">Ubicación Física</h5>
+        <div class="location-grid">
+          <div class="location-item">
+            <span class="location-label">Sección</span>
+            <span class="location-value">{{ selectedProduct.locations[0].section }}</span>
+          </div>
+          <div class="location-item">
+            <span class="location-label">Pasillo</span>
+            <span class="location-value">{{ selectedProduct.locations[0].aisle }}</span>
+          </div>
+          <div class="location-item">
+            <span class="location-label">Mueble</span>
+            <span class="location-value">{{ selectedProduct.locations[0].shelf }}</span>
+          </div>
+          <div class="location-item">
+            <span class="location-label">Nivel</span>
+            <span class="location-value">{{ selectedProduct.locations[0].level }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="lots-section" *ngIf="selectedProduct.locations && selectedProduct.locations.length > 0">
+        <h5 class="lots-title">Detalle de Lotes</h5>
+        <div class="lots-table">
+          <div class="table-header">
+            <span>Lote</span>
+            <span>Vence</span>
+            <span>Disponible</span>
+            <span>Reservada</span>
+          </div>
+          <div class="table-row" *ngFor="let location of selectedProduct.locations">
+            <span class="lot-number">{{ location.lot }}</span>
+            <span class="expiry-date">{{ formatDate(location.expires) }}</span>
+            <span class="available-qty">{{ location.available }}</span>
+            <span class="reserved-qty">{{ location.reserved }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

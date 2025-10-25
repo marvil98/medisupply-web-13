@@ -31,8 +31,40 @@ export class SalesReport {
   // Función simple para convertir valores según el país
   private convertValue(value: number): number {
     const country = localStorage.getItem('userCountry') || 'CO';
-    const rates: Record<string, number> = { 'CO': 4100, 'PE': 3.7, 'EC': 1, 'MX': 17.5 };
-    return Math.round(value * (rates[country] || 1));
+    
+    // Tasas de conversión actualizadas (octubre 2024)
+    // El backend devuelve valores en pesos colombianos (COP)
+    const rates: Record<string, number> = { 
+      'CO': 1,           // Colombia - Sin conversión (ya está en pesos)
+      'PE': 0.0014,      // Perú - COP a PEN (1 COP ≈ 0.0014 PEN)
+      'EC': 0.00026,     // Ecuador - COP a USD (1 COP ≈ 0.00026 USD)
+      'MX': 0.0047       // México - COP a MXN (1 COP ≈ 0.0047 MXN)
+    };
+    
+    const rate = rates[country] || 1;
+    const convertedValue = Math.round(value * rate);
+    
+    console.log('💰 SalesReport: Conversión de valor:', {
+      valorOriginal: value,
+      pais: country,
+      monedaOriginal: 'COP (Peso Colombiano)',
+      monedaDestino: this.getCurrencyName(country),
+      tasa: rate,
+      valorConvertido: convertedValue
+    });
+    
+    return convertedValue;
+  }
+
+  // Función auxiliar para obtener el nombre de la moneda
+  private getCurrencyName(country: string): string {
+    const currencies: Record<string, string> = {
+      'CO': 'COP (Peso Colombiano)',
+      'PE': 'PEN (Sol Peruano)', 
+      'EC': 'USD (Dólar Estadounidense)',
+      'MX': 'MXN (Peso Mexicano)'
+    };
+    return currencies[country] || 'COP (Peso Colombiano)';
   }
 
   // Computed signal para obtener el símbolo de moneda según el país
@@ -72,24 +104,106 @@ export class SalesReport {
     const data = this.reportData();
     if (!data || !data.grafico) return [];
   
+    // Generar etiquetas más descriptivas basadas en el tipo de período
+    const periodLabels = this.generatePeriodLabels(data.period_type, data.grafico.length);
+  
     return [
       {
         name: 'Ventas',
         series: data.grafico.map((valor: number, index: number) => ({
-          name: `T${index + 1}`,
+          name: periodLabels[index] || `Período ${index + 1}`,
           value: valor,
         })),
       },
     ];
   }
+
+  private generatePeriodLabels(periodType: string, dataLength: number): string[] {
+    const labels: string[] = [];
+    
+    // Validar coherencia entre tipo de período y cantidad de datos
+    const expectedLength = this.getExpectedDataLength(periodType);
+    if (expectedLength && dataLength !== expectedLength) {
+      console.warn(`⚠️ Inconsistencia detectada: ${periodType} esperaba ${expectedLength} puntos, pero recibió ${dataLength}`);
+    }
+    
+    switch (periodType) {
+      case 'bimestral':
+        // Bimestral: Desglose por semanas (6-8 semanas en 2 meses)
+        for (let i = 0; i < dataLength; i++) {
+          labels.push(`Semana ${i + 1}`);
+        }
+        break;
+      case 'trimestral':
+        // Trimestral: Desglose por semanas (12-13 semanas en 3 meses)
+        for (let i = 0; i < dataLength; i++) {
+          labels.push(`Semana ${i + 1}`);
+        }
+        break;
+      case 'semestral':
+        // Semestral: Desglose por meses (6 meses)
+        if (dataLength === 6) {
+          const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'];
+          labels.push(...monthNames);
+        } else {
+          // Si no son exactamente 6, usar genérico
+          for (let i = 0; i < dataLength; i++) {
+            labels.push(`Mes ${i + 1}`);
+          }
+        }
+        break;
+      case 'anual':
+        // Anual: Desglose por meses (12 meses)
+        if (dataLength === 12) {
+          const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 
+                             'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+          labels.push(...monthNames);
+        } else {
+          // Para otros casos, usar genérico
+          for (let i = 0; i < dataLength; i++) {
+            labels.push(`Mes ${i + 1}`);
+          }
+        }
+        break;
+      default:
+        // Fallback genérico
+        for (let i = 0; i < dataLength; i++) {
+          labels.push(`Período ${i + 1}`);
+        }
+    }
+    
+    return labels;
+  }
+
+  private getExpectedDataLength(periodType: string): number | null {
+    switch (periodType) {
+      case 'bimestral':
+        return 6; // 6-8 semanas en 2 meses (promedio 6)
+      case 'trimestral':
+        return 12; // 12-13 semanas en 3 meses (promedio 12)
+      case 'semestral':
+        return 6; // 6 meses
+      case 'anual':
+        return 12; // 12 meses
+      default:
+        return null; // No hay expectativa definida
+    }
+  }
   
 
   generarReporte() {
+    const startTime = performance.now();
+    
+    console.log('🚀 SalesReport: ===== INICIANDO GENERACIÓN DE REPORTE =====');
+    console.log('⏱️ SalesReport: Timestamp inicio:', new Date().toISOString());
+    console.log('🕐 SalesReport: Tiempo de inicio (ms):', startTime);
+    
     // Limpiar mensaje anterior y datos
     this.showMessage.set(false);
     this.reportData.set(null);
     
     // Preparar datos de la petición
+    const country = localStorage.getItem('userCountry') || 'CO';
     const request: SalesReportRequest = {
       vendor_id: this.vendedor(),
       period: this.periodo(),
@@ -97,26 +211,49 @@ export class SalesReport {
       end_date: this.getEndDate()
     };
 
-    console.log('🚀 SalesReport: Iniciando consulta al backend');
-    console.log('📊 SalesReport: Datos de la petición:', request);
+    console.log('📋 SalesReport: Parámetros del usuario:');
+    console.log('👤 SalesReport: Vendedor seleccionado:', this.vendedor());
+    console.log('📅 SalesReport: Período seleccionado:', this.periodo());
+    console.log('🌍 SalesReport: País seleccionado:', country);
+    console.log('📊 SalesReport: Fecha inicio calculada:', this.getStartDate());
+    console.log('📊 SalesReport: Fecha fin calculada:', this.getEndDate());
+    console.log('📦 SalesReport: Request completo:', JSON.stringify(request, null, 2));
 
     // Realizar petición al backend
     this.salesReportService.getSalesReport(request).subscribe({
       next: (response) => {
-        console.log('✅ SalesReport: Respuesta completa del backend:', response);
+        const endTime = performance.now();
+        const duration = endTime - startTime;
+        
+        console.log('✅ SalesReport: ===== RESPUESTA RECIBIDA EN COMPONENTE =====');
+        console.log('⏱️ SalesReport: Timestamp fin:', new Date().toISOString());
+        console.log('🕐 SalesReport: Tiempo de fin (ms):', endTime);
+        console.log('⏰ SalesReport: Duración total componente (ms):', Math.round(duration * 100) / 100);
+        console.log('📋 SalesReport: Response completa del backend:', JSON.stringify(response, null, 2));
         
         // Extraer los datos del response (el backend devuelve {data: {...}, success: true})
         const rawData = response.data || response;
-        console.log('📊 SalesReport: Datos extraídos:', rawData);
+        console.log('📊 SalesReport: Datos extraídos de response:', rawData);
         
         if (!rawData || !rawData.productos || !rawData.grafico) {
-          console.error('❌ SalesReport: Estructura de datos inválida:', rawData);
+          console.error('❌ SalesReport: ===== ESTRUCTURA DE DATOS INVÁLIDA =====');
+          console.error('❌ SalesReport: Datos recibidos:', rawData);
+          console.error('❌ SalesReport: ¿Tiene productos?:', !!rawData?.productos);
+          console.error('❌ SalesReport: ¿Tiene gráfico?:', !!rawData?.grafico);
+          console.error('❌ SalesReport: Productos recibidos:', rawData?.productos);
+          console.error('❌ SalesReport: Gráfico recibido:', rawData?.grafico);
+          
           this.messageType.set('error');
           this.messageText.set('salesReportError');
           this.showMessage.set(true);
           this.reportData.set(null);
           return;
         }
+        
+        console.log('🌍 SalesReport: Configuración de país:');
+        console.log('🌍 SalesReport: País actual:', localStorage.getItem('userCountry') || 'CO');
+        console.log('🌍 SalesReport: Símbolo de moneda:', this.currencySymbol());
+        console.log('💡 SalesReport: NOTA: El backend siempre devuelve datos en COP, las conversiones se hacen en el frontend');
         
         // Convertir valores según el país actual
         const convertedData = {
@@ -126,37 +263,57 @@ export class SalesReport {
             ...producto,
             ventas: this.convertValue(producto.ventas)
           })),
-          grafico: rawData.grafico.map(value => this.convertValue(value))
+          grafico: rawData.grafico // Los valores del gráfico NO se convierten - son unidades/cantidades
         };
 
-        console.log('🌍 País actual:', localStorage.getItem('userCountry') || 'CO');
-        console.log('💰 Datos originales:', rawData);
-        console.log('📦 Productos originales:', rawData.productos);
-        console.log('📦 Número de productos:', rawData.productos?.length);
-        console.log('📦 Detalle de productos originales:', rawData.productos?.map(p => ({ nombre: p.nombre, ventas: p.ventas })));
-        console.log('🔄 Datos convertidos:', convertedData);
-        console.log('📦 Productos convertidos:', convertedData.productos);
-        console.log('📦 Número de productos convertidos:', convertedData.productos?.length);
+        console.log('💰 SalesReport: Conversión de monedas:');
+        console.log('💰 SalesReport: Ventas totales originales:', rawData.ventasTotales);
+        console.log('💰 SalesReport: Ventas totales convertidas:', convertedData.ventasTotales);
+        console.log('📦 SalesReport: Productos originales:', rawData.productos);
+        console.log('📦 SalesReport: Número de productos:', rawData.productos?.length);
+        console.log('📦 SalesReport: Detalle productos originales:', rawData.productos?.map(p => ({ 
+          nombre: p.nombre, 
+          ventas: p.ventas 
+        })));
+        console.log('🔄 SalesReport: Datos convertidos:', convertedData);
+        console.log('📦 SalesReport: Productos convertidos:', convertedData.productos);
+        console.log('📦 SalesReport: Número de productos convertidos:', convertedData.productos?.length);
+        console.log('📊 SalesReport: Gráfico original:', rawData.grafico);
+        console.log('📊 SalesReport: Gráfico convertido:', convertedData.grafico);
+        console.log('💡 SalesReport: NOTA: El gráfico mantiene los valores originales porque representan cantidades/unidades, no valores monetarios');
     
+        console.log('✅ SalesReport: ===== REPORTE GENERADO EXITOSAMENTE =====');
         this.messageType.set('success');
         this.messageText.set('salesReportSuccess');
         this.showMessage.set(true);
         this.reportData.set(convertedData);
       },
       error: (error) => {
-        console.error('❌ SalesReport: Error en la consulta:', error);
+        const endTime = performance.now();
+        const duration = endTime - startTime;
+        
+        console.error('❌ SalesReport: ===== ERROR EN GENERACIÓN DE REPORTE =====');
+        console.error('⏱️ SalesReport: Timestamp error:', new Date().toISOString());
+        console.error('🕐 SalesReport: Tiempo de error (ms):', endTime);
+        console.error('⏰ SalesReport: Duración hasta error (ms):', Math.round(duration * 100) / 100);
+        console.error('📊 SalesReport: Status HTTP:', error.status || 'Desconocido');
+        console.error('📋 SalesReport: Mensaje de error:', error.message || 'Sin mensaje');
+        console.error('🔍 SalesReport: Error completo:', error);
         
         // Mensaje específico para cuando no hay datos (404)
         if (error.status === 404) {
+          console.error('❌ SalesReport: Error 404 - No hay datos para los parámetros especificados');
           this.messageType.set('error');
           this.messageText.set('salesReportNoDataForParams');
         } else {
+          console.error('❌ SalesReport: Error general en la consulta');
           this.messageType.set('error');
           this.messageText.set('salesReportError');
         }
         
         this.showMessage.set(true);
         this.reportData.set(null);
+        console.error('❌ SalesReport: ===== ERROR MANEJADO =====');
       }
     });
   }
@@ -171,26 +328,39 @@ export class SalesReport {
     const period = this.periodo();
     const currentDate = new Date();
     
+    console.log('📅 SalesReport: Calculando fecha de inicio para período:', period);
+    console.log('📅 SalesReport: Fecha actual:', currentDate.toISOString());
+    
     switch (period) {
       case 'bimestral':
         currentDate.setMonth(currentDate.getMonth() - 2);
+        console.log('📅 SalesReport: Período bimestral - restando 2 meses');
         break;
       case 'trimestral':
         currentDate.setMonth(currentDate.getMonth() - 3);
+        console.log('📅 SalesReport: Período trimestral - restando 3 meses');
         break;
       case 'semestral':
         currentDate.setMonth(currentDate.getMonth() - 6);
+        console.log('📅 SalesReport: Período semestral - restando 6 meses');
         break;
       case 'anual':
         currentDate.setFullYear(currentDate.getFullYear() - 1);
+        console.log('📅 SalesReport: Período anual - restando 1 año');
         break;
+      default:
+        console.warn('⚠️ SalesReport: Período no reconocido:', period);
     }
     
-    return currentDate.toISOString().split('T')[0];
+    const startDate = currentDate.toISOString().split('T')[0];
+    console.log('📅 SalesReport: Fecha de inicio calculada:', startDate);
+    return startDate;
   }
 
   private getEndDate(): string {
-    return new Date().toISOString().split('T')[0];
+    const endDate = new Date().toISOString().split('T')[0];
+    console.log('📅 SalesReport: Fecha de fin (actual):', endDate);
+    return endDate;
   }
   
 }

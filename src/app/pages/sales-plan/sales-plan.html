@@ -1,0 +1,310 @@
+<app-page-header 
+  [pageTitle]="pageTitle" 
+  [backRoute]="backRoute">
+</app-page-header>
+
+<div class="sales-plan-container">
+  <div class="form-container">
+    <form [formGroup]="salesPlanForm" (ngSubmit)="createSalesPlan()">
+      
+      <!-- Selector de Producto -->
+      <div class="product-selector-section">
+        <label class="product-label">{{ 'product_label' | translate }}</label>
+        <div class="product-selector-container" (click)="toggleProductSelector()">
+          <span class="selector-text">
+            {{ getSelectedProductsText() | translate }}
+          </span>
+          <mat-icon class="selector-icon">{{ isProductSelectorOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
+        </div>
+        
+                <!-- Controles de búsqueda y ordenamiento -->
+                <div class="product-controls-container" *ngIf="isProductSelectorOpen">
+                  <!-- Filtro de búsqueda -->
+                  <div class="product-search-container">
+                    <mat-form-field appearance="outline" class="search-field">
+                      <mat-label>{{ 'search_products_label' | translate }}</mat-label>
+                      <input 
+                        matInput 
+                        [ngModel]="productSearchFilter()"
+                        (ngModelChange)="onSearchChange($event)"
+                        [ngModelOptions]="{standalone: true}"
+                        [placeholder]="'search_products_placeholder' | translate"
+                        class="search-input">
+                      <mat-icon matSuffix>search</mat-icon>
+                      <button 
+                        mat-icon-button 
+                        matSuffix 
+                        *ngIf="productSearchFilter()"
+                        (click)="clearProductFilter()"
+                        class="clear-button">
+                        <mat-icon>clear</mat-icon>
+                      </button>
+                    </mat-form-field>
+                  </div>
+
+                  <!-- Controles de ordenamiento y paginación -->
+                  <div class="product-sort-pagination">
+                    <!-- Ordenamiento -->
+                    <div class="sort-controls">
+                      <mat-form-field appearance="outline" class="sort-field">
+                        <mat-label>{{ 'sort_by_label' | translate }}</mat-label>
+                        <mat-select 
+                          [ngModel]="sortBy()"
+                          (ngModelChange)="setSortBy($event)"
+                          [ngModelOptions]="{standalone: true}">
+                          <mat-option value="name">{{ 'sort_name' | translate }}</mat-option>
+                          <mat-option value="price">{{ 'sort_price' | translate }}</mat-option>
+                          <mat-option value="popularity">{{ 'sort_popularity' | translate }}</mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                      
+                      <button 
+                        mat-icon-button 
+                        (click)="toggleSortOrder()"
+                        class="sort-order-button"
+                        [title]="sortOrder() === 'asc' ? 'sort_desc' : 'sort_asc'">
+                        <mat-icon>{{ sortOrder() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+                      </button>
+                    </div>
+
+                    <!-- Items por página -->
+                    <div class="items-per-page">
+                      <mat-form-field appearance="outline" class="items-field">
+                        <mat-label>{{ 'items_per_page' | translate }}</mat-label>
+                        <mat-select 
+                          [ngModel]="itemsPerPage()"
+                          (ngModelChange)="setItemsPerPage($event)"
+                          [ngModelOptions]="{standalone: true}">
+                          <mat-option value="10">10</mat-option>
+                          <mat-option value="20">20</mat-option>
+                          <mat-option value="50">50</mat-option>
+                          <mat-option value="100">100</mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <!-- Información de resultados -->
+                  <div class="results-info" *ngIf="paginationInfo().total > 0">
+                    <span class="results-text">
+                      {{ 'showing_results' | translate }}: 
+                      {{ paginationInfo().startItem }}-{{ paginationInfo().endItem }} 
+                      {{ 'of' | translate }} {{ paginationInfo().total }}
+                    </span>
+                  </div>
+                </div>
+
+        <!-- Grid de Productos -->
+        <div class="products-grid" *ngIf="isProductSelectorOpen">
+          <!-- Mensaje cuando no hay productos -->
+          <div class="no-products-message" *ngIf="filteredProducts().length === 0">
+            <mat-icon>search_off</mat-icon>
+            <p>{{ 'no_products_found' | translate }}</p>
+            <button mat-button (click)="clearProductFilter()" class="clear-filter-button">
+              {{ 'clear_filter_button' | translate }}
+            </button>
+          </div>
+          
+          <!-- Lista de productos paginados -->
+          <div class="product-card" 
+               *ngFor="let product of paginatedProducts()" 
+               (click)="selectProduct(product)"
+               [class.selected]="isProductSelected(product)">
+            
+            <!-- Indicador de selección -->
+            <div class="selection-indicator" *ngIf="isProductSelected(product)">
+              <mat-icon>check_circle</mat-icon>
+            </div>
+            
+            <!-- Columna 1: Imagen -->
+            <div class="product-image">
+              <img 
+                [src]="getProductImage(product)" 
+                [alt]="product.name"
+                (error)="onImageError($event, product)"
+                class="product-img">
+            </div>
+            
+            <!-- Columna 2: Detalles del producto -->
+            <div class="product-details">
+              <div class="product-name">{{ product.name }}</div>
+              <div class="product-price">{{ getConvertedPrice(product) | currency:currencySymbol():'symbol':'1.0-0' }}</div>
+            </div>
+            
+            <!-- Columna 3: Botón Meta -->
+            <button class="meta-button" 
+                    (click)="setProductGoal(product, $event)"
+                    [disabled]="!isProductSelected(product)">
+              {{ 'goal_button' | translate }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Controles de paginación -->
+        <div class="pagination-controls" *ngIf="isProductSelectorOpen && paginationInfo().totalPages > 1">
+          <div class="pagination-info">
+            <span>{{ 'page' | translate }} {{ paginationInfo().current }} {{ 'of' | translate }} {{ paginationInfo().totalPages }}</span>
+          </div>
+          
+          <div class="pagination-buttons">
+            <button 
+              mat-icon-button 
+              (click)="previousPage()"
+              [disabled]="paginationInfo().current === 1"
+              class="pagination-button">
+              <mat-icon>chevron_left</mat-icon>
+            </button>
+            
+            <!-- Números de página -->
+            <div class="page-numbers">
+              <button 
+                mat-button 
+                *ngFor="let page of [].constructor(paginationInfo().totalPages); let i = index"
+                (click)="goToPage(i + 1)"
+                [class.active]="paginationInfo().current === (i + 1)"
+                class="page-button">
+                {{ i + 1 }}
+              </button>
+            </div>
+            
+            <button 
+              mat-icon-button 
+              (click)="nextPage()"
+              [disabled]="paginationInfo().current === paginationInfo().totalPages"
+              class="pagination-button">
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Selector de Región -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ 'region_label' | translate }}</mat-label>
+        <mat-select 
+          formControlName="region" 
+          (blur)="validateField('region')"
+          required>
+          <mat-option 
+            *ngFor="let region of regionOptions" 
+            [value]="region.value">
+            {{ region.labelKey | translate }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="getErrorMessage('region')">
+          {{ getErrorMessage('region') }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Selector de Período -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ 'period_label' | translate }}</mat-label>
+        <mat-select 
+          formControlName="quarter" 
+          (blur)="validateField('quarter')"
+          required>
+          <mat-option 
+            *ngFor="let quarter of quarterOptions" 
+            [value]="quarter.value">
+            {{ quarter.labelKey | translate }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="getErrorMessage('quarter')">
+          {{ getErrorMessage('quarter') }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Campo Meta -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ 'goal_label' | translate }}</mat-label>
+        <input 
+          matInput 
+          type="text" 
+          formControlName="totalGoal"
+          (input)="onTotalGoalChange($event.target.value)"
+          (blur)="validateField('totalGoal')"
+          placeholder="$1.000.000"
+          required>
+        <mat-error *ngIf="getErrorMessage('totalGoal')">
+          {{ getErrorMessage('totalGoal') }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Botón Crear Plan -->
+      <div class="action-buttons">
+        <button 
+          mat-raised-button 
+          type="submit"
+          [disabled]="!isFormValid() || saveStatus() === 'saving'"
+          class="create-button">
+          {{ 'create_plan_button' | translate }}
+        </button>
+      </div>
+
+      <!-- Mensajes de Estado -->
+      <div class="status-messages" *ngIf="saveStatus() !== 'idle'">
+        <div *ngIf="saveStatus() === 'saving'" class="saving-message">
+          <mat-icon>hourglass_empty</mat-icon>
+          {{ 'saving_plan' | translate }}
+        </div>
+        
+        <div *ngIf="saveStatus() === 'success'" class="success-message">
+          <mat-icon>check_circle</mat-icon>
+          {{ 'plan_created_success' | translate }}
+        </div>
+        
+        <div *ngIf="saveStatus() === 'error'" class="error-message">
+          <mat-icon>error</mat-icon>
+          {{ 'plan_creation_error' | translate }}
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal para establecer meta -->
+<div class="modal-overlay" *ngIf="showGoalModal" (click)="closeGoalModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ 'set_goal_title' | translate }}</h3>
+      <button class="close-button" (click)="closeGoalModal()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <p class="product-info">
+        {{ 'set_goal_for' | translate }} <strong>{{ currentProduct?.name }}</strong>
+      </p>
+      
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ 'goal_value_label' | translate }}</mat-label>
+        <input 
+          matInput 
+          type="number" 
+          [(ngModel)]="goalValue"
+          [ngModelOptions]="{standalone: true}"
+          placeholder="0"
+          min="1"
+          required>
+        <mat-error *ngIf="!goalValue || +goalValue <= 0">
+          {{ 'goal_validation_error' | translate }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+    
+    <div class="modal-footer">
+      <button mat-button (click)="closeGoalModal()" class="cancel-button">
+        {{ 'cancel_button' | translate }}
+      </button>
+      <button 
+        mat-raised-button 
+        color="primary" 
+        (click)="saveGoal()"
+        [disabled]="!goalValue || +goalValue <= 0"
+        class="save-button">
+        {{ 'save_goal_button' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { ProductValidationService } from './product-validation.service';
 
 export interface ValidationResult {
   isValid: boolean;
@@ -8,6 +9,7 @@ export interface ValidationResult {
 }
 
 export interface ProductTemplate {
+  sku: string;
   nombre: string;
   descripcion: string;
   precio: number;
@@ -20,7 +22,10 @@ export interface ProductTemplate {
   providedIn: 'root'
 })
 export class FileValidationService {
+  
+  constructor(private productValidationService: ProductValidationService) {}
   private readonly requiredFields = [
+    'sku',
     'nombre',
     'descripcion', 
     'precio',
@@ -30,6 +35,7 @@ export class FileValidationService {
   ];
 
   private readonly fieldTypes = {
+    sku: 'string',
     nombre: 'string',
     descripcion: 'string',
     precio: 'number',
@@ -86,8 +92,11 @@ export class FileValidationService {
 
       // Validar duplicados (siempre ejecutar, independientemente de otros errores)
       const duplicates = this.findDuplicates(data);
-      if (duplicates.length > 0) {
-        errors.push(`Se encontraron productos duplicados: ${duplicates.join(', ')}`);
+      if (duplicates.sku.length > 0) {
+        errors.push(`Se encontraron SKUs duplicados en el archivo: ${duplicates.sku.join(', ')}`);
+      }
+      if (duplicates.nombre.length > 0) {
+        errors.push(`Se encontraron productos duplicados en el archivo: ${duplicates.nombre.join(', ')}`);
       }
 
       return {
@@ -162,6 +171,7 @@ export class FileValidationService {
 
     // Mapeo de variaciones de nombres de campos
     const fieldVariations: { [key: string]: string[] } = {
+      'sku': ['sku', 'codigo', 'code', 'cod', 'id_producto', 'product_id'],
       'nombre': ['nombre', 'name', 'producto', 'product', 'item'],
       'descripcion': ['descripcion', 'description', 'desc', 'detalle', 'detail'],
       'precio': ['precio', 'price', 'costo', 'cost', 'valor'],
@@ -279,6 +289,7 @@ export class FileValidationService {
     });
 
     return {
+      sku: rowData[headerMap['sku']]?.trim() || '',
       nombre: rowData[headerMap['nombre']]?.trim() || '',
       descripcion: rowData[headerMap['descripcion']]?.trim() || '',
       precio: parseFloat(rowData[headerMap['precio']]?.trim() || '0'),
@@ -303,30 +314,93 @@ export class FileValidationService {
     return duplicates;
   }
 
-  private findDuplicates(data: ProductTemplate[]): string[] {
-    const seen = new Set<string>();
-    const duplicates: string[] = [];
+  private findDuplicates(data: ProductTemplate[]): { sku: string[], nombre: string[] } {
+    const seenSku = new Set<string>();
+    const seenNombre = new Set<string>();
+    const duplicateSkus: string[] = [];
+    const duplicateNombres: string[] = [];
     
     for (const product of data) {
-      // Crear una clave única basada en nombre y código (si existe)
-      const key = `${product.nombre.toLowerCase().trim()}`;
+      // Validar duplicados por SKU
+      const skuKey = product.sku.toLowerCase().trim();
+      if (skuKey && seenSku.has(skuKey)) {
+        duplicateSkus.push(product.sku);
+      } else if (skuKey) {
+        seenSku.add(skuKey);
+      }
       
-      if (seen.has(key)) {
-        duplicates.push(product.nombre);
-      } else {
-        seen.add(key);
+      // Validar duplicados por nombre
+      const nombreKey = product.nombre.toLowerCase().trim();
+      if (nombreKey && seenNombre.has(nombreKey)) {
+        duplicateNombres.push(product.nombre);
+      } else if (nombreKey) {
+        seenNombre.add(nombreKey);
       }
     }
     
-    return duplicates;
+    return { sku: duplicateSkus, nombre: duplicateNombres };
+  }
+
+  /**
+   * Valida productos contra la base de datos existente
+   */
+  async validateAgainstExistingProducts(data: ProductTemplate[]): Promise<ValidationResult> {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    try {
+      // Obtener productos existentes de la BD
+      const existingProducts = await this.productValidationService.getAllProducts().toPromise();
+      
+      if (!existingProducts) {
+        warnings.push('No se pudieron obtener los productos existentes para validación');
+        return { isValid: true, errors, warnings, data };
+      }
+
+      // Validar SKUs contra productos existentes
+      const skus = data.map(p => p.sku).filter(sku => sku.trim() !== '');
+      const skuValidationResults = this.productValidationService.validateSkusLocally(skus, existingProducts);
+      
+      skuValidationResults.forEach((result, index) => {
+        if (!result.isValid && result.errorMessage) {
+          errors.push(`Fila ${index + 2}: ${result.errorMessage}`);
+        }
+      });
+
+      // Validar duplicados en el archivo
+      const skuDuplicates = this.productValidationService.validateSkuDuplicatesInFile(data);
+      const nameDuplicates = this.productValidationService.validateNameDuplicatesInFile(data);
+
+      skuDuplicates.forEach(duplicate => {
+        errors.push(`SKU '${duplicate.sku}' duplicado en las filas: ${duplicate.rowNumbers.join(', ')}`);
+      });
+
+      nameDuplicates.forEach(duplicate => {
+        errors.push(`Producto '${duplicate.nombre}' duplicado en las filas: ${duplicate.rowNumbers.join(', ')}`);
+      });
+
+      return {
+        isValid: errors.length === 0,
+        errors,
+        warnings,
+        data: errors.length === 0 ? data : undefined
+      };
+
+    } catch (error) {
+      return {
+        isValid: false,
+        errors: ['Error al validar contra productos existentes'],
+        warnings: []
+      };
+    }
   }
 
   generateTemplateCSV(): string {
     const headers = this.requiredFields.join(',');
     const sampleData = [
-      'Producto Ejemplo 1,Descripción del producto 1,10000,Categoría A,10,unidad',
-      'Producto Ejemplo 2,Descripción del producto 2,15000,Categoría B,5,kg',
-      'Producto Ejemplo 3,Descripción del producto 3,20000,Categoría A,15,litro'
+      'MED-001,Producto Ejemplo 1,Descripción del producto 1,10000,Categoría A,10,unidad',
+      'MED-002,Producto Ejemplo 2,Descripción del producto 2,15000,Categoría B,5,kg',
+      'SURG-001,Producto Ejemplo 3,Descripción del producto 3,20000,Categoría A,15,litro'
     ].join('\n');
     
     return `${headers}\n${sampleData}`;

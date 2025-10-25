@@ -25,6 +25,7 @@ import { EditProductDialog } from './edit-product-dialog.component';
 
 export interface Product {
   id: string;
+  sku: string;
   nombre: string;
   descripcion: string;
   precio: number;
@@ -95,6 +96,7 @@ export class ProductList {
   products = signal<Product[]>([
     {
       id: '1',
+      sku: 'MED-001',
       nombre: 'Producto Ejemplo 1',
       descripcion: 'Descripción del producto 1',
       precio: 10000,
@@ -106,6 +108,7 @@ export class ProductList {
     },
     {
       id: '2',
+      sku: 'MED-002',
       nombre: 'Producto Ejemplo 2',
       descripcion: 'Descripción del producto 2',
       precio: 15000,
@@ -117,6 +120,7 @@ export class ProductList {
     },
     {
       id: '3',
+      sku: 'SURG-001',
       nombre: 'Producto Ejemplo 3',
       descripcion: 'Descripción del producto 3',
       precio: 20000,
@@ -128,6 +132,7 @@ export class ProductList {
     },
     {
       id: '4',
+      sku: 'EQUIP-001',
       nombre: 'Producto Ejemplo 4',
       descripcion: 'Descripción del producto 4',
       precio: 25000,
@@ -140,6 +145,7 @@ export class ProductList {
   ]);
 
   displayedColumns: string[] = [
+    'sku',
     'nombre',
     'descripcion', 
     'precio',
@@ -223,10 +229,11 @@ export class ProductList {
 
   private async validateFileContent(file: UploadedFile): Promise<void> {
     try {
-      file.progress = 50;
+      file.progress = 25;
       
       let validationResult: ValidationResult;
       
+      // Primera validación: estructura del archivo
       if (file.file.name.toLowerCase().endsWith('.csv')) {
         validationResult = await this.fileValidationService.validateCSVFile(file.file);
       } else if (file.file.name.toLowerCase().endsWith('.xlsx')) {
@@ -237,6 +244,18 @@ export class ProductList {
           errors: ['Formato de archivo no soportado'],
           warnings: []
         };
+      }
+      
+      file.progress = 50;
+      
+      // Segunda validación: contra productos existentes (solo si la primera pasó)
+      if (validationResult.isValid && validationResult.data) {
+        const dbValidationResult = await this.fileValidationService.validateAgainstExistingProducts(validationResult.data);
+        
+        // Combinar resultados
+        validationResult.errors = [...validationResult.errors, ...dbValidationResult.errors];
+        validationResult.warnings = [...validationResult.warnings, ...dbValidationResult.warnings];
+        validationResult.isValid = validationResult.errors.length === 0;
       }
       
       file.validationResult = validationResult;
@@ -312,6 +331,7 @@ export class ProductList {
         // Usar los datos reales del archivo CSV
         const csvProducts = file.validationResult.data.map((productData, index) => ({
           id: (this.products().length + newProducts.length + index + 1).toString(),
+          sku: productData.sku,
           nombre: productData.nombre,
           descripcion: productData.descripcion,
           precio: productData.precio,

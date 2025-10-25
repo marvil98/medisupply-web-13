@@ -33,6 +33,20 @@ export interface EditProductDialogData {
       <mat-dialog-content>
         <form #productForm="ngForm" class="product-form">
           <mat-form-field appearance="outline" class="full-width">
+            <mat-label>SKU *</mat-label>
+            <input 
+              matInput 
+              [(ngModel)]="editedProduct.sku" 
+              name="sku"
+              required
+              placeholder="Ingrese el SKU del producto"
+              #skuInput="ngModel">
+            <mat-error *ngIf="skuInput.invalid && skuInput.touched">
+              El SKU es requerido
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
             <mat-label>Nombre *</mat-label>
             <input 
               matInput 
@@ -279,7 +293,7 @@ export class EditProductDialog {
   }
 
   onSave(): void {
-    if (this.editedProduct.nombre && this.editedProduct.descripcion && 
+    if (this.editedProduct.sku && this.editedProduct.nombre && this.editedProduct.descripcion && 
         this.editedProduct.precio > 0 && this.editedProduct.stock_minimo >= 0 &&
         this.editedProduct.categoria && this.editedProduct.unidad_medida) {
       this.dialogRef.close(this.editedProduct);

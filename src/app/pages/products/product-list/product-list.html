@@ -164,6 +164,16 @@
       <div class="table-container">
         <table mat-table [dataSource]="paginatedProducts()" class="products-table">
           
+          <!-- Columna SKU -->
+          <ng-container matColumnDef="sku">
+            <th mat-header-cell *matHeaderCellDef>{{ 'productSkuColumn' | translate }}</th>
+            <td mat-cell *matCellDef="let product">
+              <div class="product-sku">
+                <strong>{{ product.sku }}</strong>
+              </div>
+            </td>
+          </ng-container>
+
           <!-- Columna Nombre -->
           <ng-container matColumnDef="nombre">
             <th mat-header-cell *matHeaderCellDef>{{ 'productNameColumn' | translate }}</th>

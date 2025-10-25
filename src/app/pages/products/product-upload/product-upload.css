@@ -1,19 +1,27 @@
+/* Contenedor principal con padding consistente */
 .upload-container {
   padding: 24px 80px;
   max-width: 1200px;
   margin: 0 auto;
+  background-color: var(--mat-sys-surface);
+  min-height: calc(100vh - 120px);
 }
 
+/* Secciones de tarjetas con estilo consistente */
 .template-section,
 .upload-section {
   margin-bottom: 24px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  overflow: hidden;
 }
 
 .template-section mat-card-header,
 .upload-section mat-card-header {
-  padding-bottom: 16px;
+  padding: 24px 24px 16px 24px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
 }
 
 .template-section mat-card-title,
@@ -24,34 +32,58 @@
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--mat-sys-primary);
+  margin: 0;
 }
 
 .template-section mat-icon,
 .upload-section mat-icon {
   font-size: 1.5rem;
+  color: var(--mat-sys-primary);
 }
 
 .template-section p {
   margin-bottom: 16px;
   color: #666;
   line-height: 1.5;
+  font-size: 0.95rem;
 }
 
-/* Drop Zone */
+/* Drop Zone con estilo mejorado */
 .drop-zone {
-  border: 2px dashed #ccc;
+  border: 2px dashed #d1d5db;
   border-radius: 12px;
   padding: 48px 24px;
   text-align: center;
   background-color: #fafafa;
   transition: all 0.3s ease;
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.drop-zone::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(34, 96, 255, 0.05) 0%, rgba(34, 96, 255, 0.02) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .drop-zone:hover,
 .drop-zone.drag-over {
   border-color: var(--mat-sys-primary);
   background-color: #f0f4ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(34, 96, 255, 0.15);
+}
+
+.drop-zone:hover::before,
+.drop-zone.drag-over::before {
+  opacity: 1;
 }
 
 .drop-zone-content {
@@ -59,12 +91,20 @@
   flex-direction: column;
   align-items: center;
   gap: 16px;
+  position: relative;
+  z-index: 1;
 }
 
 .upload-icon {
   font-size: 3rem !important;
   color: var(--mat-sys-primary);
   opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.drop-zone:hover .upload-icon {
+  opacity: 1;
+  transform: scale(1.1);
 }
 
 .drop-zone h3 {
@@ -72,15 +112,18 @@
   font-size: 1.25rem;
   font-weight: 600;
   color: #333;
+  font-family: 'League Spartan', sans-serif;
 }
 
 .drop-zone p {
   margin: 0;
   color: #666;
   max-width: 400px;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
-/* Files List */
+/* Files List con estilo mejorado */
 .files-list {
   margin-top: 24px;
   padding-top: 24px;
@@ -92,101 +135,131 @@
   font-size: 1.1rem;
   font-weight: 600;
   color: #333;
+  font-family: 'League Spartan', sans-serif;
 }
 
 .file-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  padding: 16px 20px;
   background-color: #f8f9fa;
-  border-radius: 8px;
-  margin-bottom: 8px;
+  border-radius: 12px;
+  margin-bottom: 12px;
   border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.file-item:hover {
+  background-color: #f0f4ff;
+  border-color: var(--mat-sys-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(34, 96, 255, 0.1);
 }
 
 .file-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   flex: 1;
 }
 
 .file-info mat-icon {
   font-size: 1.5rem;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
 .file-info mat-icon.valid {
   color: #28a745;
+  background-color: rgba(40, 167, 69, 0.1);
 }
 
 .file-info mat-icon.invalid {
   color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.1);
 }
 
 .file-details {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .file-name {
-  font-weight: 500;
+  font-weight: 600;
   color: #333;
+  font-size: 0.95rem;
+  font-family: 'League Spartan', sans-serif;
 }
 
 .file-size {
   font-size: 0.875rem;
   color: #666;
+  font-weight: 400;
 }
 
 .file-progress {
   width: 200px;
-  margin-top: 4px;
+  margin-top: 8px;
 }
 
 .file-errors {
-  margin-top: 4px;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .error-text {
   font-size: 0.75rem;
   color: #dc3545;
   background-color: #f8d7da;
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 6px 12px;
+  border-radius: 6px;
   border: 1px solid #f5c6cb;
+  font-weight: 500;
+  line-height: 1.4;
 }
 
 .file-warnings {
-  margin-top: 4px;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .warning-text {
   font-size: 0.75rem;
   color: #856404;
   background-color: #fff3cd;
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 6px 12px;
+  border-radius: 6px;
   border: 1px solid #ffeaa7;
-  display: block;
-  margin-bottom: 2px;
+  font-weight: 500;
+  line-height: 1.4;
 }
 
-/* Upload Actions */
+/* Upload Actions con estilo mejorado */
 .upload-actions {
   margin-top: 24px;
   padding-top: 24px;
   border-top: 1px solid #e0e0e0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .upload-progress {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
 }
 
 .upload-progress p {
@@ -194,17 +267,95 @@
   text-align: center;
   color: #666;
   font-size: 0.875rem;
+  font-weight: 500;
 }
 
-/* Status Messages */
+/* Status Messages mejorados */
 .status-message {
   position: fixed;
   top: 20px;
   right: 20px;
   z-index: 1000;
+  max-width: 400px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Responsive */
+/* Botones con estilo consistente */
+button[mat-flat-button] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  font-family: 'League Spartan', sans-serif;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+button[mat-flat-button]:not([disabled]):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(34, 96, 255, 0.2);
+}
+
+button[mat-flat-button][disabled] {
+  background-color: rgba(117, 117, 117, 0.71) !important;
+  color: white !important;
+  opacity: 1 !important;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+button[mat-icon-button] {
+  color: #666;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+button[mat-icon-button]:hover {
+  background-color: #f0f0f0;
+  color: var(--mat-sys-primary);
+}
+
+/* Card Content Spacing mejorado */
+mat-card-content {
+  padding: 24px;
+}
+
+mat-card-header {
+  padding: 24px 24px 16px 24px;
+}
+
+/* Estilos adicionales para mejor UX */
+.upload-section mat-card-content {
+  padding: 24px;
+}
+
+.template-section mat-card-content {
+  padding: 24px;
+}
+
+/* Animaciones suaves */
+.file-item,
+.drop-zone,
+button[mat-flat-button] {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Estados de carga */
+.uploading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.uploading .file-item {
+  background-color: #e3f2fd;
+  border-color: var(--mat-sys-primary);
+}
+
+/* Responsive mejorado */
 @media (max-width: 768px) {
   .upload-container {
     padding: 16px 24px;
@@ -214,37 +365,72 @@
     padding: 32px 16px;
   }
   
+  .drop-zone h3 {
+    font-size: 1.1rem;
+  }
+  
+  .drop-zone p {
+    font-size: 0.9rem;
+  }
+  
   .file-item {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: 12px;
+    padding: 16px;
+  }
+  
+  .file-info {
+    width: 100%;
+    justify-content: space-between;
   }
   
   .file-progress {
     width: 100%;
   }
+  
+  .upload-actions {
+    gap: 16px;
+  }
+  
+  .upload-progress {
+    padding: 16px;
+  }
 }
 
-/* Button Styles */
-button[mat-flat-button] {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 500;
-}
-
-button[mat-flat-button][disabled] {
-  background-color: rgba(117, 117, 117, 0.71) !important;
-  color: white !important;
-  opacity: 1 !important;
-  cursor: not-allowed;
-}
-
-/* Card Content Spacing */
-mat-card-content {
-  padding: 16px 24px 24px 24px;
-}
-
-mat-card-header {
-  padding: 24px 24px 0 24px;
+@media (max-width: 480px) {
+  .upload-container {
+    padding: 12px 16px;
+  }
+  
+  .template-section mat-card-title,
+  .upload-section mat-card-title {
+    font-size: 1.1rem;
+  }
+  
+  .drop-zone {
+    padding: 24px 12px;
+  }
+  
+  .upload-icon {
+    font-size: 2.5rem !important;
+  }
+  
+  .file-item {
+    padding: 12px;
+  }
+  
+  .file-name {
+    font-size: 0.9rem;
+  }
+  
+  .file-size {
+    font-size: 0.8rem;
+  }
+  
+  .error-text,
+  .warning-text {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+  }
 }

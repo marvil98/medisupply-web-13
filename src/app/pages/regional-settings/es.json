@@ -170,7 +170,10 @@
   "city_bogota": "Bogotá",
   "city_medellin": "Medellín",
   "city_cali": "Cali",
+  "city_barranquilla": "Barranquilla",
   "warehouse_bog001": "BOG001 - Bodega Central",
   "warehouse_bog002": "BOG002 - Bodega Norte",
-  "warehouse_med001": "MED001 - Bodega Medellín"
+  "warehouse_med001": "MED001 - Bodega Medellín",
+  "warehouse_cal001": "CAL001 - Bodega Cali",
+  "warehouse_bar001": "BAR001 - Bodega Barranquilla"
 }

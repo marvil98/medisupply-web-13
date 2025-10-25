@@ -47,12 +47,10 @@ export class UbicacionComponent {
   searchQuery = '';
   
   // Filtros
-  selectedCountry = signal('');
   selectedCity = signal('');
   selectedWarehouse = signal('');
   
   // Opciones para los filtros
-  countryOptions: any[] = [];
   cityOptions: any[] = [];
   warehouseOptions: any[] = [];
   
@@ -74,34 +72,16 @@ export class UbicacionComponent {
   }
   
   private initializeData() {
-    this.loadCountries();
-  }
-  
-  private loadCountries() {
-    this.countryOptions = [
-      { value: 'colombia', labelKey: 'country_co' },
-      { value: 'mexico', labelKey: 'country_mx' },
-      { value: 'peru', labelKey: 'country_pe' }
-    ];
-  }
-  
-  onCountryChange() {
-    this.selectedCity.set('');
-    this.selectedWarehouse.set('');
-    this.cityOptions = [];
-    this.warehouseOptions = [];
-    
-    if (this.selectedCountry()) {
-      this.loadCities();
-    }
+    this.loadCities();
   }
   
   private loadCities() {
-    // TODO: Implementar carga de ciudades según país seleccionado
+    // Precargar todas las ciudades disponibles
     this.cityOptions = [
       { value: 'bogota', labelKey: 'city_bogota' },
       { value: 'medellin', labelKey: 'city_medellin' },
-      { value: 'cali', labelKey: 'city_cali' }
+      { value: 'cali', labelKey: 'city_cali' },
+      { value: 'barranquilla', labelKey: 'city_barranquilla' }
     ];
   }
   
@@ -115,12 +95,34 @@ export class UbicacionComponent {
   }
   
   private loadWarehouses() {
-    // TODO: Implementar carga de bodegas según ciudad seleccionada
-    this.warehouseOptions = [
-      { value: 'bog001', labelKey: 'warehouse_bog001' },
-      { value: 'bog002', labelKey: 'warehouse_bog002' },
-      { value: 'med001', labelKey: 'warehouse_med001' }
-    ];
+    // Cargar bodegas según la ciudad seleccionada
+    const city = this.selectedCity();
+    
+    switch (city) {
+      case 'bogota':
+        this.warehouseOptions = [
+          { value: 'bog001', labelKey: 'warehouse_bog001' },
+          { value: 'bog002', labelKey: 'warehouse_bog002' }
+        ];
+        break;
+      case 'medellin':
+        this.warehouseOptions = [
+          { value: 'med001', labelKey: 'warehouse_med001' }
+        ];
+        break;
+      case 'cali':
+        this.warehouseOptions = [
+          { value: 'cal001', labelKey: 'warehouse_cal001' }
+        ];
+        break;
+      case 'barranquilla':
+        this.warehouseOptions = [
+          { value: 'bar001', labelKey: 'warehouse_bar001' }
+        ];
+        break;
+      default:
+        this.warehouseOptions = [];
+    }
   }
   
   onSearch() {

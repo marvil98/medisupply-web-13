@@ -161,6 +161,24 @@
   font-size: 24px;
 }
 
+.sort-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  margin-left: 12px;
+}
+
+.sort-indicator mat-icon {
+  font-size: 16px;
+  color: #1976d2;
+}
+
 .panel-actions {
   display: flex;
   gap: 8px;

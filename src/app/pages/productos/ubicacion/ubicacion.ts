@@ -75,7 +75,7 @@ export class UbicacionComponent {
   // Panel de navegación
   viewMode: 'grid' | 'list' = 'grid';
   availabilityFilter: 'all' | 'available' | 'unavailable' = 'all';
-  sortByAvailability = false;
+  sortBy: 'name' | 'availability' | 'none' = 'none';
   
   constructor() {
     this.initializeData();
@@ -929,7 +929,13 @@ export class UbicacionComponent {
   }
 
   toggleSort() {
-    this.sortByAvailability = !this.sortByAvailability;
+    if (this.sortBy === 'none') {
+      this.sortBy = 'name';
+    } else if (this.sortBy === 'name') {
+      this.sortBy = 'availability';
+    } else {
+      this.sortBy = 'none';
+    }
   }
 
   setAvailabilityFilter(filter: 'all' | 'available' | 'unavailable') {
@@ -946,8 +952,10 @@ export class UbicacionComponent {
       filtered = filtered.filter(product => !product.hasAvailability);
     }
     
-    // Ordenar por disponibilidad si está activado
-    if (this.sortByAvailability) {
+    // Ordenar según el criterio seleccionado
+    if (this.sortBy === 'name') {
+      filtered.sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }));
+    } else if (this.sortBy === 'availability') {
       filtered.sort((a, b) => {
         if (a.hasAvailability && !b.hasAvailability) return -1;
         if (!a.hasAvailability && b.hasAvailability) return 1;
@@ -968,6 +976,39 @@ export class UbicacionComponent {
 
   trackByProductId(index: number, product: any) {
     return product.id;
+  }
+
+  getSortIcon() {
+    switch (this.sortBy) {
+      case 'name':
+        return 'sort_by_alpha';
+      case 'availability':
+        return 'sort';
+      default:
+        return 'sort';
+    }
+  }
+
+  getSortTooltip() {
+    switch (this.sortBy) {
+      case 'name':
+        return 'Ordenar por disponibilidad';
+      case 'availability':
+        return 'Sin ordenamiento';
+      default:
+        return 'Ordenar por nombre';
+    }
+  }
+
+  getSortLabel() {
+    switch (this.sortBy) {
+      case 'name':
+        return 'Ordenado por nombre';
+      case 'availability':
+        return 'Ordenado por disponibilidad';
+      default:
+        return '';
+    }
   }
   
   onPageChange(event: any) {

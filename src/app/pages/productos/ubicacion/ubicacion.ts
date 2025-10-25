@@ -72,12 +72,17 @@ export class UbicacionComponent {
   showLocationPopup = false;
   selectedProduct: any = null;
   
+  // Panel de navegación
+  viewMode: 'grid' | 'list' = 'grid';
+  availabilityFilter: 'all' | 'available' | 'unavailable' = 'all';
+  sortByAvailability = false;
+  
   constructor() {
     this.initializeData();
   }
   
   private initializeData() {
-    this.loadCities();
+      this.loadCities();
     this.loadAllProducts();
   }
   
@@ -771,15 +776,15 @@ export class UbicacionComponent {
     
     switch (city) {
       case 'bogota':
-        this.warehouseOptions = [
-          { value: 'bog001', labelKey: 'warehouse_bog001' },
+    this.warehouseOptions = [
+      { value: 'bog001', labelKey: 'warehouse_bog001' },
           { value: 'bog002', labelKey: 'warehouse_bog002' }
         ];
         break;
       case 'medellin':
         this.warehouseOptions = [
-          { value: 'med001', labelKey: 'warehouse_med001' }
-        ];
+      { value: 'med001', labelKey: 'warehouse_med001' }
+    ];
         break;
       case 'cali':
         this.warehouseOptions = [
@@ -916,6 +921,53 @@ export class UbicacionComponent {
       month: 'short',
       year: 'numeric'
     });
+  }
+
+  // Métodos para el panel de navegación
+  toggleViewMode() {
+    this.viewMode = this.viewMode === 'grid' ? 'list' : 'grid';
+  }
+
+  toggleSort() {
+    this.sortByAvailability = !this.sortByAvailability;
+  }
+
+  setAvailabilityFilter(filter: 'all' | 'available' | 'unavailable') {
+    this.availabilityFilter = filter;
+  }
+
+  getFilteredProducts() {
+    let filtered = [...this.filteredProducts];
+    
+    // Filtrar por disponibilidad
+    if (this.availabilityFilter === 'available') {
+      filtered = filtered.filter(product => product.hasAvailability);
+    } else if (this.availabilityFilter === 'unavailable') {
+      filtered = filtered.filter(product => !product.hasAvailability);
+    }
+    
+    // Ordenar por disponibilidad si está activado
+    if (this.sortByAvailability) {
+      filtered.sort((a, b) => {
+        if (a.hasAvailability && !b.hasAvailability) return -1;
+        if (!a.hasAvailability && b.hasAvailability) return 1;
+        return 0;
+      });
+    }
+    
+    return filtered;
+  }
+
+  getAvailableCount() {
+    return this.filteredProducts.filter(product => product.hasAvailability).length;
+  }
+
+  getUnavailableCount() {
+    return this.filteredProducts.filter(product => !product.hasAvailability).length;
+  }
+
+  trackByProductId(index: number, product: any) {
+    return product.id;
   }
   
   onPageChange(event: any) {

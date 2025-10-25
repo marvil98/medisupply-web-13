@@ -46,47 +46,95 @@
     </div>
   </div>
 
-  <!-- Resultados -->
-  <div class="results-section" *ngIf="filteredProducts.length > 0">
-    <div class="products-grid">
-      <mat-card *ngFor="let product of filteredProducts" class="product-card">
-        <mat-card-header>
-          <div mat-card-avatar class="product-image">
-            <img [src]="product.image" [alt]="product.name" *ngIf="product.image">
-            <mat-icon *ngIf="!product.image">inventory</mat-icon>
-          </div>
-          <mat-card-title>{{ product.name }}</mat-card-title>
-          <mat-card-subtitle>{{ product.sku }}</mat-card-subtitle>
-        </mat-card-header>
+  <!-- Panel de Resultados -->
+  <div class="results-panel" *ngIf="filteredProducts.length > 0">
+    <!-- Header del Panel -->
+    <div class="panel-header">
+      <div class="panel-title">
+        <mat-icon>inventory_2</mat-icon>
+        <h3>Productos Encontrados ({{ totalProducts }})</h3>
+      </div>
+      <div class="panel-actions">
+        <button mat-icon-button (click)="toggleViewMode()" [title]="viewMode === 'grid' ? 'Vista Lista' : 'Vista Cuadrícula'">
+          <mat-icon>{{ viewMode === 'grid' ? 'view_list' : 'view_module' }}</mat-icon>
+        </button>
+        <button mat-icon-button (click)="toggleSort()" [title]="'Ordenar por disponibilidad'">
+          <mat-icon>sort</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Filtros Rápidos -->
+    <div class="quick-filters">
+      <button 
+        mat-stroked-button 
+        [class.active]="availabilityFilter === 'all'"
+        (click)="setAvailabilityFilter('all')">
+        Todos ({{ totalProducts }})
+      </button>
+      <button 
+        mat-stroked-button 
+        [class.active]="availabilityFilter === 'available'"
+        (click)="setAvailabilityFilter('available')">
+        Disponibles ({{ getAvailableCount() }})
+      </button>
+      <button 
+        mat-stroked-button 
+        [class.active]="availabilityFilter === 'unavailable'"
+        (click)="setAvailabilityFilter('unavailable')">
+        Sin Stock ({{ getUnavailableCount() }})
+      </button>
+    </div>
+
+    <!-- Grid de Productos -->
+    <div class="products-container" [class.list-view]="viewMode === 'list'">
+      <div 
+        *ngFor="let product of getFilteredProducts(); trackBy: trackByProductId" 
+        class="product-item"
+        [class.list-item]="viewMode === 'list'"
+        [class.unavailable]="!product.hasAvailability">
         
-        <mat-card-content>
-          <div class="availability-info">
-            <span 
-              class="availability-badge"
-              [class.available]="product.hasAvailability"
-              [class.unavailable]="!product.hasAvailability">
-              <mat-icon>{{ product.hasAvailability ? 'check_circle' : 'cancel' }}</mat-icon>
-              <span *ngIf="product.hasAvailability">
-                {{ 'totalAvailable' | translate }}: {{ product.totalAvailable }}
-              </span>
-              <span *ngIf="!product.hasAvailability">
-                {{ 'noAvailability' | translate }}
-              </span>
+        <div class="product-image-container">
+          <img [src]="product.image" [alt]="product.name" *ngIf="product.image" class="product-image">
+          <mat-icon *ngIf="!product.image" class="product-icon">inventory</mat-icon>
+          <div class="product-status-indicator" [class.available]="product.hasAvailability"></div>
+        </div>
+        
+        <div class="product-info">
+          <h4 class="product-name">{{ product.name }}</h4>
+          <p class="product-sku">{{ product.sku }}</p>
+          <div class="product-meta">
+            <span class="warehouse-info">
+              <mat-icon>warehouse</mat-icon>
+              {{ getWarehouseName(product.warehouse) }}
             </span>
           </div>
-        </mat-card-content>
+        </div>
         
-        <mat-card-actions>
+        <div class="product-availability">
+          <div class="availability-badge" [class.available]="product.hasAvailability" [class.unavailable]="!product.hasAvailability">
+            <mat-icon>{{ product.hasAvailability ? 'check_circle' : 'cancel' }}</mat-icon>
+            <span *ngIf="product.hasAvailability" class="available-text">
+              {{ product.totalAvailable }} unidades
+            </span>
+            <span *ngIf="!product.hasAvailability" class="unavailable-text">
+              Sin stock
+            </span>
+          </div>
+        </div>
+        
+        <div class="product-actions">
           <button 
             mat-flat-button 
             color="primary" 
             (click)="onViewLocations(product)"
-            [disabled]="!product.hasAvailability">
+            [disabled]="!product.hasAvailability"
+            class="action-button">
             <mat-icon>location_on</mat-icon>
-            {{ 'viewLocations' | translate }}
+            Ver Ubicaciones
           </button>
-        </mat-card-actions>
-      </mat-card>
+        </div>
+      </div>
     </div>
 
     <!-- Paginación -->

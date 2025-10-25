@@ -21,11 +21,12 @@
     </app-custom-select>
 
     <div class="button-group">
-      <button mat-flat-button color="accent" (click)="refreshData()" class="refresh-button">
-        {{ 'refreshDataButton' | translate }}
-      </button>
       <button mat-flat-button color="primary" (click)="generate()" [disabled]="isGenerateDisabled">
         {{ 'generateButton' | translate }}
+      </button>
+      <button mat-icon-button color="accent" (click)="refreshData()" 
+              [title]="'refreshDataButton' | translate" class="refresh-button">
+        <mat-icon>refresh</mat-icon>
       </button>
     </div>
   </div>

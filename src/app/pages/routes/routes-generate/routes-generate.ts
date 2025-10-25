@@ -2,6 +2,7 @@ import { Component, computed, signal } from '@angular/core';
 import { PageHeader } from '../../../shared/page-header/page-header';
 import { CustomSelect } from '../../../shared/custom-select/custom-select';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { StatusMessage } from '../../../shared/status-message/status-message';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
@@ -17,7 +18,7 @@ console.log('📁 RoutesGenerate: Módulo cargado');
 @Component({
   selector: 'app-routes-generate',
   standalone: true,
-  imports: [CommonModule, PageHeader, CustomSelect, MatButtonModule, StatusMessage, TranslatePipe, RouteMap],
+  imports: [CommonModule, PageHeader, CustomSelect, MatButtonModule, MatIconModule, StatusMessage, TranslatePipe, RouteMap],
   templateUrl: './routes-generate.html',
   styleUrls: ['./routes-generate.css'],
 })

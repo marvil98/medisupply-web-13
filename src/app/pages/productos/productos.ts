@@ -24,7 +24,7 @@ export class Productos {
     {
       titleKey: 'cardProductLocationTitle',
       subtitleKey: 'cardProductLocationSubtitle',
-      icon: 'location_on',
+      icon: 'map',
       ariaLabelKey: 'cardProductLocationAria',
       path: '/productos/ubicacion',
     },

@@ -119,3 +119,62 @@
     <p>{{ 'loadingProducts' | translate }}</p>
   </div>
 </section>
+
+<!-- Popup de ubicaciones -->
+<div class="popup-overlay" *ngIf="showLocationPopup" (click)="closeLocationPopup()">
+  <div class="popup-content" (click)="$event.stopPropagation()" *ngIf="selectedProduct">
+    <div class="popup-header">
+      <h3 class="popup-title">{{ getCityName(selectedProduct.city) }} > {{ getWarehouseName(selectedProduct.warehouse) }}</h3>
+      <button class="close-button" (click)="closeLocationPopup()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    
+    <div class="popup-body">
+      <div class="product-info">
+        <h4 class="product-name">{{ selectedProduct.name }}</h4>
+        <p class="product-sku">SKU {{ selectedProduct.sku }} • Total: {{ selectedProduct.totalAvailable }}</p>
+      </div>
+      
+      <div class="location-details" *ngIf="selectedProduct.locations && selectedProduct.locations.length > 0">
+        <h5 class="location-title">Ubicación Física</h5>
+        <div class="location-grid">
+          <div class="location-item">
+            <span class="location-label">Sección</span>
+            <span class="location-value">{{ selectedProduct.locations[0].section }}</span>
+          </div>
+          <div class="location-item">
+            <span class="location-label">Pasillo</span>
+            <span class="location-value">{{ selectedProduct.locations[0].aisle }}</span>
+          </div>
+          <div class="location-item">
+            <span class="location-label">Mueble</span>
+            <span class="location-value">{{ selectedProduct.locations[0].shelf }}</span>
+          </div>
+          <div class="location-item">
+            <span class="location-label">Nivel</span>
+            <span class="location-value">{{ selectedProduct.locations[0].level }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="lots-section" *ngIf="selectedProduct.locations && selectedProduct.locations.length > 0">
+        <h5 class="lots-title">Detalle de Lotes</h5>
+        <div class="lots-table">
+          <div class="table-header">
+            <span>Lote</span>
+            <span>Vence</span>
+            <span>Disponible</span>
+            <span>Reservada</span>
+          </div>
+          <div class="table-row" *ngFor="let location of selectedProduct.locations">
+            <span class="lot-number">{{ location.lot }}</span>
+            <span class="expiry-date">{{ formatDate(location.expires) }}</span>
+            <span class="available-qty">{{ location.available }}</span>
+            <span class="reserved-qty">{{ location.reserved }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

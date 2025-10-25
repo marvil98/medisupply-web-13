@@ -149,7 +149,7 @@
 
   "productLocationTitle": "Consulta de Localización de Productos",
   "searchProductLabel": "Buscar producto",
-  "searchProductPlaceholder": "Ingresa nombre o código del producto",
+  "searchProductPlaceholder": "Buscar producto (nombre o código)",
   "countryLabel": "País",
   "countryPlaceholder": "Seleccionar país",
   "cityLabel": "Ciudad",

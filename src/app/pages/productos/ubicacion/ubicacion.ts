@@ -60,9 +60,13 @@ export class UbicacionComponent {
   filteredProducts: any[] = [];
   
   // Paginación
-  pageSize = 20;
+  pageSize = 3;
   currentPage = 0;
   totalProducts = 0;
+  
+  // Configuración de paginación
+  readonly paginationOptions = [3, 5, 10, 20, 50];
+  readonly defaultPageSize = 3;
   
   // Estados
   loading = false;
@@ -936,10 +940,12 @@ export class UbicacionComponent {
     } else {
       this.sortBy = 'none';
     }
+    this.resetPagination();
   }
 
   setAvailabilityFilter(filter: 'all' | 'available' | 'unavailable') {
     this.availabilityFilter = filter;
+    this.resetPagination();
   }
 
   getFilteredProducts() {
@@ -963,7 +969,11 @@ export class UbicacionComponent {
       });
     }
     
-    return filtered;
+    // Aplicar paginación
+    const startIndex = this.currentPage * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    
+    return filtered.slice(startIndex, endIndex);
   }
 
   getAvailableCount() {
@@ -972,6 +982,19 @@ export class UbicacionComponent {
 
   getUnavailableCount() {
     return this.filteredProducts.filter(product => !product.hasAvailability).length;
+  }
+
+  getTotalFilteredProducts() {
+    let filtered = [...this.filteredProducts];
+    
+    // Aplicar los mismos filtros que en getFilteredProducts pero sin paginación
+    if (this.availabilityFilter === 'available') {
+      filtered = filtered.filter(product => product.hasAvailability);
+    } else if (this.availabilityFilter === 'unavailable') {
+      filtered = filtered.filter(product => !product.hasAvailability);
+    }
+    
+    return filtered.length;
   }
 
   trackByProductId(index: number, product: any) {
@@ -1014,6 +1037,9 @@ export class UbicacionComponent {
   onPageChange(event: any) {
     this.currentPage = event.pageIndex;
     this.pageSize = event.pageSize;
-    // TODO: Implementar lógica de paginación
+  }
+
+  resetPagination() {
+    this.currentPage = 0;
   }
 }

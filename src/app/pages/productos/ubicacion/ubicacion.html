@@ -52,7 +52,7 @@
     <div class="panel-header">
       <div class="panel-title">
         <mat-icon>inventory_2</mat-icon>
-        <h3>Productos Encontrados ({{ totalProducts }})</h3>
+        <h3>Productos Encontrados ({{ getTotalFilteredProducts() }})</h3>
         <span class="sort-indicator" *ngIf="sortBy !== 'none'">
           <mat-icon>{{ getSortIcon() }}</mat-icon>
           <span>{{ getSortLabel() }}</span>
@@ -74,7 +74,7 @@
         mat-stroked-button 
         [class.active]="availabilityFilter === 'all'"
         (click)="setAvailabilityFilter('all')">
-        Todos ({{ totalProducts }})
+        Todos ({{ getTotalFilteredProducts() }})
       </button>
       <button 
         mat-stroked-button 
@@ -143,12 +143,12 @@
 
     <!-- Paginación -->
     <mat-paginator
-      *ngIf="totalProducts > pageSize"
-      [length]="totalProducts"
+      *ngIf="getTotalFilteredProducts() > pageSize"
+      [length]="getTotalFilteredProducts()"
       [pageSize]="pageSize"
       [pageIndex]="currentPage"
       (page)="onPageChange($event)"
-      [pageSizeOptions]="[10, 20, 50]">
+      [pageSizeOptions]="paginationOptions">
     </mat-paginator>
   </div>
 

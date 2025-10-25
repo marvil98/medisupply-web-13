@@ -9,6 +9,7 @@ import { RoutesGenerate } from './pages/routes/routes-generate/routes-generate';
 import { SalesPlan } from './pages/sales-plan/sales-plan';
 import { Productos } from './pages/productos/productos';
 import { UbicacionComponent } from './pages/productos/ubicacion/ubicacion';
+import { ProductList } from './pages/products/product-list/product-list';
 
 @Component({
   standalone: true,
@@ -26,7 +27,7 @@ export const routes: Routes = [
   { path: 'ventas', component: EmptyComponent },
   { path: 'rutas', redirectTo: 'rutas/generar', pathMatch: 'full' },
   { path: 'settings/region', component: RegionalSettings },
-  { path: 'productos/cargar', component: EmptyComponent },
+  { path: 'productos/cargar', component: ProductList },
   { path: 'productos/ubicacion', component: UbicacionComponent },
   { path: 'rutas/generar', component: RoutesGenerate },
   { path: 'ventas/crear-plan', component: SalesPlan },

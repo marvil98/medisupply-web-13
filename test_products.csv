@@ -1,0 +1,13 @@
+nombre,descripcion,precio,categoria,stock_minimo,unidad_medida
+Producto de Prueba 1,Descripción del primer producto de prueba,15000,Categoría A,20,unidad
+Producto de Prueba 2,Descripción del segundo producto de prueba,25000,Categoría B,15,kg
+Producto de Prueba 3,Descripción del tercer producto de prueba,35000,Categoría C,10,litro
+Producto de Prueba 4,Descripción del cuarto producto de prueba,45000,Categoría A,25,unidad
+Producto de Prueba 5,Descripción del quinto producto de prueba,55000,Categoría B,30,kg
+Producto de Prueba 6,Descripción del sexto producto de prueba,65000,Categoría C,12,litro
+Producto de Prueba 7,Descripción del séptimo producto de prueba,75000,Categoría A,18,unidad
+Producto de Prueba 8,Descripción del octavo producto de prueba,85000,Categoría B,22,kg
+Producto de Prueba 9,Descripción del noveno producto de prueba,95000,Categoría C,14,litro
+Producto de Prueba 10,Descripción del décimo producto de prueba,105000,Categoría A,28,unidad
+Producto de Prueba 11,Descripción del undécimo producto de prueba,115000,Categoría B,16,kg
+Producto de Prueba 12,Descripción del duodécimo producto de prueba,125000,Categoría C,24,litro

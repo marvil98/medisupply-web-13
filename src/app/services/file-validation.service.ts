@@ -12,12 +12,11 @@ export interface ValidationResult {
 
 export interface ProductTemplate {
   sku: string;
-  nombre: string;
-  descripcion: string;
-  precio: number;
-  categoria: string;
-  stock_minimo: number;
-  unidad_medida: string;
+  name: string;
+  value: number;
+  category_name: string;
+  quantity: number;
+  warehouse_id: number;
 }
 
 @Injectable({
@@ -31,22 +30,20 @@ export class FileValidationService {
   ) {}
   private readonly requiredFields = [
     'sku',
-    'nombre',
-    'descripcion', 
-    'precio',
-    'categoria',
-    'stock_minimo',
-    'unidad_medida'
+    'name',
+    'value',
+    'category_name',
+    'quantity',
+    'warehouse_id'
   ];
 
   private readonly fieldTypes = {
     sku: 'string',
-    nombre: 'string',
-    descripcion: 'string',
-    precio: 'number',
-    categoria: 'string',
-    stock_minimo: 'number',
-    unidad_medida: 'string'
+    name: 'string',
+    value: 'number',
+    category_name: 'string',
+    quantity: 'number',
+    warehouse_id: 'number'
   };
 
   async validateCSVFile(file: File): Promise<ValidationResult> {
@@ -177,12 +174,11 @@ export class FileValidationService {
     // Mapeo de variaciones de nombres de campos
     const fieldVariations: { [key: string]: string[] } = {
       'sku': ['sku', 'codigo', 'code', 'cod', 'id_producto', 'product_id'],
-      'nombre': ['nombre', 'name', 'producto', 'product', 'item'],
-      'descripcion': ['descripcion', 'description', 'desc', 'detalle', 'detail'],
-      'precio': ['precio', 'price', 'costo', 'cost', 'valor'],
-      'categoria': ['categoria', 'category', 'categ', 'tipo', 'type'],
-      'stock_minimo': ['stock_minimo', 'stock_min', 'minimo', 'minimum', 'min_stock'],
-      'unidad_medida': ['unidad_medida', 'unidad', 'unit', 'medida', 'measure', 'uom']
+      'name': ['name', 'nombre', 'producto', 'product', 'item'],
+      'value': ['value', 'precio', 'price', 'costo', 'cost', 'valor'],
+      'category_name': ['category_name', 'categoria', 'category', 'categ', 'tipo', 'type'],
+      'quantity': ['quantity', 'stock_minimo', 'stock_min', 'minimo', 'minimum', 'min_stock', 'stock'],
+      'warehouse_id': ['warehouse_id', 'warehouse', 'bodega', 'bodega_id', 'almacen', 'almacen_id']
     };
 
     // Verificar campos obligatorios con variaciones
@@ -295,12 +291,11 @@ export class FileValidationService {
 
     return {
       sku: rowData[headerMap['sku']]?.trim() || '',
-      nombre: rowData[headerMap['nombre']]?.trim() || '',
-      descripcion: rowData[headerMap['descripcion']]?.trim() || '',
-      precio: parseFloat(rowData[headerMap['precio']]?.trim() || '0'),
-      categoria: rowData[headerMap['categoria']]?.trim() || '',
-      stock_minimo: parseInt(rowData[headerMap['stock_minimo']]?.trim() || '0'),
-      unidad_medida: rowData[headerMap['unidad_medida']]?.trim() || ''
+      name: rowData[headerMap['name']]?.trim() || '',
+      value: parseFloat(rowData[headerMap['value']]?.trim() || '0'),
+      category_name: rowData[headerMap['category_name']]?.trim() || '',
+      quantity: parseInt(rowData[headerMap['quantity']]?.trim() || '0'),
+      warehouse_id: parseInt(rowData[headerMap['warehouse_id']]?.trim() || '1')
     };
   }
 
@@ -444,7 +439,7 @@ export class FileValidationService {
     const headers = backendHeaders.join(',');
     
     const rows = data.map(product => 
-      `${product.sku},${product.nombre},${product.precio},${product.categoria},${product.stock_minimo},1`
+      `${product.sku},${product.name},${product.value},${product.category_name},${product.quantity},${product.warehouse_id}`
     );
     
     return `${headers}\n${rows.join('\n')}`;

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ProductValidationService } from './product-validation.service';
 import { ProductsService } from './products.service';
+import { environment } from '../../environments/environment';
 
 export interface ValidationResult {
   isValid: boolean;
@@ -347,6 +348,7 @@ export class FileValidationService {
 
   /**
    * Valida productos contra la base de datos existente usando el endpoint de upload
+   * Si el backend no está disponible, hace validación local
    */
   async validateAgainstExistingProducts(data: ProductTemplate[]): Promise<ValidationResult> {
     const errors: string[] = [];
@@ -362,19 +364,51 @@ export class FileValidationService {
       const formData = new FormData();
       formData.append('files', file);
       
-      // Enviar al endpoint de validación del backend
-      const response = await fetch('http://localhost:8081/products/upload', {
+      console.log('Enviando CSV al backend:', csvContent);
+      console.log('URL del backend:', `${environment.baseUrl}products/upload`);
+      console.log('FormData keys:', Array.from(formData.keys()));
+      console.log('File name:', file.name);
+      console.log('File size:', file.size);
+      console.log('File type:', file.type);
+      
+      // Enviar al endpoint de validación del backend existente
+      const response = await fetch(`${environment.baseUrl}products/upload`, {
         method: 'POST',
-        body: formData
+        body: formData,
+        headers: {
+          'Accept': 'application/json'
+        }
       });
       
       if (!response.ok) {
         const errorText = await response.text();
-        errors.push(`Error del servidor: ${errorText}`);
+        console.error('Error del servidor:', errorText);
+        console.error('Status del servidor:', response.status);
+        console.error('Headers del servidor:', response.headers);
+        
+        // Mostrar el error específico del backend
+        try {
+          const errorJson = JSON.parse(errorText);
+          if (errorJson.error) {
+            errors.push(`Error del backend: ${errorJson.error}`);
+          } else if (errorJson.message) {
+            errors.push(`Error del backend: ${errorJson.message}`);
+          } else {
+            errors.push(`Error del backend: ${errorText}`);
+          }
+        } catch {
+          errors.push(`Error del backend (${response.status}): ${errorText}`);
+        }
+        
+        // Agregar información adicional para debug
+        errors.push(`Status HTTP: ${response.status}`);
+        errors.push(`URL: ${environment.baseUrl}products/upload`);
+        
         return { isValid: false, errors, warnings };
       }
       
       const result = await response.json();
+      console.log('Respuesta del backend:', result);
       
       // Procesar la respuesta del backend
       if (result.errors && result.errors.length > 0) {
@@ -396,40 +430,61 @@ export class FileValidationService {
       console.error('Error al validar contra productos existentes:', error);
       warnings.push('No se pudo conectar con el servidor para validación. Se validará solo localmente.');
       
-      // Validación local como fallback
-      const localErrors: string[] = [];
-      
-      // Validar duplicados en el archivo
-      const skuDuplicates = this.productValidationService.validateSkuDuplicatesInFile(data);
-      const nameDuplicates = this.productValidationService.validateNameDuplicatesInFile(data);
-
-      skuDuplicates.forEach(duplicate => {
-        localErrors.push(`SKU '${duplicate.sku}' duplicado en las filas: ${duplicate.rowNumbers.join(', ')}`);
-      });
-
-      nameDuplicates.forEach(duplicate => {
-        localErrors.push(`Producto '${duplicate.nombre}' duplicado en las filas: ${duplicate.rowNumbers.join(', ')}`);
-      });
-
-      return {
-        isValid: localErrors.length === 0,
-        errors: localErrors,
-        warnings,
-        data: localErrors.length === 0 ? data : undefined
-      };
+      // Usar validación local como fallback
+      return this.validateLocallyOnly(data);
     }
   }
 
   /**
-   * Convierte los datos de productos a formato CSV
+   * Convierte los datos de productos a formato CSV con las columnas que espera el backend
    */
   private convertDataToCSV(data: ProductTemplate[]): string {
-    const headers = this.requiredFields.join(',');
+    // Headers que espera el backend
+    const backendHeaders = ['sku', 'name', 'value', 'category_name', 'quantity', 'warehouse_id'];
+    const headers = backendHeaders.join(',');
+    
     const rows = data.map(product => 
-      `${product.sku},${product.nombre},${product.descripcion},${product.precio},${product.categoria},${product.stock_minimo},${product.unidad_medida}`
+      `${product.sku},${product.nombre},${product.precio},${product.categoria},${product.stock_minimo},1`
     );
     
     return `${headers}\n${rows.join('\n')}`;
+  }
+
+  /**
+   * Valida productos solo localmente (sin backend)
+   */
+  async validateLocallyOnly(data: ProductTemplate[]): Promise<ValidationResult> {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    // Validar duplicados en el archivo
+    const skuDuplicates = this.productValidationService.validateSkuDuplicatesInFile(data);
+    const nameDuplicates = this.productValidationService.validateNameDuplicatesInFile(data);
+
+    skuDuplicates.forEach(duplicate => {
+      errors.push(`SKU '${duplicate.sku}' duplicado en las filas: ${duplicate.rowNumbers.join(', ')}`);
+    });
+
+    nameDuplicates.forEach(duplicate => {
+      errors.push(`Producto '${duplicate.nombre}' duplicado en las filas: ${duplicate.rowNumbers.join(', ')}`);
+    });
+
+    warnings.push('Validación realizada solo localmente. No se validó contra productos existentes en el servidor.');
+
+    return {
+      isValid: errors.length === 0,
+      errors,
+      warnings,
+      data: errors.length === 0 ? data : undefined
+    };
+  }
+
+  /**
+   * Valida productos sin intentar conectar al backend
+   */
+  async validateWithoutBackend(data: ProductTemplate[]): Promise<ValidationResult> {
+    console.log('Validando productos sin backend...');
+    return this.validateLocallyOnly(data);
   }
 
   generateTemplateCSV(): string {

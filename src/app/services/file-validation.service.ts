@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ProductValidationService } from './product-validation.service';
+import { ProductsService } from './products.service';
 
 export interface ValidationResult {
   isValid: boolean;
@@ -23,7 +24,10 @@ export interface ProductTemplate {
 })
 export class FileValidationService {
   
-  constructor(private productValidationService: ProductValidationService) {}
+  constructor(
+    private productValidationService: ProductValidationService,
+    private productsService: ProductsService
+  ) {}
   private readonly requiredFields = [
     'sku',
     'nombre',
@@ -342,42 +346,44 @@ export class FileValidationService {
   }
 
   /**
-   * Valida productos contra la base de datos existente
+   * Valida productos contra la base de datos existente usando el endpoint de upload
    */
   async validateAgainstExistingProducts(data: ProductTemplate[]): Promise<ValidationResult> {
     const errors: string[] = [];
     const warnings: string[] = [];
 
     try {
-      // Obtener productos existentes de la BD
-      const existingProducts = await this.productValidationService.getAllProducts().toPromise();
+      // Crear un archivo CSV temporal para enviar al backend
+      const csvContent = this.convertDataToCSV(data);
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const file = new File([blob], 'temp_validation.csv', { type: 'text/csv' });
       
-      if (!existingProducts) {
-        warnings.push('No se pudieron obtener los productos existentes para validación');
-        return { isValid: true, errors, warnings, data };
+      // Crear FormData para enviar al endpoint de upload
+      const formData = new FormData();
+      formData.append('files', file);
+      
+      // Enviar al endpoint de validación del backend
+      const response = await fetch('http://localhost:8081/products/upload', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        errors.push(`Error del servidor: ${errorText}`);
+        return { isValid: false, errors, warnings };
       }
-
-      // Validar SKUs contra productos existentes
-      const skus = data.map(p => p.sku).filter(sku => sku.trim() !== '');
-      const skuValidationResults = this.productValidationService.validateSkusLocally(skus, existingProducts);
       
-      skuValidationResults.forEach((result, index) => {
-        if (!result.isValid && result.errorMessage) {
-          errors.push(`Fila ${index + 2}: ${result.errorMessage}`);
-        }
-      });
-
-      // Validar duplicados en el archivo
-      const skuDuplicates = this.productValidationService.validateSkuDuplicatesInFile(data);
-      const nameDuplicates = this.productValidationService.validateNameDuplicatesInFile(data);
-
-      skuDuplicates.forEach(duplicate => {
-        errors.push(`SKU '${duplicate.sku}' duplicado en las filas: ${duplicate.rowNumbers.join(', ')}`);
-      });
-
-      nameDuplicates.forEach(duplicate => {
-        errors.push(`Producto '${duplicate.nombre}' duplicado en las filas: ${duplicate.rowNumbers.join(', ')}`);
-      });
+      const result = await response.json();
+      
+      // Procesar la respuesta del backend
+      if (result.errors && result.errors.length > 0) {
+        errors.push(...result.errors);
+      }
+      
+      if (result.warnings && result.warnings.length > 0) {
+        warnings.push(...result.warnings);
+      }
 
       return {
         isValid: errors.length === 0,
@@ -387,23 +393,124 @@ export class FileValidationService {
       };
 
     } catch (error) {
+      console.error('Error al validar contra productos existentes:', error);
+      warnings.push('No se pudo conectar con el servidor para validación. Se validará solo localmente.');
+      
+      // Validación local como fallback
+      const localErrors: string[] = [];
+      
+      // Validar duplicados en el archivo
+      const skuDuplicates = this.productValidationService.validateSkuDuplicatesInFile(data);
+      const nameDuplicates = this.productValidationService.validateNameDuplicatesInFile(data);
+
+      skuDuplicates.forEach(duplicate => {
+        localErrors.push(`SKU '${duplicate.sku}' duplicado en las filas: ${duplicate.rowNumbers.join(', ')}`);
+      });
+
+      nameDuplicates.forEach(duplicate => {
+        localErrors.push(`Producto '${duplicate.nombre}' duplicado en las filas: ${duplicate.rowNumbers.join(', ')}`);
+      });
+
       return {
-        isValid: false,
-        errors: ['Error al validar contra productos existentes'],
-        warnings: []
+        isValid: localErrors.length === 0,
+        errors: localErrors,
+        warnings,
+        data: localErrors.length === 0 ? data : undefined
       };
     }
+  }
+
+  /**
+   * Convierte los datos de productos a formato CSV
+   */
+  private convertDataToCSV(data: ProductTemplate[]): string {
+    const headers = this.requiredFields.join(',');
+    const rows = data.map(product => 
+      `${product.sku},${product.nombre},${product.descripcion},${product.precio},${product.categoria},${product.stock_minimo},${product.unidad_medida}`
+    );
+    
+    return `${headers}\n${rows.join('\n')}`;
   }
 
   generateTemplateCSV(): string {
     const headers = this.requiredFields.join(',');
     const sampleData = [
-      'MED-001,Producto Ejemplo 1,Descripción del producto 1,10000,Categoría A,10,unidad',
-      'MED-002,Producto Ejemplo 2,Descripción del producto 2,15000,Categoría B,5,kg',
-      'SURG-001,Producto Ejemplo 3,Descripción del producto 3,20000,Categoría A,15,litro'
+      'SYNC-001,Producto Síncrono 1,Descripción síncrona 1,1000,Categoría Síncrona,1,unidad',
+      'SYNC-002,Producto Síncrono 2,Descripción síncrona 2,2000,Categoría Síncrona,2,kg',
+      'SYNC-003,Producto Síncrono 3,Descripción síncrona 3,3000,Categoría Síncrona,3,litro'
     ].join('\n');
     
     return `${headers}\n${sampleData}`;
+  }
+
+  /**
+   * Genera una plantilla CSV usando productos reales del backend
+   */
+  generateTemplateCSVWithRealData(): Promise<string> {
+    const headers = this.requiredFields.join(',');
+    
+    console.log('🔍 FileValidationService: Iniciando generación de plantilla con datos reales');
+    console.log('🌐 FileValidationService: Headers requeridos:', headers);
+    
+    return new Promise((resolve) => {
+      this.productsService.getAvailableProducts().subscribe({
+        next: (response) => {
+          console.log('📡 FileValidationService: Respuesta completa del backend:', response);
+          console.log('📊 FileValidationService: Tipo de respuesta:', typeof response);
+          console.log('📋 FileValidationService: Propiedades de la respuesta:', Object.keys(response));
+          
+          if (response && response.products && Array.isArray(response.products) && response.products.length > 0) {
+            console.log('✅ FileValidationService: Productos encontrados:', response.products.length);
+            console.log('📦 FileValidationService: Primeros productos:', response.products.slice(0, 3));
+            
+            // Usar los primeros 3 productos reales como ejemplos
+            const examples = response.products.slice(0, 3).map(product => {
+              console.log('🔧 FileValidationService: Procesando producto:', product);
+              const csvLine = `${product.sku},${product.name},${product.name} - Descripción,${product.value},${product.category_name},${product.total_quantity},unidad`;
+              console.log('📝 FileValidationService: Línea CSV generada:', csvLine);
+              return csvLine;
+            });
+            
+            const sampleData = examples.join('\n');
+            const finalCsv = `${headers}\n${sampleData}`;
+            console.log('📄 FileValidationService: CSV final generado:', finalCsv);
+            resolve(finalCsv);
+          } else {
+            console.log('⚠️ FileValidationService: No hay productos o respuesta inválida');
+            console.log('📊 FileValidationService: response.products:', response?.products);
+            console.log('📊 FileValidationService: Array.isArray:', Array.isArray(response?.products));
+            console.log('📊 FileValidationService: Length:', response?.products?.length);
+            
+            // Fallback a datos de ejemplo si no hay productos
+            const fallbackData = [
+              'FALLBACK-001,Producto Fallback 1,Descripción fallback 1,1000,Categoría Fallback,1,unidad',
+              'FALLBACK-002,Producto Fallback 2,Descripción fallback 2,2000,Categoría Fallback,2,kg',
+              'FALLBACK-003,Producto Fallback 3,Descripción fallback 3,3000,Categoría Fallback,3,litro'
+            ].join('\n');
+            console.log('🔄 FileValidationService: Usando datos de fallback (sin productos del backend)');
+            resolve(`${headers}\n${fallbackData}`);
+          }
+        },
+        error: (error) => {
+          console.error('❌ FileValidationService: Error al obtener productos para plantilla:', error);
+          console.error('❌ FileValidationService: Detalles del error:', {
+            message: error.message,
+            status: error.status,
+            statusText: error.statusText,
+            url: error.url
+          });
+          
+          // Fallback a datos de ejemplo en caso de error
+          const fallbackData = [
+            'ERROR-001,Producto Error 1,Descripción error 1,1000,Categoría Error,1,unidad',
+            'ERROR-002,Producto Error 2,Descripción error 2,2000,Categoría Error,2,kg',
+            'ERROR-003,Producto Error 3,Descripción error 3,3000,Categoría Error,3,litro'
+          ].join('\n');
+          console.log('🔄 FileValidationService: Usando datos de fallback por error de conexión');
+          resolve(`${headers}\n${fallbackData}`);
+        }
+      });
+    });
   }
 }
 

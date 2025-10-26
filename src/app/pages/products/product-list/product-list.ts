@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -20,21 +20,10 @@ import { StatusMessage } from '../../../shared/status-message/status-message';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { Router } from '@angular/router';
 import { FileValidationService, ValidationResult } from '../../../services/file-validation.service';
+import { ProductsService, Product } from '../../../services/products.service';
 import { ConfirmDialog } from './confirm-dialog.component';
 import { EditProductDialog } from './edit-product-dialog.component';
 
-export interface Product {
-  id: string;
-  sku: string;
-  nombre: string;
-  descripcion: string;
-  precio: number;
-  categoria: string;
-  stock_minimo: number;
-  unidad_medida: string;
-  estado: 'activo' | 'inactivo';
-  fecha_creacion: Date;
-}
 
 interface UploadedFile {
   id: string;
@@ -72,7 +61,7 @@ interface UploadedFile {
   templateUrl: './product-list.html',
   styleUrls: ['./product-list.css']
 })
-export class ProductList {
+export class ProductList implements OnInit {
   pageTitle = 'pageProductListTitle';
   backRoute = '/dashboard';
 
@@ -83,6 +72,7 @@ export class ProductList {
   showSuccessMessage = signal(false);
   showErrorMessage = signal(false);
   errorMessage = signal('');
+  isLoading = signal(false);
 
   private readonly allowedTypes = ['.csv', '.xlsx'];
   private readonly maxFileSize = 10 * 1024 * 1024; // 10MB
@@ -92,73 +82,22 @@ export class ProductList {
   pageIndex = 0;
   totalProducts = signal(0);
 
-  // Datos mock de productos (simulando los productos cargados)
-  products = signal<Product[]>([
-    {
-      id: '1',
-      sku: 'MED-001',
-      nombre: 'Producto Ejemplo 1',
-      descripcion: 'Descripción del producto 1',
-      precio: 10000,
-      categoria: 'Categoría A',
-      stock_minimo: 10,
-      unidad_medida: 'unidad',
-      estado: 'activo',
-      fecha_creacion: new Date('2024-01-15')
-    },
-    {
-      id: '2',
-      sku: 'MED-002',
-      nombre: 'Producto Ejemplo 2',
-      descripcion: 'Descripción del producto 2',
-      precio: 15000,
-      categoria: 'Categoría B',
-      stock_minimo: 5,
-      unidad_medida: 'kg',
-      estado: 'activo',
-      fecha_creacion: new Date('2024-01-15')
-    },
-    {
-      id: '3',
-      sku: 'SURG-001',
-      nombre: 'Producto Ejemplo 3',
-      descripcion: 'Descripción del producto 3',
-      precio: 20000,
-      categoria: 'Categoría A',
-      stock_minimo: 15,
-      unidad_medida: 'litro',
-      estado: 'activo',
-      fecha_creacion: new Date('2024-01-15')
-    },
-    {
-      id: '4',
-      sku: 'EQUIP-001',
-      nombre: 'Producto Ejemplo 4',
-      descripcion: 'Descripción del producto 4',
-      precio: 25000,
-      categoria: 'Categoría C',
-      stock_minimo: 8,
-      unidad_medida: 'unidad',
-      estado: 'activo',
-      fecha_creacion: new Date('2024-01-15')
-    }
-  ]);
+  // Productos desde el servicio real
+  products = signal<Product[]>([]);
 
   displayedColumns: string[] = [
     'sku',
-    'nombre',
-    'descripcion', 
-    'precio',
-    'categoria',
-    'stock_minimo',
-    'unidad_medida',
-    'estado',
-    'acciones'
+    'name',
+    'value',
+    'category_name',
+    'total_quantity',
+    'actions'
   ];
 
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
   private fileValidationService = inject(FileValidationService);
+  private productsService = inject(ProductsService);
   private dialog = inject(MatDialog);
 
   // Categorías disponibles para los productos
@@ -171,8 +110,78 @@ export class ProductList {
   paginatedProducts = signal<Product[]>([]);
 
   constructor() {
-    // Inicializar productos paginados
+    // Los productos se cargarán en ngOnInit
+  }
+
+  ngOnInit(): void {
+    // Limpiar cualquier dato residual
+    this.products.set([]);
+    this.totalProducts.set(0);
     this.updatePaginatedProducts();
+    
+    // Cargar productos del backend
+    this.loadProducts();
+  }
+
+  /**
+   * Carga los productos desde el servicio
+   */
+  loadProducts(): void {
+    this.isLoading.set(true);
+    this.showErrorMessage.set(false);
+    
+    console.log('🔄 ProductList: Iniciando carga de productos desde el backend...');
+    
+    this.productsService.getAvailableProducts().subscribe({
+      next: (response) => {
+        console.log('✅ ProductList: Productos cargados exitosamente:', response);
+        console.log('📊 ProductList: Cantidad de productos recibidos:', response?.products?.length || 0);
+        console.log('🔍 ProductList: Estructura completa de la respuesta:', JSON.stringify(response, null, 2));
+        
+        const products = response.products || [];
+        console.log('📦 ProductList: Productos individuales:', products);
+        
+        // Verificar si hay datos del backend real
+        const hasRealData = products.some(p => 
+          p.sku === 'MED-001' || 
+          p.sku === 'MED-002' || 
+          p.sku === 'SURG-001' || 
+          p.sku === 'EQUIP-001'
+        );
+        
+        if (hasRealData) {
+          console.log('✅ ProductList: ¡DATOS REALES DEL BACKEND DETECTADOS!');
+          console.log('✅ ProductList: Los datos vienen del backend correctamente');
+        }
+        
+        this.products.set(products);
+        this.totalProducts.set(response.total || products.length);
+        this.updatePaginatedProducts();
+        this.isLoading.set(false);
+        
+        if (products.length === 0) {
+          console.log('⚠️ ProductList: No hay productos en el backend');
+          this.snackBar.open('No hay productos disponibles en el sistema', 'Cerrar', {
+            duration: 3000,
+            horizontalPosition: 'end',
+            verticalPosition: 'top'
+          });
+        } else {
+          console.log('✅ ProductList: Mostrando', products.length, 'productos del backend');
+        }
+      },
+      error: (error) => {
+        console.error('❌ ProductList: Error al cargar productos:', error);
+        this.isLoading.set(false);
+        this.showErrorMessage.set(true);
+        this.errorMessage.set('Error al cargar los productos. Por favor, intenta de nuevo.');
+        this.snackBar.open('Error al cargar los productos', 'Cerrar', {
+          duration: 5000,
+          horizontalPosition: 'end',
+          verticalPosition: 'top'
+        });
+      }
+    });
   }
 
   toggleUploadSection(): void {
@@ -280,16 +289,37 @@ export class ProductList {
   }
 
   downloadTemplate(): void {
-    const csvContent = this.fileValidationService.generateTemplateCSV();
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'plantilla_productos.csv');
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // Usar el método que obtiene datos reales del backend
+    this.fileValidationService.generateTemplateCSVWithRealData().then(csvContent => {
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'plantilla_productos.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      this.snackBar.open('Plantilla descargada con datos reales', 'Cerrar', {
+        duration: 3000,
+        horizontalPosition: 'end',
+        verticalPosition: 'top'
+      });
+    }).catch(error => {
+      console.error('Error al generar plantilla:', error);
+      // Fallback al método síncrono en caso de error
+      const csvContent = this.fileValidationService.generateTemplateCSV();
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'plantilla_productos.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
   }
 
   uploadProducts(): void {
@@ -324,32 +354,12 @@ export class ProductList {
   }
 
   private addProductsFromFiles(files: UploadedFile[]): void {
-    const newProducts: Product[] = [];
-    
-    files.forEach(file => {
-      if (file.validationResult?.data) {
-        // Usar los datos reales del archivo CSV
-        const csvProducts = file.validationResult.data.map((productData, index) => ({
-          id: (this.products().length + newProducts.length + index + 1).toString(),
-          sku: productData.sku,
-          nombre: productData.nombre,
-          descripcion: productData.descripcion,
-          precio: productData.precio,
-          categoria: productData.categoria,
-          stock_minimo: productData.stock_minimo,
-          unidad_medida: productData.unidad_medida,
-          estado: 'activo' as const,
-          fecha_creacion: new Date()
-        }));
-        
-        newProducts.push(...csvProducts);
-      }
+    // Por ahora, mostrar mensaje de que la carga de archivos no está implementada
+    this.snackBar.open('La carga de archivos no está implementada aún', 'Cerrar', {
+      duration: 3000,
+      horizontalPosition: 'end',
+      verticalPosition: 'top'
     });
-
-    this.products.update(current => [...current, ...newProducts]);
-    
-    // Actualizar paginación después de agregar productos
-    this.updatePaginatedProducts();
   }
 
   private showError(messageKey: string): void {
@@ -394,90 +404,29 @@ export class ProductList {
   }
 
   editProduct(product: Product): void {
-    const dialogRef = this.dialog.open(EditProductDialog, {
-      width: '500px',
-      data: { 
-        product: { ...product },
-        categories: this.availableCategories,
-        units: this.availableUnits
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        // Actualizar el producto en la lista
-        this.products.update(products => 
-          products.map(p => p.id === product.id ? { ...result, id: product.id, fecha_creacion: product.fecha_creacion } : p)
-        );
-        this.updatePaginatedProducts();
-        
-        this.snackBar.open('Producto actualizado exitosamente', 'Cerrar', {
-          duration: 3000,
-          horizontalPosition: 'end',
-          verticalPosition: 'top'
-        });
-      }
+    // Por ahora, mostrar mensaje de que la edición no está implementada
+    this.snackBar.open('La edición de productos no está implementada aún', 'Cerrar', {
+      duration: 3000,
+      horizontalPosition: 'end',
+      verticalPosition: 'top'
     });
   }
 
   deleteProduct(product: Product): void {
-    const dialogRef = this.dialog.open(ConfirmDialog, {
-      width: '400px',
-      data: {
-        title: 'Confirmar eliminación',
-        message: `¿Estás seguro de que deseas eliminar el producto "${product.nombre}"? Esta acción no se puede deshacer.`,
-        confirmText: 'Eliminar',
-        cancelText: 'Cancelar',
-        isDestructive: true
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(confirmed => {
-      if (confirmed) {
-        // Eliminar el producto de la lista
-        this.products.update(products => 
-          products.filter(p => p.id !== product.id)
-        );
-        this.updatePaginatedProducts();
-        
-        this.snackBar.open('Producto eliminado exitosamente', 'Cerrar', {
-          duration: 3000,
-          horizontalPosition: 'end',
-          verticalPosition: 'top'
-        });
-      }
+    // Por ahora, mostrar mensaje de que la eliminación no está implementada
+    this.snackBar.open('La eliminación de productos no está implementada aún', 'Cerrar', {
+      duration: 3000,
+      horizontalPosition: 'end',
+      verticalPosition: 'top'
     });
   }
 
   toggleProductStatus(product: Product): void {
-    const newStatus = product.estado === 'activo' ? 'inactivo' : 'activo';
-    const actionText = newStatus === 'activo' ? 'activar' : 'desactivar';
-    
-    const dialogRef = this.dialog.open(ConfirmDialog, {
-      width: '400px',
-      data: {
-        title: `Confirmar ${actionText}`,
-        message: `¿Estás seguro de que deseas ${actionText} el producto "${product.nombre}"?`,
-        confirmText: actionText.charAt(0).toUpperCase() + actionText.slice(1),
-        cancelText: 'Cancelar',
-        isDestructive: false
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(confirmed => {
-      if (confirmed) {
-        // Cambiar el estado del producto
-        this.products.update(products => 
-          products.map(p => p.id === product.id ? { ...p, estado: newStatus } : p)
-        );
-        this.updatePaginatedProducts();
-        
-        this.snackBar.open(`Producto ${actionText}do exitosamente`, 'Cerrar', {
-          duration: 3000,
-          horizontalPosition: 'end',
-          verticalPosition: 'top'
-        });
-      }
+    // Por ahora, mostrar mensaje de que el cambio de estado no está implementado
+    this.snackBar.open('El cambio de estado de productos no está implementado aún', 'Cerrar', {
+      duration: 3000,
+      horizontalPosition: 'end',
+      verticalPosition: 'top'
     });
   }
 

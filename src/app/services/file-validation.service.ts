@@ -467,23 +467,13 @@ export class FileValidationService {
       console.log('Status Text:', response.statusText);
       console.log('Headers:', Object.fromEntries(response.headers.entries()));
       
-      // Log del cuerpo de la respuesta
-      const responseText = await response.text();
-      console.log('=== CUERPO DE LA RESPUESTA ===');
-      console.log('Tamaño de la respuesta:', responseText.length, 'caracteres');
-      console.log('Respuesta completa:', responseText);
-      
-      // Intentar parsear como JSON si es posible
-      try {
-        const responseJson = JSON.parse(responseText);
-        console.log('=== RESPUESTA COMO JSON ===');
-        console.log('JSON parseado:', responseJson);
-      } catch (e) {
-        console.log('=== RESPUESTA COMO TEXTO ===');
-        console.log('No se pudo parsear como JSON, es texto plano');
-      }
-      
       if (!response.ok) {
+        // Log del cuerpo de la respuesta para errores
+        const responseText = await response.text();
+        console.log('=== CUERPO DE LA RESPUESTA (ERROR) ===');
+        console.log('Tamaño de la respuesta:', responseText.length, 'caracteres');
+        console.log('Respuesta completa:', responseText);
+        
         console.error('=== ERROR DEL SERVIDOR ===');
         console.error('Error del servidor:', responseText);
         console.error('Status del servidor:', response.status);
@@ -510,6 +500,7 @@ export class FileValidationService {
         return { isValid: false, errors, warnings };
       }
       
+      // Para respuestas exitosas, leer como JSON directamente
       const result = await response.json();
       console.log('=== RESPUESTA EXITOSA ===');
       console.log('Respuesta del backend:', result);

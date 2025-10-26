@@ -97,8 +97,8 @@ export class FileValidationService {
       if (duplicates.sku.length > 0) {
         errors.push(`Se encontraron SKUs duplicados en el archivo: ${duplicates.sku.join(', ')}`);
       }
-      if (duplicates.nombre.length > 0) {
-        errors.push(`Se encontraron productos duplicados en el archivo: ${duplicates.nombre.join(', ')}`);
+      if (duplicates.name.length > 0) {
+        errors.push(`Se encontraron productos duplicados en el archivo: ${duplicates.name.join(', ')}`);
       }
 
       return {
@@ -314,11 +314,11 @@ export class FileValidationService {
     return duplicates;
   }
 
-  private findDuplicates(data: ProductTemplate[]): { sku: string[], nombre: string[] } {
+  private findDuplicates(data: ProductTemplate[]): { sku: string[], name: string[] } {
     const seenSku = new Set<string>();
-    const seenNombre = new Set<string>();
+    const seenName = new Set<string>();
     const duplicateSkus: string[] = [];
-    const duplicateNombres: string[] = [];
+    const duplicateNames: string[] = [];
     
     for (const product of data) {
       // Validar duplicados por SKU
@@ -330,69 +330,177 @@ export class FileValidationService {
       }
       
       // Validar duplicados por nombre
-      const nombreKey = product.nombre.toLowerCase().trim();
-      if (nombreKey && seenNombre.has(nombreKey)) {
-        duplicateNombres.push(product.nombre);
-      } else if (nombreKey) {
-        seenNombre.add(nombreKey);
+      const nameKey = product.name.toLowerCase().trim();
+      if (nameKey && seenName.has(nameKey)) {
+        duplicateNames.push(product.name);
+      } else if (nameKey) {
+        seenName.add(nameKey);
       }
     }
     
-    return { sku: duplicateSkus, nombre: duplicateNombres };
+    return { sku: duplicateSkus, name: duplicateNames };
   }
 
   /**
    * Valida productos contra la base de datos existente usando el endpoint de upload
    * Si el backend no está disponible, hace validación local
    */
-  async validateAgainstExistingProducts(data: ProductTemplate[]): Promise<ValidationResult> {
+  async validateAgainstExistingProducts(data: ProductTemplate[], originalFile?: File): Promise<ValidationResult> {
     const errors: string[] = [];
     const warnings: string[] = [];
 
     try {
-      // Crear un archivo CSV temporal para enviar al backend
-      const csvContent = this.convertDataToCSV(data);
-      const blob = new Blob([csvContent], { type: 'text/csv' });
-      const file = new File([blob], 'temp_validation.csv', { type: 'text/csv' });
+      let file: File;
+      
+      // SIEMPRE usar el archivo original del usuario
+      if (originalFile) {
+        console.log('✅ Usando archivo original del usuario:', originalFile.name);
+        console.log('📁 Archivo original - Tamaño:', originalFile.size, 'bytes');
+        console.log('📁 Archivo original - Tipo:', originalFile.type);
+        file = originalFile;
+      } else {
+        console.log('❌ ERROR: No se proporcionó archivo original');
+        errors.push('No se pudo obtener el archivo original para enviar al backend');
+        return { isValid: false, errors, warnings };
+      }
       
       // Crear FormData para enviar al endpoint de upload
+      // IMPORTANTE: El backend espera el campo "files" (plural)
       const formData = new FormData();
       formData.append('files', file);
       
-      console.log('Enviando CSV al backend:', csvContent);
+      // Leer el contenido del archivo original para verificar
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        console.log('=== CONTENIDO DEL ARCHIVO ORIGINAL ===');
+        console.log('Contenido:', e.target?.result);
+        console.log('Tamaño en caracteres:', (e.target?.result as string)?.length);
+      };
+      reader.readAsText(file);
+      
+      // Probar la estructura del FormData
+      this.testFormDataStructure(file);
+      
+      console.log('=== ENVIANDO AL BACKEND ===');
       console.log('URL del backend:', `${environment.baseUrl}products/upload`);
-      console.log('FormData keys:', Array.from(formData.keys()));
       console.log('File name:', file.name);
       console.log('File size:', file.size);
       console.log('File type:', file.type);
+      console.log('FormData keys:', Array.from(formData.keys()));
       
-      // Enviar al endpoint de validación del backend existente
+      // Simular el comando curl exacto
+      console.log('=== COMANDO CURL EQUIVALENTE ===');
+      console.log(`curl -X POST -F "files=@${file.name}" ${environment.baseUrl}products/upload`);
+      
+      // Verificar el FormData exactamente como lo recibe el backend
+      console.log('=== VERIFICACIÓN FORMDATA ===');
+      for (let [key, value] of formData.entries()) {
+        console.log(`FormData[${key}]:`, value);
+        if (value instanceof File) {
+          console.log('  - File name:', value.name);
+          console.log('  - File size:', value.size);
+          console.log('  - File type:', value.type);
+          console.log('  - File lastModified:', value.lastModified);
+        }
+      }
+      
+      // Simular exactamente lo que hace curl con más detalles
+      console.log('=== SIMULACIÓN CURL DETALLADA ===');
+      console.log('Comando curl completo:');
+      console.log(`curl -X POST \\`);
+      console.log(`  -F "files=@${file.name}" \\`);
+      console.log(`  -H "Content-Type: multipart/form-data" \\`);
+      console.log(`  "${environment.baseUrl}products/upload"`);
+      
+      // Mostrar headers que enviará el navegador
+      console.log('=== HEADERS QUE ENVIARÁ EL NAVEGADOR ===');
+      console.log('Content-Type: multipart/form-data; boundary=----WebKitFormBoundary...');
+      console.log('Content-Length: [calculado automáticamente]');
+      console.log('Origin: http://localhost:4200');
+      console.log('Referer: http://localhost:4200/products/cargar');
+      
+      // ENVIAR COMO ARRAY JSON (más simple)
+      console.log('=== ENVIANDO COMO ARRAY JSON ===');
+      
+      // Convertir el archivo CSV a array de objetos
+      const fileContent = await this.readFileAsText(file);
+      const lines = fileContent.split('\n').filter(line => line.trim());
+      const headers = this.parseCSVLine(lines[0]);
+      const products = [];
+      
+      for (let i = 1; i < lines.length; i++) {
+        const values = this.parseCSVLine(lines[i]);
+        const product: any = {};
+        headers.forEach((header, index) => {
+          product[header.trim()] = values[index]?.trim() || '';
+        });
+        products.push(product);
+      }
+      
+      console.log('=== PRODUCTOS A ENVIAR ===');
+      console.log('Cantidad de productos:', products.length);
+      console.log('Primeros 3 productos:', products.slice(0, 3));
+      
+      // Log del JSON que se enviará
+      const jsonPayload = JSON.stringify(products);
+      console.log('=== PAYLOAD JSON ===');
+      console.log('Tamaño del JSON:', jsonPayload.length, 'caracteres');
+      console.log('Primeros 500 caracteres:', jsonPayload.substring(0, 500) + (jsonPayload.length > 500 ? '...' : ''));
+      
+      // Log de la petición HTTP
+      console.log('=== PETICIÓN HTTP ===');
+      console.log('URL:', `${environment.baseUrl}products/upload`);
+      console.log('Método: POST');
+      console.log('Content-Type: application/json');
+      console.log('Body: Array JSON de productos');
+      
       const response = await fetch(`${environment.baseUrl}products/upload`, {
         method: 'POST',
-        body: formData,
         headers: {
-          'Accept': 'application/json'
-        }
+          'Content-Type': 'application/json'
+        },
+        body: jsonPayload
       });
       
+      console.log('=== RESPUESTA DEL SERVIDOR ===');
+      console.log('Status:', response.status);
+      console.log('Status Text:', response.statusText);
+      console.log('Headers:', Object.fromEntries(response.headers.entries()));
+      
+      // Log del cuerpo de la respuesta
+      const responseText = await response.text();
+      console.log('=== CUERPO DE LA RESPUESTA ===');
+      console.log('Tamaño de la respuesta:', responseText.length, 'caracteres');
+      console.log('Respuesta completa:', responseText);
+      
+      // Intentar parsear como JSON si es posible
+      try {
+        const responseJson = JSON.parse(responseText);
+        console.log('=== RESPUESTA COMO JSON ===');
+        console.log('JSON parseado:', responseJson);
+      } catch (e) {
+        console.log('=== RESPUESTA COMO TEXTO ===');
+        console.log('No se pudo parsear como JSON, es texto plano');
+      }
+      
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error del servidor:', errorText);
+        console.error('=== ERROR DEL SERVIDOR ===');
+        console.error('Error del servidor:', responseText);
         console.error('Status del servidor:', response.status);
-        console.error('Headers del servidor:', response.headers);
+        console.error('Headers del servidor:', Object.fromEntries(response.headers.entries()));
         
         // Mostrar el error específico del backend
         try {
-          const errorJson = JSON.parse(errorText);
+          const errorJson = JSON.parse(responseText);
           if (errorJson.error) {
             errors.push(`Error del backend: ${errorJson.error}`);
           } else if (errorJson.message) {
             errors.push(`Error del backend: ${errorJson.message}`);
           } else {
-            errors.push(`Error del backend: ${errorText}`);
+            errors.push(`Error del backend: ${responseText}`);
           }
         } catch {
-          errors.push(`Error del backend (${response.status}): ${errorText}`);
+          errors.push(`Error del backend (${response.status}): ${responseText}`);
         }
         
         // Agregar información adicional para debug
@@ -403,7 +511,10 @@ export class FileValidationService {
       }
       
       const result = await response.json();
+      console.log('=== RESPUESTA EXITOSA ===');
       console.log('Respuesta del backend:', result);
+      console.log('Tipo de respuesta:', typeof result);
+      console.log('Claves de la respuesta:', Object.keys(result));
       
       // Procesar la respuesta del backend
       if (result.errors && result.errors.length > 0) {
@@ -452,26 +563,26 @@ export class FileValidationService {
     const errors: string[] = [];
     const warnings: string[] = [];
 
-    // Validar duplicados en el archivo
-    const skuDuplicates = this.productValidationService.validateSkuDuplicatesInFile(data);
-    const nameDuplicates = this.productValidationService.validateNameDuplicatesInFile(data);
+      // Validar duplicados en el archivo
+      const skuDuplicates = this.productValidationService.validateSkuDuplicatesInFile(data);
+      const nameDuplicates = this.productValidationService.validateNameDuplicatesInFile(data);
 
-    skuDuplicates.forEach(duplicate => {
-      errors.push(`SKU '${duplicate.sku}' duplicado en las filas: ${duplicate.rowNumbers.join(', ')}`);
-    });
+      skuDuplicates.forEach(duplicate => {
+        errors.push(`SKU '${duplicate.sku}' duplicado en las filas: ${duplicate.rowNumbers.join(', ')}`);
+      });
 
-    nameDuplicates.forEach(duplicate => {
-      errors.push(`Producto '${duplicate.nombre}' duplicado en las filas: ${duplicate.rowNumbers.join(', ')}`);
-    });
+      nameDuplicates.forEach(duplicate => {
+        errors.push(`Producto '${duplicate.nombre}' duplicado en las filas: ${duplicate.rowNumbers.join(', ')}`);
+      });
 
     warnings.push('Validación realizada solo localmente. No se validó contra productos existentes en el servidor.');
 
-    return {
-      isValid: errors.length === 0,
-      errors,
-      warnings,
-      data: errors.length === 0 ? data : undefined
-    };
+      return {
+        isValid: errors.length === 0,
+        errors,
+        warnings,
+        data: errors.length === 0 ? data : undefined
+      };
   }
 
   /**
@@ -480,6 +591,85 @@ export class FileValidationService {
   async validateWithoutBackend(data: ProductTemplate[]): Promise<ValidationResult> {
     console.log('Validando productos sin backend...');
     return this.validateLocallyOnly(data);
+  }
+
+  /**
+   * Prueba la estructura del FormData para debug
+   */
+  testFormDataStructure(file: File): void {
+    console.log('=== PRUEBA DE ESTRUCTURA FORMDATA ===');
+    
+    const formData = new FormData();
+    formData.append('files', file);
+    
+    console.log('FormData creado con:');
+    console.log('- Campo: "files"');
+    console.log('- Archivo:', file.name);
+    console.log('- Tamaño:', file.size, 'bytes');
+    console.log('- Tipo:', file.type);
+    
+    // Verificar que el FormData tiene la estructura correcta
+    const entries = Array.from(formData.entries());
+    console.log('Entradas del FormData:', entries.length);
+    
+    entries.forEach(([key, value], index) => {
+      console.log(`Entrada ${index + 1}:`);
+      console.log(`  Key: "${key}"`);
+      console.log(`  Value type: ${typeof value}`);
+      if (value instanceof File) {
+        console.log(`  File name: ${value.name}`);
+        console.log(`  File size: ${value.size}`);
+        console.log(`  File type: ${value.type}`);
+      }
+    });
+    
+    // Simular el comando curl equivalente
+    console.log('Comando curl equivalente:');
+    console.log(`curl -X POST -F "files=@${file.name}" ${environment.baseUrl}products/upload`);
+  }
+
+  /**
+   * Prueba directa del endpoint sin validación previa
+   */
+  async testDirectUpload(file: File): Promise<void> {
+    console.log('=== PRUEBA DIRECTA DEL UPLOAD ===');
+    
+    const formData = new FormData();
+    formData.append('files', file);
+    
+    console.log('Enviando archivo directamente:', file.name);
+    console.log('Tamaño:', file.size, 'bytes');
+    console.log('Tipo:', file.type);
+    
+    try {
+      const response = await fetch(`${environment.baseUrl}products/upload`, {
+        method: 'POST',
+        body: formData
+      });
+      
+      console.log('Respuesta del servidor:');
+      console.log('Status:', response.status);
+      console.log('Status Text:', response.statusText);
+      console.log('Headers:', Object.fromEntries(response.headers.entries()));
+      
+      const responseText = await response.text();
+      console.log('Contenido de la respuesta:', responseText);
+      
+      if (response.ok) {
+        console.log('✅ Upload exitoso!');
+        try {
+          const jsonResponse = JSON.parse(responseText);
+          console.log('JSON parseado:', jsonResponse);
+        } catch (e) {
+          console.log('No se pudo parsear como JSON');
+        }
+      } else {
+        console.log('❌ Upload falló');
+      }
+
+    } catch (error) {
+      console.error('Error en la prueba:', error);
+    }
   }
 
   generateTemplateCSV(): string {

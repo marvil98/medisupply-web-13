@@ -259,7 +259,7 @@ export class ProductList implements OnInit {
       
       // Segunda validación: contra productos existentes (solo si la primera pasó)
       if (validationResult.isValid && validationResult.data) {
-        const dbValidationResult = await this.fileValidationService.validateAgainstExistingProducts(validationResult.data);
+        const dbValidationResult = await this.fileValidationService.validateAgainstExistingProducts(validationResult.data, file.file);
         
         // Combinar resultados
         validationResult.errors = [...validationResult.errors, ...dbValidationResult.errors];

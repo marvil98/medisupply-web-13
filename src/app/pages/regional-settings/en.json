@@ -191,5 +191,11 @@
   "previousPageLabel": "Previous page",
   "firstPageLabel": "First page",
   "lastPageLabel": "Last page",
-  "rangeLabel": "{{startIndex}} - {{endIndex}} of {{length}}"
+  "rangeLabel": "{{startIndex}} - {{endIndex}} of {{length}}",
+  "productSkuColumn": "SKU",
+  "productNameColumn": "Name",
+  "productPriceColumn": "Price",
+  "productCategoryColumn": "Category",
+  "productTotalStockColumn": "Total Stock",
+  "productActionsColumn": "Actions"
 }

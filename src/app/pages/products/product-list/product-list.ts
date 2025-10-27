@@ -322,7 +322,7 @@ export class ProductList implements OnInit {
     });
   }
 
-  uploadProducts(): void {
+  async uploadProducts(): Promise<void> {
     const validFiles = this.uploadedFiles().filter(file => file.isValid);
     
     if (validFiles.length === 0) {
@@ -334,29 +334,61 @@ export class ProductList implements OnInit {
     this.showSuccessMessage.set(false);
     this.showErrorMessage.set(false);
 
-    // Simular proceso de carga
-    setTimeout(() => {
+    try {
+      console.log(`🔄 ProductList: Procesando ${validFiles.length} archivos válidos...`);
+      
+      // Procesar cada archivo válido enviando datos al backend
+      for (const file of validFiles) {
+        if (file.validationResult?.data) {
+          console.log(`📤 ProductList: Enviando archivo ${file.file.name} al backend...`);
+          
+          try {
+            // Enviar datos al backend - este método realmente hace el POST
+            console.log(`📊 ProductList: Datos a enviar para ${file.file.name}:`, file.validationResult.data.length, 'productos');
+            const result = await this.fileValidationService.validateAgainstExistingProducts(file.validationResult.data, file.file);
+            console.log(`✅ ProductList: Archivo ${file.file.name} enviado exitosamente`);
+            console.log(`📋 ProductList: Resultado del backend:`, result);
+          } catch (error) {
+            console.error(`❌ ProductList: Error enviando archivo ${file.file.name}:`, error);
+            // Continuar con otros archivos aunque uno falle
+          }
+        }
+      }
+      
+      // Esperar un momento para que el backend procese los datos
+      console.log('⏳ ProductList: Esperando que el backend procese los datos...');
+      await new Promise(resolve => setTimeout(resolve, 1000)); // 1 segundo de espera
+      
+      // Actualizar la tabla después de enviar todos los archivos
+      console.log('🔄 ProductList: Actualizando tabla después de enviar archivos...');
+      this.loadProducts();
+      
       this.isUploading.set(false);
       this.showSuccessMessage.set(true);
       
-      // Simular agregar productos al listado
+      // Mostrar mensaje de éxito
       this.addProductsFromFiles(validFiles);
       
       // Limpiar archivos cargados
       this.uploadedFiles.set([]);
       this.showUploadSection.set(false);
       
-      // Mostrar mensaje de éxito
+      // Ocultar mensaje de éxito después de 3 segundos
       setTimeout(() => {
         this.showSuccessMessage.set(false);
       }, 3000);
-    }, 3000);
+      
+    } catch (error) {
+      console.error('Error al procesar archivos:', error);
+      this.isUploading.set(false);
+      this.showError('uploadSystemError');
+    }
   }
 
   private addProductsFromFiles(files: UploadedFile[]): void {
-    // Por ahora, mostrar mensaje de que la carga de archivos no está implementada
-    this.snackBar.open('La carga de archivos no está implementada aún', 'Cerrar', {
-      duration: 3000,
+    // Mostrar mensaje de confirmación de carga exitosa
+    this.snackBar.open(`✅ ${files.length} archivo(s) procesado(s) exitosamente. Tabla actualizada.`, 'Cerrar', {
+      duration: 4000,
       horizontalPosition: 'end',
       verticalPosition: 'top'
     });

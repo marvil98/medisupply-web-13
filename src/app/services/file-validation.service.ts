@@ -454,6 +454,10 @@ export class FileValidationService {
       console.log('Content-Type: text/plain');
       console.log('Body: Array JSON como string');
       
+      // Log del CURL exacto en una sola línea
+      console.log('=== CURL EXACTO ===');
+      console.log(`curl -X POST -H "Content-Type: text/plain" -d '${jsonPayload}' ${environment.baseUrl}products/upload3`);
+      
             const response = await fetch(`${environment.baseUrl}products/upload3`, {
               method: 'POST',
               headers: {

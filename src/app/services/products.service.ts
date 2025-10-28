@@ -33,10 +33,10 @@ export class ProductsService {
   }
 
   /**
-   * Obtiene todos los productos disponibles para una ciudad específica
+   * Obtiene todos los productos disponibles
    */
   getAvailableProducts(cityId: number = 1): Observable<ProductsResponse> {
-    const url = `${this.api}products/by-city/${cityId}`;
+    const url = `${this.api}products/available`;
     
     console.log('🔍 ProductsService: ===== INICIANDO PETICIÓN AL BACKEND =====');
     console.log('🌐 ProductsService: URL completa:', url);
@@ -64,36 +64,20 @@ export class ProductsService {
         console.log('🔄 ProductsService: ===== TRANSFORMANDO DATOS =====');
         console.log('🔄 ProductsService: Datos recibidos:', data);
         
-        // El endpoint /products/by-city/1 devuelve un objeto con products array
-        if (data.products && Array.isArray(data.products)) {
-          console.log('✅ ProductsService: Transformando objeto con products array');
+        // El endpoint /products/available devuelve un array directo de productos
+        if (Array.isArray(data)) {
+          console.log('✅ ProductsService: Transformando array directo');
           
-          // Agrupar productos por SKU (el backend puede devolver múltiples lotes como productos separados)
-          const productsMap = new Map<string, any>();
-          
-          data.products.forEach((product: any) => {
-            const sku = product.sku || '';
-            if (!sku) return;
-            
-            if (productsMap.has(sku)) {
-              // Ya existe, sumar la cantidad
-              const existing = productsMap.get(sku);
-              existing.total_quantity = (existing.total_quantity || 0) + (product.quantity || 0);
-            } else {
-              // Nuevo producto
-              productsMap.set(sku, {
-                product_id: product.product_id,
-                sku: product.sku,
-                name: product.name,
-                value: product.value,
-                category_name: product.category_name,
-                total_quantity: product.quantity || 0,
-                image_url: product.image_url || null
-              });
-            }
-          });
-          
-          const products = Array.from(productsMap.values());
+          // El backend ya devuelve productos con total_quantity, solo necesitamos mapearlos
+          const products = data.map((product: any) => ({
+            product_id: product.product_id,
+            sku: product.sku,
+            name: product.name,
+            value: product.value,
+            category_name: product.category_name,
+            total_quantity: product.total_quantity || 0,
+            image_url: product.image_url || null
+          }));
           
           console.log('✅ ProductsService: Productos transformados:', products.length);
           console.log('✅ ProductsService: Primeros 3 productos:', products.slice(0, 3));
@@ -101,16 +85,26 @@ export class ProductsService {
           return {
             products,
             total: products.length,
-            success: data.success || true,
+            success: true,
             message: 'Productos cargados exitosamente'
           };
-        } else if (Array.isArray(data)) {
-          // Si el backend devuelve un array directo (fallback)
-          console.log('✅ ProductsService: Transformando array directo');
+        } else if (data.products && Array.isArray(data.products)) {
+          // Fallback: si el backend devuelve un objeto con products array
+          console.log('✅ ProductsService: Transformando objeto con products array');
+          const products = data.products.map((product: any) => ({
+            product_id: product.product_id,
+            sku: product.sku,
+            name: product.name,
+            value: product.value,
+            category_name: product.category_name,
+            total_quantity: product.total_quantity || product.quantity || 0,
+            image_url: product.image_url || null
+          }));
+          
           return {
-            products: data,
-            total: data.length,
-            success: true,
+            products,
+            total: products.length,
+            success: data.success || true,
             message: 'Productos cargados exitosamente'
           };
         } else {

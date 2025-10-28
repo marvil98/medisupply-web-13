@@ -145,8 +145,11 @@ export class UbicacionComponent implements OnInit {
       id: product.product_id, // Para compatibilidad con el template
       totalAvailable: totalAvailable,
       hasAvailability: hasAvailability,
-      warehouse: (product as any).warehouse_id || 1, // Usar warehouse_id del backend
-      city: 1, // Por ahora hardcodeado, se puede mejorar
+      warehouse: (product as any).warehouse_id,
+      city: (product as any).city_id,
+      // Preservar city_name y warehouse_name del backend si están disponibles
+      city_name: (product as any).city_name || product.city_name,
+      warehouse_name: (product as any).warehouse_name || product.warehouse_name,
       locations: this.generateMockLocations(product)
     };
   }
@@ -218,8 +221,8 @@ export class UbicacionComponent implements OnInit {
   }
 
   private generateMockLocations(product: Product): ProductLocation[] {
-    // Generar ubicaciones mock basadas en el producto
-    // En el futuro esto vendrá del backend
+    // NOTA: La ubicación física (sección, pasillo, mueble, nivel) es generada
+    // porque el backend aún no proporciona estos datos. El lote SÍ es real.
     const sections = ['A', 'B', 'C'];
     const aisles = ['1', '2', '3'];
     const shelves = ['1', '2', '3'];
@@ -231,14 +234,17 @@ export class UbicacionComponent implements OnInit {
     const level = levels[product.product_id % levels.length];
     
     // Usar el campo correcto 'quantity' en lugar de 'total_quantity'
-    const availableQuantity = (product as any).quantity || 0;
+    const availableQuantity = (product as any).quantity ?? (product as any).total_stock ?? 0;
+    
+    // Usar el lote real del backend si está disponible
+    const realLot = (product as any).lote || product.lote;
     
     return [{
       section,
       aisle,
       shelf,
       level,
-      lot: (product as any).lote || `LOT-${product.sku}-${new Date().getFullYear()}`,
+      lot: realLot || `LOT-${product.sku}-${new Date().getFullYear()}`,
       expires: (product as any).expiry_date || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       available: availableQuantity,
       reserved: 0

@@ -276,7 +276,7 @@ export class UbicacionComponent implements OnInit {
         console.log('🏢 Ubicacion: Bodegas recibidas:', response.warehouses);
         this.warehouseOptions = response.warehouses.map(warehouse => ({
           value: warehouse.warehouse_id.toString(),
-          labelKey: `warehouse_${warehouse.warehouse_id}`,
+          labelKey: warehouse.name, // Usar el nombre real de la bodega
           name: warehouse.name,
           description: warehouse.description
         }));
@@ -296,6 +296,7 @@ export class UbicacionComponent implements OnInit {
 
   onWarehouseChange() {
     const selectedWarehouse = this.selectedWarehouse();
+    console.log('🏢 Ubicacion: Bodega seleccionada:', selectedWarehouse);
     if (selectedWarehouse) {
       this.loadProductsByWarehouse(selectedWarehouse);
     } else {
@@ -309,12 +310,17 @@ export class UbicacionComponent implements OnInit {
     this.loading = true;
     this.message = null;
     
+    console.log('📦 Ubicacion: Cargando productos para bodega:', warehouseId);
+    console.log('📡 Ubicacion: Llamando al backend para warehouseId:', warehouseId);
     this.locationService.getProductsByWarehouse(parseInt(warehouseId)).subscribe({
       next: (response) => {
+        console.log('✅ Ubicacion: Respuesta del backend para productos:', response);
+        console.log('📦 Ubicacion: Productos recibidos:', response.products);
         // Mapear los productos del backend al formato esperado por el frontend
         this.products = response.products.map(product => this.mapProductToFrontendFormat(product));
         this.filteredProducts = [...this.products];
         this.totalProducts = this.products.length;
+        console.log('✅ Ubicacion: Productos mapeados y mostrados:', this.products.length);
         this.loading = false;
         
         // Mostrar mensaje si no hay productos en esta bodega

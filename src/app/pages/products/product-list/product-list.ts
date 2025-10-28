@@ -1,19 +1,20 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, signal, inject, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
-import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSortModule, MatSort } from '@angular/material/sort';
 import { FormsModule } from '@angular/forms';
 import { PageHeader } from '../../../shared/page-header/page-header';
 import { StatusMessage } from '../../../shared/status-message/status-message';
@@ -53,6 +54,7 @@ interface UploadedFile {
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    MatSortModule,
     FormsModule,
     PageHeader,
     StatusMessage,
@@ -61,7 +63,7 @@ interface UploadedFile {
   templateUrl: './product-list.html',
   styleUrls: ['./product-list.css']
 })
-export class ProductList implements OnInit {
+export class ProductList implements OnInit, AfterViewInit {
   pageTitle = 'pageProductListTitle';
   backRoute = '/dashboard';
 
@@ -84,6 +86,13 @@ export class ProductList implements OnInit {
 
   // Productos desde el servicio real
   products = signal<Product[]>([]);
+  
+  // DataSource para la tabla con ordenamiento
+  dataSource = new MatTableDataSource<Product>([]);
+
+  // Referencias a MatSort y MatPaginator
+  @ViewChild(MatSort, { static: false }) sort!: MatSort;
+  @ViewChild(MatPaginator, { static: false }) paginator!: MatPaginator;
 
   displayedColumns: string[] = [
     'sku',
@@ -111,18 +120,28 @@ export class ProductList implements OnInit {
   selectedCityId: number | null = null;
   selectedWarehouseId: number | null = null;
 
-  // Computed signal para productos paginados
-  paginatedProducts = signal<Product[]>([]);
-
   constructor() {
     // Los productos se cargarán en ngOnInit
+    // Configurar función de ordenamiento personalizada para columnas especiales
+    this.dataSource.sortingDataAccessor = (item, property) => {
+      switch (property) {
+        case 'value':
+          return item.value || 0;
+        case 'total_quantity':
+          return item.total_quantity || 0;
+        case 'category_name':
+          return item.category_name || '';
+        default:
+          return (item as any)[property] || '';
+      }
+    };
   }
 
   ngOnInit(): void {
     // Limpiar cualquier dato residual
     this.products.set([]);
     this.totalProducts.set(0);
-    this.updatePaginatedProducts();
+    this.dataSource.data = [];
     
     // Obtener parámetros de la URL
     this.route.queryParams.subscribe(params => {
@@ -136,6 +155,23 @@ export class ProductList implements OnInit {
       // Cargar productos según los parámetros
       this.loadProducts();
     });
+  }
+
+  ngAfterViewInit(): void {
+    // Conectar el MatSort y MatPaginator con el DataSource
+    this.connectSortAndPaginator();
+  }
+
+  /**
+   * Conecta el MatSort y MatPaginator con el DataSource
+   */
+  private connectSortAndPaginator(): void {
+    if (this.sort) {
+      this.dataSource.sort = this.sort;
+    }
+    if (this.paginator) {
+      this.dataSource.paginator = this.paginator;
+    }
   }
 
   /**
@@ -190,8 +226,31 @@ export class ProductList implements OnInit {
         
         this.products.set(products);
         this.totalProducts.set(response.total || products.length);
-        this.updatePaginatedProducts();
+        
+        // Actualizar el DataSource con los productos
+        this.dataSource.data = products;
+        
         this.isLoading.set(false);
+        
+        // Reconectar Sort y Paginator DESPUÉS de que isLoading sea false
+        // para asegurar que la tabla esté visible en el DOM
+        setTimeout(() => {
+          this.connectSortAndPaginator();
+          
+          // Verificar que el sort esté conectado
+          if (this.sort) {
+            console.log('🔍 Sort conectado:', this.dataSource.sort !== null);
+            console.log('🔍 Sort activo:', this.dataSource.sort?.active);
+          } else {
+            console.warn('⚠️ Sort no encontrado en ViewChild');
+          }
+          
+          // Actualizar configuración del paginator si está disponible
+          if (this.paginator) {
+            this.paginator.length = response.total || products.length;
+            this.paginator.pageSize = this.pageSize;
+          }
+        }, 100);
         
         if (products.length === 0) {
           console.log('⚠️ ProductList: No hay productos en el backend');
@@ -395,6 +454,8 @@ export class ProductList implements OnInit {
       
       // Actualizar la tabla después de enviar todos los archivos
       console.log('🔄 ProductList: Actualizando tabla después de enviar archivos...');
+      // Esperar un poco más para asegurar que los datos estén en el backend
+      await new Promise(resolve => setTimeout(resolve, 500));
       this.loadProducts();
       
       this.isUploading.set(false);
@@ -452,21 +513,6 @@ export class ProductList implements OnInit {
 
   get validFilesCount(): number {
     return this.uploadedFiles().filter(file => file.isValid).length;
-  }
-
-  // Métodos para paginación
-  onPageChange(event: PageEvent): void {
-    this.pageIndex = event.pageIndex;
-    this.pageSize = event.pageSize;
-    this.updatePaginatedProducts();
-  }
-
-  private updatePaginatedProducts(): void {
-    const startIndex = this.pageIndex * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
-    const paginated = this.products().slice(startIndex, endIndex);
-    this.paginatedProducts.set(paginated);
-    this.totalProducts.set(this.products().length);
   }
 
   editProduct(product: Product): void {

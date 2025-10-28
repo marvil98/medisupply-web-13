@@ -67,15 +67,33 @@ export class ProductsService {
         // El endpoint /products/by-city/1 devuelve un objeto con products array
         if (data.products && Array.isArray(data.products)) {
           console.log('✅ ProductsService: Transformando objeto con products array');
-          const products = data.products.map((product: any) => ({
-            product_id: product.product_id,
-            sku: product.sku,
-            name: product.name,
-            value: product.value,
-            category_name: product.category_name,
-            total_quantity: product.total_stock || product.total_quantity || 0,
-            image_url: product.image_url || null
-          }));
+          
+          // Agrupar productos por SKU (el backend puede devolver múltiples lotes como productos separados)
+          const productsMap = new Map<string, any>();
+          
+          data.products.forEach((product: any) => {
+            const sku = product.sku || '';
+            if (!sku) return;
+            
+            if (productsMap.has(sku)) {
+              // Ya existe, sumar la cantidad
+              const existing = productsMap.get(sku);
+              existing.total_quantity = (existing.total_quantity || 0) + (product.quantity || 0);
+            } else {
+              // Nuevo producto
+              productsMap.set(sku, {
+                product_id: product.product_id,
+                sku: product.sku,
+                name: product.name,
+                value: product.value,
+                category_name: product.category_name,
+                total_quantity: product.quantity || 0,
+                image_url: product.image_url || null
+              });
+            }
+          });
+          
+          const products = Array.from(productsMap.values());
           
           console.log('✅ ProductsService: Productos transformados:', products.length);
           console.log('✅ ProductsService: Primeros 3 productos:', products.slice(0, 3));
@@ -133,15 +151,32 @@ export class ProductsService {
       }),
       map(data => {
         if (data.products && Array.isArray(data.products)) {
-          const products = data.products.map((product: any) => ({
-            product_id: product.product_id,
-            sku: product.sku,
-            name: product.name,
-            value: product.value,
-            category_name: product.category_name,
-            total_quantity: product.quantity || product.total_quantity || 0,
-            image_url: product.image_url || null
-          }));
+          // Agrupar productos por SKU (el backend puede devolver múltiples lotes como productos separados)
+          const productsMap = new Map<string, any>();
+          
+          data.products.forEach((product: any) => {
+            const sku = product.sku || '';
+            if (!sku) return;
+            
+            if (productsMap.has(sku)) {
+              // Ya existe, sumar la cantidad
+              const existing = productsMap.get(sku);
+              existing.total_quantity = (existing.total_quantity || 0) + (product.quantity || 0);
+            } else {
+              // Nuevo producto
+              productsMap.set(sku, {
+                product_id: product.product_id,
+                sku: product.sku,
+                name: product.name,
+                value: product.value,
+                category_name: product.category_name,
+                total_quantity: product.quantity || 0,
+                image_url: product.image_url || null
+              });
+            }
+          });
+          
+          const products = Array.from(productsMap.values());
           
           return {
             products,

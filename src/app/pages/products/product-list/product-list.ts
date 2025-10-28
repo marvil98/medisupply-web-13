@@ -24,6 +24,7 @@ import { FileValidationService, ValidationResult } from '../../../services/file-
 import { ProductsService, Product } from '../../../services/products.service';
 import { ConfirmDialog } from './confirm-dialog.component';
 import { EditProductDialog } from './edit-product-dialog.component';
+import { ACTIVE_TRANSLATIONS } from '../../../shared/lang/lang-store';
 
 
 interface UploadedFile {
@@ -109,6 +110,13 @@ export class ProductList implements OnInit, AfterViewInit {
   private fileValidationService = inject(FileValidationService);
   private productsService = inject(ProductsService);
   private dialog = inject(MatDialog);
+
+  /**
+   * Obtiene una traducción por su clave
+   */
+  private translate(key: string): string {
+    return ACTIVE_TRANSLATIONS[key] || key;
+  }
 
   // Categorías disponibles para los productos
   availableCategories = ['Categoría A', 'Categoría B', 'Categoría C', 'Medicamentos', 'Equipos', 'Suministros'];
@@ -254,7 +262,7 @@ export class ProductList implements OnInit, AfterViewInit {
         
         if (products.length === 0) {
           console.log('⚠️ ProductList: No hay productos en el backend');
-          this.snackBar.open('No hay productos disponibles en el sistema', 'Cerrar', {
+          this.snackBar.open(this.translate('noProductsInSystem'), this.translate('closeButton'), {
             duration: 3000,
             horizontalPosition: 'end',
             verticalPosition: 'top'
@@ -267,8 +275,8 @@ export class ProductList implements OnInit, AfterViewInit {
         console.error('❌ ProductList: Error al cargar productos:', error);
         this.isLoading.set(false);
         this.showErrorMessage.set(true);
-        this.errorMessage.set('Error al cargar los productos. Por favor, intenta de nuevo.');
-        this.snackBar.open('Error al cargar los productos', 'Cerrar', {
+        this.errorMessage.set('errorLoadingProducts');
+        this.snackBar.open(this.translate('errorLoadingProducts'), this.translate('closeButton'), {
           duration: 5000,
           horizontalPosition: 'end',
           verticalPosition: 'top'
@@ -394,7 +402,7 @@ export class ProductList implements OnInit, AfterViewInit {
       link.click();
       document.body.removeChild(link);
       
-      this.snackBar.open('Plantilla descargada con datos reales', 'Cerrar', {
+      this.snackBar.open(this.translate('templateDownloadedRealData'), this.translate('closeButton'), {
         duration: 3000,
         horizontalPosition: 'end',
         verticalPosition: 'top'
@@ -482,7 +490,10 @@ export class ProductList implements OnInit, AfterViewInit {
 
   private addProductsFromFiles(files: UploadedFile[]): void {
     // Mostrar mensaje de confirmación de carga exitosa
-    this.snackBar.open(`✅ ${files.length} archivo(s) procesado(s) exitosamente. Tabla actualizada.`, 'Cerrar', {
+    const fileText = files.length === 1 
+      ? `✅ ${files.length} ${this.translate('fileProcessedSingular')}`
+      : `✅ ${files.length} ${this.translate('filesProcessedPlural')}`;
+    this.snackBar.open(fileText, this.translate('closeButton'), {
       duration: 4000,
       horizontalPosition: 'end',
       verticalPosition: 'top'
@@ -517,7 +528,7 @@ export class ProductList implements OnInit, AfterViewInit {
 
   editProduct(product: Product): void {
     // Por ahora, mostrar mensaje de que la edición no está implementada
-    this.snackBar.open('La edición de productos no está implementada aún', 'Cerrar', {
+    this.snackBar.open(this.translate('editNotImplemented'), this.translate('closeButton'), {
       duration: 3000,
       horizontalPosition: 'end',
       verticalPosition: 'top'
@@ -526,7 +537,7 @@ export class ProductList implements OnInit, AfterViewInit {
 
   deleteProduct(product: Product): void {
     // Por ahora, mostrar mensaje de que la eliminación no está implementada
-    this.snackBar.open('La eliminación de productos no está implementada aún', 'Cerrar', {
+    this.snackBar.open(this.translate('deleteNotImplemented'), this.translate('closeButton'), {
       duration: 3000,
       horizontalPosition: 'end',
       verticalPosition: 'top'
@@ -535,7 +546,7 @@ export class ProductList implements OnInit, AfterViewInit {
 
   toggleProductStatus(product: Product): void {
     // Por ahora, mostrar mensaje de que el cambio de estado no está implementado
-    this.snackBar.open('El cambio de estado de productos no está implementado aún', 'Cerrar', {
+    this.snackBar.open(this.translate('statusChangeNotImplemented'), this.translate('closeButton'), {
       duration: 3000,
       horizontalPosition: 'end',
       verticalPosition: 'top'

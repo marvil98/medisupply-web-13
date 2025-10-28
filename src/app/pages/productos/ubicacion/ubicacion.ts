@@ -10,12 +10,12 @@ import { MatCardModule } from '@angular/material/card';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { TranslateModule } from '@ngx-translate/core';
 import { PageHeader } from '../../../shared/page-header/page-header';
 import { StatusMessage } from '../../../shared/status-message/status-message';
 import { CustomSelect } from '../../../shared/custom-select/custom-select';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { LocationService, City, Warehouse, Product, ProductLocation } from '../../../services/location.service';
+import { ACTIVE_TRANSLATIONS, currentLangSignal } from '../../../shared/lang/lang-store';
 
 @Component({
   selector: 'app-ubicacion',
@@ -32,7 +32,6 @@ import { LocationService, City, Warehouse, Product, ProductLocation } from '../.
     MatPaginatorModule,
     MatDialogModule,
     MatProgressSpinnerModule,
-    TranslateModule,
     TranslatePipe,
     PageHeader,
     StatusMessage,
@@ -83,6 +82,13 @@ export class UbicacionComponent implements OnInit {
   sortBy: 'name' | 'availability' | 'none' = 'none';
   
   constructor(private locationService: LocationService) {}
+
+  /**
+   * Obtiene una traducción por su clave
+   */
+  private translate(key: string): string {
+    return ACTIVE_TRANSLATIONS[key] || key;
+  }
   
   ngOnInit() {
     this.initializeData();
@@ -213,13 +219,13 @@ export class UbicacionComponent implements OnInit {
     
     switch (status) {
       case 'available':
-        return `${product.totalAvailable} unidades disponibles`;
+        return `${product.totalAvailable} ${this.translate('unitsAvailable')}`;
       case 'low-stock':
-        return `Stock bajo: ${product.totalAvailable} unidades`;
+        return `${this.translate('lowStock')}: ${product.totalAvailable} ${this.translate('unitsLabel')}`;
       case 'out-of-stock':
-        return 'Sin stock';
+        return this.translate('outOfStock');
       default:
-        return 'Estado desconocido';
+        return this.translate('unknownStatus');
     }
   }
 
@@ -592,20 +598,20 @@ export class UbicacionComponent implements OnInit {
   getSortTooltip() {
     switch (this.sortBy) {
       case 'name':
-        return 'Ordenar por disponibilidad';
+        return this.translate('sortByAvailability');
       case 'availability':
-        return 'Sin ordenamiento';
+        return this.translate('noSorting');
       default:
-        return 'Ordenar por nombre';
+        return this.translate('sortByName');
     }
   }
 
   getSortLabel() {
     switch (this.sortBy) {
       case 'name':
-        return 'Ordenado por nombre';
+        return this.translate('sortedByName');
       case 'availability':
-        return 'Ordenado por disponibilidad';
+        return this.translate('sortedByAvailability');
       default:
         return '';
     }

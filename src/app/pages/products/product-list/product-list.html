@@ -217,7 +217,7 @@
             <td mat-cell *matCellDef="let product">
               <div class="stock-info">
                 <span class="stock-value">{{ product.total_quantity || 0 }}</span>
-                <span class="stock-unit">unidades</span>
+                <span class="stock-unit">{{ 'unitsLabel' | translate }}</span>
               </div>
             </td>
           </ng-container>

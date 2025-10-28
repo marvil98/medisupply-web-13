@@ -10,6 +10,7 @@ import { StatusMessage } from '../../../shared/status-message/status-message';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { Router } from '@angular/router';
 import { FileValidationService, ValidationResult } from '../../../services/file-validation.service';
+import { ACTIVE_TRANSLATIONS } from '../../../shared/lang/lang-store';
 
 interface UploadedFile {
   id: string;
@@ -55,6 +56,13 @@ export class ProductUpload {
     private router: Router,
     private fileValidationService: FileValidationService
   ) {}
+
+  /**
+   * Obtiene una traducción por su clave
+   */
+  private translate(key: string): string {
+    return ACTIVE_TRANSLATIONS[key] || key;
+  }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -117,7 +125,7 @@ export class ProductUpload {
       } else {
         validationResult = {
           isValid: false,
-          errors: ['Formato de archivo no soportado'],
+          errors: [this.translate('unsupportedFileFormat')],
           warnings: []
         };
       }
@@ -132,7 +140,7 @@ export class ProductUpload {
       
     } catch (error) {
       file.isValid = false;
-      file.errorMessage = 'Error al validar el archivo';
+      file.errorMessage = this.translate('errorValidatingFile');
       file.progress = 100;
     }
   }
@@ -177,7 +185,7 @@ export class ProductUpload {
       // Redirigir después de 2 segundos
       setTimeout(() => {
         this.router.navigate(['/productos']);
-        this.snackBar.open('¡Productos cargados exitosamente!', 'Cerrar', {
+        this.snackBar.open(this.translate('productsUploadedSuccessfully'), this.translate('closeButton'), {
           duration: 3000
         });
       }, 2000);

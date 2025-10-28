@@ -118,13 +118,14 @@
         </div>
         
         <div class="product-availability">
-          <div class="availability-badge" [class.available]="product.hasAvailability" [class.unavailable]="!product.hasAvailability">
-            <mat-icon>{{ product.hasAvailability ? 'check_circle' : 'cancel' }}</mat-icon>
-            <span *ngIf="product.hasAvailability" class="available-text">
-              {{ product.totalAvailable }} unidades
-            </span>
-            <span *ngIf="!product.hasAvailability" class="unavailable-text">
-              Sin stock
+          <div class="availability-badge" [class]="getStockStatusClass(product)">
+            <mat-icon>
+              <span *ngIf="getStockStatus(product) === 'available'">check_circle</span>
+              <span *ngIf="getStockStatus(product) === 'low-stock'">warning</span>
+              <span *ngIf="getStockStatus(product) === 'out-of-stock'">cancel</span>
+            </mat-icon>
+            <span class="stock-text">
+              {{ getStockStatusText(product) }}
             </span>
           </div>
         </div>
@@ -178,7 +179,7 @@
 <div class="popup-overlay" *ngIf="showLocationPopup" (click)="closeLocationPopup()">
   <div class="popup-content" (click)="$event.stopPropagation()" *ngIf="selectedProduct">
     <div class="popup-header">
-      <h3 class="popup-title">{{ getCityName(selectedProduct.city) }} > {{ getWarehouseName(selectedProduct.warehouse) }}</h3>
+      <h3 class="popup-title">{{ getCityName(selectedProduct.city?.toString() || '') }} > {{ getWarehouseName(selectedProduct.warehouse?.toString() || '') }}</h3>
       <button class="close-button" (click)="closeLocationPopup()">
         <mat-icon>close</mat-icon>
       </button>

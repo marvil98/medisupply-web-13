@@ -124,7 +124,7 @@ export class UbicacionComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        console.error('Error loading products:', error);
+        console.error('❌ Error loading products:', error);
         this.message = {
           type: 'error',
           key: 'errorLoadingProducts'
@@ -135,16 +135,87 @@ export class UbicacionComponent implements OnInit {
   }
 
   private mapProductToFrontendFormat(product: Product): any {
+    // El campo correcto es 'quantity', no 'total_quantity'
+    const totalAvailable = (product as any).quantity || 0;
+    const hasAvailability = this.determineStockAvailability(product);
+    
     return {
       ...product,
       product_id: product.product_id,
       id: product.product_id, // Para compatibilidad con el template
-      totalAvailable: product.total_quantity,
-      hasAvailability: product.total_quantity > 0,
-      warehouse: 1, // Por ahora hardcodeado, se puede mejorar
+      totalAvailable: totalAvailable,
+      hasAvailability: hasAvailability,
+      warehouse: (product as any).warehouse_id || 1, // Usar warehouse_id del backend
       city: 1, // Por ahora hardcodeado, se puede mejorar
       locations: this.generateMockLocations(product)
     };
+  }
+
+  private determineStockAvailability(product: Product): boolean {
+    // Lógica para determinar si hay stock disponible
+    // El campo correcto es 'quantity', no 'total_quantity'
+    const totalQuantity = (product as any).quantity || 0;
+    
+    // Opción 1: Solo verificar si hay cantidad > 0
+    if (totalQuantity > 0) {
+      return true;
+    }
+    
+    // Opción 2: Verificar si el producto está activo (si tienes este campo)
+    // if (product.status === 'activo' && totalQuantity > 0) {
+    //   return true;
+    // }
+    
+    // Opción 3: Verificar stock mínimo (si tienes este campo)
+    // const minimumStock = product.minimum_stock || 0;
+    // if (totalQuantity > minimumStock) {
+    //   return true;
+    // }
+    
+    return false;
+  }
+
+  // Métodos adicionales para manejar diferentes tipos de stock
+  getStockStatus(product: any): 'available' | 'low-stock' | 'out-of-stock' {
+    const totalAvailable = product.totalAvailable || 0;
+    
+    if (totalAvailable === 0) {
+      return 'out-of-stock';
+    } else if (totalAvailable <= 10) { // Ajusta este valor según tu lógica de negocio
+      return 'low-stock';
+    } else {
+      return 'available';
+    }
+  }
+
+  getStockStatusText(product: any): string {
+    const status = this.getStockStatus(product);
+    
+    switch (status) {
+      case 'available':
+        return `${product.totalAvailable} unidades disponibles`;
+      case 'low-stock':
+        return `Stock bajo: ${product.totalAvailable} unidades`;
+      case 'out-of-stock':
+        return 'Sin stock';
+      default:
+        return 'Estado desconocido';
+    }
+  }
+
+  getStockStatusClass(product: any): string {
+    const status = this.getStockStatus(product);
+    
+    switch (status) {
+      case 'available':
+        return 'available';
+      case 'low-stock':
+        return 'low-stock';
+      case 'out-of-stock':
+        return 'unavailable';
+      default:
+        return 'unknown';
+    }
   }
 
   private generateMockLocations(product: Product): ProductLocation[] {
@@ -160,14 +231,17 @@ export class UbicacionComponent implements OnInit {
     const shelf = shelves[product.product_id % shelves.length];
     const level = levels[product.product_id % levels.length];
     
+    // Usar el campo correcto 'quantity' en lugar de 'total_quantity'
+    const availableQuantity = (product as any).quantity || 0;
+    
     return [{
       section,
       aisle,
       shelf,
       level,
-      lot: `LOT-${product.sku}-${new Date().getFullYear()}`,
-      expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 año desde ahora
-      available: product.total_quantity,
+      lot: (product as any).lote || `LOT-${product.sku}-${new Date().getFullYear()}`,
+      expires: (product as any).expiry_date || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      available: availableQuantity,
       reserved: 0
     }];
   }

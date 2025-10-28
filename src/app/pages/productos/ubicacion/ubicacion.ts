@@ -87,7 +87,7 @@ export class UbicacionComponent implements OnInit {
   ngOnInit() {
     this.initializeData();
   }
-
+  
   private initializeData() {
     this.loadCities();
     this.loadAllProducts();
@@ -139,6 +139,10 @@ export class UbicacionComponent implements OnInit {
     const totalAvailable = (product as any).quantity ?? (product as any).total_stock ?? 0;
     const hasAvailability = this.determineStockAvailability(product);
     
+    // Usar solo ubicaciones del backend (sin fallback mock)
+    const backendLocations = this.extractLocationsFromBackend(product);
+    const hasRealLocations = backendLocations.length > 0;
+    
     return {
       ...product,
       product_id: product.product_id,
@@ -150,7 +154,8 @@ export class UbicacionComponent implements OnInit {
       // Preservar city_name y warehouse_name del backend si están disponibles
       city_name: (product as any).city_name || product.city_name,
       warehouse_name: (product as any).warehouse_name || product.warehouse_name,
-      locations: this.generateMockLocations(product)
+      locations: backendLocations, // Solo usar datos del backend
+      hasRealLocations: hasRealLocations
     };
   }
 
@@ -220,37 +225,110 @@ export class UbicacionComponent implements OnInit {
     }
   }
 
-  private generateMockLocations(product: Product): ProductLocation[] {
-    // NOTA: La ubicación física (sección, pasillo, mueble, nivel) es generada
-    // porque el backend aún no proporciona estos datos. El lote SÍ es real.
-    const sections = ['A', 'B', 'C'];
-    const aisles = ['1', '2', '3'];
-    const shelves = ['1', '2', '3'];
-    const levels = ['1', '2', '3'];
+  private extractLocationsFromBackend(product: Product): ProductLocation[] {
+    // Extraer ubicaciones del backend si están disponibles
+    const backendLocations = (product as any).locations;
     
-    const section = sections[product.product_id % sections.length];
-    const aisle = aisles[product.product_id % aisles.length];
-    const shelf = shelves[product.product_id % shelves.length];
-    const level = levels[product.product_id % levels.length];
+    console.log('🔍 Ubicacion: Extrayendo ubicaciones del producto:', product.product_id);
+    console.log('🔍 Ubicacion: Estructura de locations recibida:', JSON.stringify(backendLocations, null, 2));
     
-    // Usar el campo correcto 'quantity' en lugar de 'total_quantity'
-    const availableQuantity = (product as any).quantity ?? (product as any).total_stock ?? 0;
+    if (!backendLocations || !Array.isArray(backendLocations) || backendLocations.length === 0) {
+      console.log('⚠️ Ubicacion: No hay ubicaciones en el backend para este producto');
+      return [];
+    }
     
-    // Usar el lote real del backend si está disponible
-    const realLot = (product as any).lote || product.lote;
+    // Convertir las ubicaciones del backend al formato esperado por el frontend
+    const locations: ProductLocation[] = [];
+    const seenLots = new Set<string>(); // Para evitar duplicados
     
-    return [{
-      section,
-      aisle,
-      shelf,
-      level,
-      lot: realLot || `LOT-${product.sku}-${new Date().getFullYear()}`,
-      expires: (product as any).expiry_date || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      available: availableQuantity,
-      reserved: 0
-    }];
+    for (const location of backendLocations) {
+      console.log('📍 Ubicacion: Procesando ubicación:', location);
+      
+      // Si la ubicación tiene lotes, crear una entrada por cada lote
+      if (location.lots && Array.isArray(location.lots)) {
+        console.log('📦 Ubicacion: Encontrados', location.lots.length, 'lotes en esta ubicación');
+        
+        for (const lot of location.lots) {
+          const lotNumber = lot.lot_number || lot.lot || '';
+          
+          // Evitar duplicados usando el número de lote como clave única
+          if (lotNumber && seenLots.has(lotNumber)) {
+            console.log('⚠️ Ubicacion: Lote duplicado detectado:', lotNumber, '- omitiendo');
+            continue;
+          }
+          
+          if (lotNumber) {
+            seenLots.add(lotNumber);
+          }
+          
+          // Formatear la fecha correctamente
+          let expiryDate = '';
+          if (lot.expiry_date) {
+            try {
+              const date = new Date(lot.expiry_date);
+              if (!isNaN(date.getTime())) {
+                expiryDate = date.toISOString().split('T')[0];
+              } else {
+                expiryDate = lot.expiry_date; // Usar el string original si no se puede parsear
+              }
+            } catch (e) {
+              expiryDate = lot.expiry_date || lot.expires || '';
+            }
+          } else {
+            expiryDate = lot.expires || '';
+          }
+          
+          locations.push({
+            section: location.section || '',
+            aisle: location.aisle || '',
+            shelf: location.shelf || '',
+            level: location.level || '',
+            lot: lotNumber,
+            expires: expiryDate,
+            available: lot.available_quantity || lot.available || 0,
+            reserved: lot.reserved_quantity || lot.reserved || 0
+          });
+          
+          console.log('✅ Ubicacion: Lote agregado:', {
+            section: location.section,
+            aisle: location.aisle,
+            shelf: location.shelf,
+            level: location.level,
+            lot: lotNumber,
+            expires: expiryDate
+          });
+        }
+      } else {
+        // Si no hay lotes, crear una entrada con la ubicación y datos del producto
+        const lotNumber = (product as any).lote || product.lote || '';
+        
+        // Evitar duplicados
+        if (lotNumber && seenLots.has(lotNumber)) {
+          console.log('⚠️ Ubicacion: Lote duplicado detectado (sin array lots):', lotNumber, '- omitiendo');
+          continue;
+        }
+        
+        if (lotNumber) {
+          seenLots.add(lotNumber);
+        }
+        
+        locations.push({
+          section: location.section || '',
+          aisle: location.aisle || '',
+          shelf: location.shelf || '',
+          level: location.level || '',
+          lot: lotNumber,
+          expires: location.expiry_date || location.expires || '',
+          available: (product as any).quantity ?? (product as any).total_stock ?? 0,
+          reserved: 0
+        });
+      }
+    }
+    
+    console.log('✅ Ubicacion: Total de ubicaciones únicas extraídas:', locations.length);
+    return locations;
   }
-  
+
   onCityChange() {
     console.log('🏙️ Ubicacion: Ciudad seleccionada:', this.selectedCity());
     this.selectedWarehouse.set('');
@@ -322,11 +400,22 @@ export class UbicacionComponent implements OnInit {
       next: (response) => {
         console.log('✅ Ubicacion: Respuesta del backend para productos:', response);
         console.log('📦 Ubicacion: Productos recibidos:', response.products);
+        
+        // Verificar si los productos tienen ubicaciones del backend
+        const productsWithLocations = response.products.filter((p: any) => p.locations && p.locations.length > 0);
+        console.log('📍 Ubicacion: Productos con ubicaciones del backend:', productsWithLocations.length);
+        if (productsWithLocations.length > 0) {
+          console.log('📍 Ubicacion: Ejemplo de producto con ubicaciones:', productsWithLocations[0]);
+        }
+        
         // Mapear los productos del backend al formato esperado por el frontend
         this.products = response.products.map(product => this.mapProductToFrontendFormat(product));
         this.filteredProducts = [...this.products];
         this.totalProducts = this.products.length;
-        console.log('✅ Ubicacion: Productos mapeados y mostrados:', this.products.length);
+        
+        const productsWithRealLocations = this.products.filter((p: any) => p.hasRealLocations);
+        console.log('✅ Ubicacion: Productos mapeados:', this.products.length);
+        console.log('✅ Ubicacion: Productos con ubicaciones reales:', productsWithRealLocations.length);
         this.loading = false;
         
         // Mostrar mensaje si no hay productos en esta bodega
@@ -418,12 +507,25 @@ export class UbicacionComponent implements OnInit {
   }
 
   formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric'
-    });
+    if (!dateString) {
+      return '';
+    }
+    
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        console.warn('⚠️ Ubicacion: Fecha inválida:', dateString);
+        return '';
+      }
+      return date.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      });
+    } catch (e) {
+      console.error('❌ Ubicacion: Error al formatear fecha:', dateString, e);
+      return '';
+    }
   }
 
   // Métodos para el panel de navegación

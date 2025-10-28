@@ -135,8 +135,8 @@ export class UbicacionComponent implements OnInit {
   }
 
   private mapProductToFrontendFormat(product: Product): any {
-    // El campo correcto es 'quantity', no 'total_quantity'
-    const totalAvailable = (product as any).quantity || 0;
+    // El backend puede devolver 'quantity' o 'total_stock', usar el que esté disponible
+    const totalAvailable = (product as any).quantity ?? (product as any).total_stock ?? 0;
     const hasAvailability = this.determineStockAvailability(product);
     
     return {
@@ -152,9 +152,8 @@ export class UbicacionComponent implements OnInit {
   }
 
   private determineStockAvailability(product: Product): boolean {
-    // Lógica para determinar si hay stock disponible
-    // El campo correcto es 'quantity', no 'total_quantity'
-    const totalQuantity = (product as any).quantity || 0;
+    // El backend puede devolver 'quantity' o 'total_stock', usar el que esté disponible
+    const totalQuantity = (product as any).quantity ?? (product as any).total_stock ?? 0;
     
     // Opción 1: Solo verificar si hay cantidad > 0
     if (totalQuantity > 0) {
@@ -311,8 +310,9 @@ export class UbicacionComponent implements OnInit {
     this.message = null;
     
     console.log('📦 Ubicacion: Cargando productos para bodega:', warehouseId);
-    console.log('📡 Ubicacion: Llamando al backend para warehouseId:', warehouseId);
-    this.locationService.getProductsByWarehouse(parseInt(warehouseId)).subscribe({
+    console.log('📡 Ubicacion: Llamando al backend para warehouseId:', warehouseId, '(incluyendo productos sin stock)');
+    // Cargar todos los productos, incluyendo los que tienen stock = 0
+    this.locationService.getProductsByWarehouse(parseInt(warehouseId), true).subscribe({
       next: (response) => {
         console.log('✅ Ubicacion: Respuesta del backend para productos:', response);
         console.log('📦 Ubicacion: Productos recibidos:', response.products);

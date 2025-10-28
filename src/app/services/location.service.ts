@@ -106,7 +106,11 @@ export class LocationService {
   }
 
   // Obtener productos por bodega
-  getProductsByWarehouse(warehouseId: number): Observable<WarehouseProductsResponse> {
-    return this.http.get<WarehouseProductsResponse>(`${this.baseUrl}products/by-warehouse/${warehouseId}`);
+  // includeZero: si es true, incluye productos con stock = 0
+  getProductsByWarehouse(warehouseId: number, includeZero: boolean = false): Observable<WarehouseProductsResponse> {
+    const url = includeZero 
+      ? `${this.baseUrl}products/by-warehouse/${warehouseId}?include_zero=true`
+      : `${this.baseUrl}products/by-warehouse/${warehouseId}`;
+    return this.http.get<WarehouseProductsResponse>(url);
   }
 }

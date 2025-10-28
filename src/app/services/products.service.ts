@@ -33,10 +33,10 @@ export class ProductsService {
   }
 
   /**
-   * Obtiene todos los productos disponibles
+   * Obtiene todos los productos disponibles para una ciudad específica
    */
-  getAvailableProducts(): Observable<ProductsResponse> {
-    const url = `${this.api}products/available`;
+  getAvailableProducts(cityId: number = 1): Observable<ProductsResponse> {
+    const url = `${this.api}products/by-city/${cityId}`;
     
     console.log('🔍 ProductsService: ===== INICIANDO PETICIÓN AL BACKEND =====');
     console.log('🌐 ProductsService: URL completa:', url);
@@ -61,8 +61,34 @@ export class ProductsService {
       }),
       // Transformar la respuesta del backend al formato esperado por el frontend
       map(data => {
-        if (Array.isArray(data)) {
-          // El backend devuelve un array directo
+        console.log('🔄 ProductsService: ===== TRANSFORMANDO DATOS =====');
+        console.log('🔄 ProductsService: Datos recibidos:', data);
+        
+        // El endpoint /products/by-city/1 devuelve un objeto con products array
+        if (data.products && Array.isArray(data.products)) {
+          console.log('✅ ProductsService: Transformando objeto con products array');
+          const products = data.products.map((product: any) => ({
+            product_id: product.product_id,
+            sku: product.sku,
+            name: product.name,
+            value: product.value,
+            category_name: product.category_name,
+            total_quantity: product.total_stock || product.total_quantity || 0,
+            image_url: product.image_url || null
+          }));
+          
+          console.log('✅ ProductsService: Productos transformados:', products.length);
+          console.log('✅ ProductsService: Primeros 3 productos:', products.slice(0, 3));
+          
+          return {
+            products,
+            total: products.length,
+            success: data.success || true,
+            message: 'Productos cargados exitosamente'
+          };
+        } else if (Array.isArray(data)) {
+          // Si el backend devuelve un array directo (fallback)
+          console.log('✅ ProductsService: Transformando array directo');
           return {
             products: data,
             total: data.length,
@@ -70,12 +96,12 @@ export class ProductsService {
             message: 'Productos cargados exitosamente'
           };
         } else {
-          // Si el backend devuelve un objeto (formato esperado)
+          console.log('❌ ProductsService: Formato de respuesta no soportado');
           return {
-            products: data.products || [],
-            total: data.total || 0,
-            success: data.success || true,
-            message: data.message || 'Productos cargados exitosamente'
+            products: [],
+            total: 0,
+            success: false,
+            message: 'Formato de respuesta no soportado'
           };
         }
       }),
@@ -87,6 +113,100 @@ export class ProductsService {
         console.error('❌ ProductsService: Error statusText:', error.statusText);
         console.error('❌ ProductsService: Error url:', error.url);
         console.error('❌ ProductsService: Error stack:', error.stack);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Obtiene productos por bodega específica
+   */
+  getProductsByWarehouse(warehouseId: number): Observable<ProductsResponse> {
+    const url = `${this.api}products/by-warehouse/${warehouseId}`;
+    
+    console.log('🔍 ProductsService: Obteniendo productos por bodega:', warehouseId);
+    console.log('🌐 ProductsService: URL:', url);
+    
+    return this.http.get<any>(url).pipe(
+      tap(data => {
+        console.log('📡 ProductsService: Productos por bodega recibidos:', data);
+      }),
+      map(data => {
+        if (data.products && Array.isArray(data.products)) {
+          const products = data.products.map((product: any) => ({
+            product_id: product.product_id,
+            sku: product.sku,
+            name: product.name,
+            value: product.value,
+            category_name: product.category_name,
+            total_quantity: product.quantity || product.total_quantity || 0,
+            image_url: product.image_url || null
+          }));
+          
+          return {
+            products,
+            total: products.length,
+            success: data.success || true,
+            message: 'Productos por bodega cargados exitosamente'
+          };
+        }
+        
+        return {
+          products: [],
+          total: 0,
+          success: false,
+          message: 'No se pudieron cargar los productos por bodega'
+        };
+      }),
+      catchError(error => {
+        console.error('❌ ProductsService: Error al obtener productos por bodega:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Obtiene productos sin stock
+   */
+  getProductsWithoutStock(): Observable<ProductsResponse> {
+    const url = `${this.api}products/without-stock`;
+    
+    console.log('🔍 ProductsService: Obteniendo productos sin stock');
+    console.log('🌐 ProductsService: URL:', url);
+    
+    return this.http.get<any>(url).pipe(
+      tap(data => {
+        console.log('📡 ProductsService: Productos sin stock recibidos:', data);
+      }),
+      map(data => {
+        if (data.products_without_stock && Array.isArray(data.products_without_stock)) {
+          const products = data.products_without_stock.map((product: any) => ({
+            product_id: product.product_id,
+            sku: product.sku,
+            name: product.name,
+            value: product.value,
+            category_name: product.category_name,
+            total_quantity: 0, // Sin stock
+            image_url: product.image_url || null
+          }));
+          
+          return {
+            products,
+            total: products.length,
+            success: data.success || true,
+            message: 'Productos sin stock cargados exitosamente'
+          };
+        }
+        
+        return {
+          products: [],
+          total: 0,
+          success: false,
+          message: 'No se pudieron cargar los productos sin stock'
+        };
+      }),
+      catchError(error => {
+        console.error('❌ ProductsService: Error al obtener productos sin stock:', error);
         return throwError(() => error);
       })
     );

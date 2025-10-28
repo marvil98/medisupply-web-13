@@ -247,6 +247,7 @@ export class UbicacionComponent implements OnInit {
   }
   
   onCityChange() {
+    console.log('🏙️ Ubicacion: Ciudad seleccionada:', this.selectedCity());
     this.selectedWarehouse.set('');
     this.warehouseOptions = [];
     this.products = [];
@@ -254,26 +255,32 @@ export class UbicacionComponent implements OnInit {
     this.totalProducts = 0;
     
     if (this.selectedCity()) {
+      console.log('🔄 Ubicacion: Cargando bodegas para ciudad:', this.selectedCity());
       this.loadWarehouses();
     }
   }
   
   private loadWarehouses() {
     const cityId = this.selectedCity();
+    console.log('🏢 Ubicacion: loadWarehouses - cityId:', cityId);
     if (!cityId) {
       this.warehouseOptions = [];
       return;
     }
 
     this.loading = true;
+    console.log('📡 Ubicacion: Llamando al backend para cityId:', cityId);
     this.locationService.getWarehouses(parseInt(cityId)).subscribe({
       next: (response) => {
+        console.log('✅ Ubicacion: Respuesta del backend para bodegas:', response);
+        console.log('🏢 Ubicacion: Bodegas recibidas:', response.warehouses);
         this.warehouseOptions = response.warehouses.map(warehouse => ({
           value: warehouse.warehouse_id.toString(),
           labelKey: `warehouse_${warehouse.warehouse_id}`,
           name: warehouse.name,
           description: warehouse.description
         }));
+        console.log('📋 Ubicacion: Opciones de bodega mapeadas:', this.warehouseOptions);
         this.loading = false;
       },
       error: (error) => {

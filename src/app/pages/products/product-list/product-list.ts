@@ -18,7 +18,7 @@ import { FormsModule } from '@angular/forms';
 import { PageHeader } from '../../../shared/page-header/page-header';
 import { StatusMessage } from '../../../shared/status-message/status-message';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { FileValidationService, ValidationResult } from '../../../services/file-validation.service';
 import { ProductsService, Product } from '../../../services/products.service';
 import { ConfirmDialog } from './confirm-dialog.component';
@@ -95,6 +95,7 @@ export class ProductList implements OnInit {
   ];
 
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private snackBar = inject(MatSnackBar);
   private fileValidationService = inject(FileValidationService);
   private productsService = inject(ProductsService);
@@ -105,6 +106,10 @@ export class ProductList implements OnInit {
   
   // Unidades de medida disponibles
   availableUnits = ['unidad', 'kg', 'litro', 'ml', 'mg', 'g', 'caja', 'paquete'];
+  
+  // Parámetros de filtro
+  selectedCityId: number | null = null;
+  selectedWarehouseId: number | null = null;
 
   // Computed signal para productos paginados
   paginatedProducts = signal<Product[]>([]);
@@ -119,8 +124,18 @@ export class ProductList implements OnInit {
     this.totalProducts.set(0);
     this.updatePaginatedProducts();
     
-    // Cargar productos del backend
-    this.loadProducts();
+    // Obtener parámetros de la URL
+    this.route.queryParams.subscribe(params => {
+      this.selectedCityId = params['cityId'] ? +params['cityId'] : null;
+      this.selectedWarehouseId = params['warehouseId'] ? +params['warehouseId'] : null;
+      
+      console.log('🔍 ProductList: Parámetros de URL recibidos:');
+      console.log('🏙️ ProductList: Ciudad ID:', this.selectedCityId);
+      console.log('🏢 ProductList: Bodega ID:', this.selectedWarehouseId);
+      
+      // Cargar productos según los parámetros
+      this.loadProducts();
+    });
   }
 
   /**
@@ -131,8 +146,27 @@ export class ProductList implements OnInit {
     this.showErrorMessage.set(false);
     
     console.log('🔄 ProductList: Iniciando carga de productos desde el backend...');
+    console.log('🏙️ ProductList: Ciudad seleccionada:', this.selectedCityId);
+    console.log('🏢 ProductList: Bodega seleccionada:', this.selectedWarehouseId);
     
-    this.productsService.getAvailableProducts().subscribe({
+    // Determinar qué método usar según los parámetros disponibles
+    let productsObservable;
+    
+    if (this.selectedWarehouseId) {
+      // Si hay bodega seleccionada, cargar productos por bodega
+      console.log('📦 ProductList: Cargando productos por bodega:', this.selectedWarehouseId);
+      productsObservable = this.productsService.getProductsByWarehouse(this.selectedWarehouseId);
+    } else if (this.selectedCityId) {
+      // Si solo hay ciudad seleccionada, cargar productos por ciudad
+      console.log('🏙️ ProductList: Cargando productos por ciudad:', this.selectedCityId);
+      productsObservable = this.productsService.getAvailableProducts(this.selectedCityId);
+    } else {
+      // Por defecto, cargar productos de Bogotá
+      console.log('🏙️ ProductList: Cargando productos por defecto (Bogotá)');
+      productsObservable = this.productsService.getAvailableProducts(1);
+    }
+    
+    productsObservable.subscribe({
       next: (response) => {
         console.log('✅ ProductList: Productos cargados exitosamente:', response);
         console.log('📊 ProductList: Cantidad de productos recibidos:', response?.products?.length || 0);

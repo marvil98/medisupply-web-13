@@ -33,8 +33,9 @@ export interface Product {
   product_id: number;
   name: string;
   sku: string;
-  image_url: string | null;
-  total_quantity: number;
+  image_url?: string | null;
+  total_quantity?: number;
+  quantity?: number;
   totalAvailable?: number;
   hasAvailability?: boolean;
   warehouse?: number;
@@ -42,6 +43,11 @@ export interface Product {
   locations?: ProductLocation[];
   category_name?: string;
   value?: number;
+  city_name?: string;
+  country?: string;
+  lote?: string;
+  status?: string;
+  warehouse_name?: string;
 }
 
 export interface LocationResponse {
@@ -58,39 +64,19 @@ export interface LocationResponse {
 
 export interface CitiesResponse {
   cities: City[];
-  total: number;
+  success: boolean;
 }
 
 export interface WarehousesResponse {
-  city_id: number | null;
-  total: number;
+  city_id?: number;
+  success: boolean;
   warehouses: Warehouse[];
 }
 
 export interface WarehouseProductsResponse {
   products: Product[];
-  summary: {
-    categories: string[];
-    countries: string[];
-    total_lotes: number;
-  };
-  total_products: number;
-  total_quantity: number;
+  success: boolean;
   warehouse_id: number;
-  hasAvailability: boolean;
-  totalAvailable: number;
-  warehouse: number;
-  locations: Array<{
-    id: number;
-    name: string;
-    address: string;
-    city: string;
-    country: string;
-    coordinates: {
-      lat: number;
-      lng: number;
-    };
-  }>;
 }
 
 @Injectable({
@@ -103,14 +89,14 @@ export class LocationService {
 
   // Obtener todas las ciudades
   getCities(): Observable<CitiesResponse> {
-    return this.http.get<CitiesResponse>(`${this.baseUrl}/products/location/cities`);
+    return this.http.get<CitiesResponse>(`${this.baseUrl}cities`);
   }
 
   // Obtener bodegas por ciudad
   getWarehouses(cityId?: number): Observable<WarehousesResponse> {
     const url = cityId 
-      ? `${this.baseUrl}/products/location/warehouses?city_id=${cityId}`
-      : `${this.baseUrl}/products/location/warehouses`;
+      ? `${this.baseUrl}warehouses/by-city/${cityId}`
+      : `${this.baseUrl}warehouses`;
     return this.http.get<WarehousesResponse>(url);
   }
 
@@ -121,6 +107,6 @@ export class LocationService {
 
   // Obtener productos por bodega
   getProductsByWarehouse(warehouseId: number): Observable<WarehouseProductsResponse> {
-    return this.http.get<WarehouseProductsResponse>(`${this.baseUrl}/products/warehouse/${warehouseId}`);
+    return this.http.get<WarehouseProductsResponse>(`${this.baseUrl}products/by-warehouse/${warehouseId}`);
   }
 }

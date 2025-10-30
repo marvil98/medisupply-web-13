@@ -36,7 +36,7 @@ export class ProductsService {
    * Obtiene todos los productos disponibles
    */
   getAvailableProducts(cityId: number = 1): Observable<ProductsResponse> {
-    const url = `${this.api}products/available`;
+    const url = `${this.api}products/location/warehouses`;
     
     console.log('🔍 ProductsService: ===== INICIANDO PETICIÓN AL BACKEND =====');
     console.log('🌐 ProductsService: URL completa:', url);

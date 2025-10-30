@@ -75,10 +75,10 @@
                           [ngModel]="itemsPerPage()"
                           (ngModelChange)="setItemsPerPage($event)"
                           [ngModelOptions]="{standalone: true}">
-                          <mat-option value="10">10</mat-option>
-                          <mat-option value="20">20</mat-option>
-                          <mat-option value="50">50</mat-option>
-                          <mat-option value="100">100</mat-option>
+                          <mat-option [value]="10">10</mat-option>
+                          <mat-option [value]="20">20</mat-option>
+                          <mat-option [value]="50">50</mat-option>
+                          <mat-option [value]="100">100</mat-option>
                         </mat-select>
                       </mat-form-field>
                     </div>

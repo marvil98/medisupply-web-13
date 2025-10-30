@@ -111,6 +111,7 @@
   "period_label": "Period",
   "goal_label": "Goal",
   "goal_button": "Goal",
+  "units": "units",
   "create_plan_button": "Create plan",
   "saving_plan": "Saving plan...",
   "plan_created_success": "Sales plan created successfully!",

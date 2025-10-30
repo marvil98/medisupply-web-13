@@ -112,11 +112,19 @@
           <div class="product-card" 
                *ngFor="let product of paginatedProducts()" 
                (click)="selectProduct(product)"
-               [class.selected]="isProductSelected(product)">
+               [class.selected]="isProductSelected(product)"
+               [class.has-goal]="product.goal && product.goal > 0">
             
             <!-- Indicador de selección -->
             <div class="selection-indicator" *ngIf="isProductSelected(product)">
               <mat-icon>check_circle</mat-icon>
+            </div>
+
+            <!-- Franja de meta establecida (abajo, en unidades) -->
+            <div class="goal-ribbon bottom" *ngIf="product.goal && product.goal > 0">
+              <span class="goal-text">
+                {{ 'goal_label' | translate }}: {{ product.goal | number:'1.0-0' }} {{ 'units' | translate }}
+              </span>
             </div>
             
             <!-- Columna 1: Imagen -->

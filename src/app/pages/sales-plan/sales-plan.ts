@@ -21,6 +21,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { currentLangSignal, loadTranslations } from '../../shared/lang/lang-store';
 import { Router } from '@angular/router';
 import { ProductsService, Product as BackendProduct } from '../../services/products.service';
+import { OfferService, CreateSalesPlanPayload } from '../../services/offer.service';
 
 interface Product {
   id: string;
@@ -57,6 +58,7 @@ export class SalesPlan {
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
   private readonly productsService = inject(ProductsService);
+  private readonly offerService = inject(OfferService);
   
   public readonly currentLangSignal = currentLangSignal;
   pageTitle = 'pageSalesPlanTitle';
@@ -66,20 +68,8 @@ export class SalesPlan {
   salesPlanForm: FormGroup;
 
   // Opciones para los selectores
-  regionOptions = [
-    { value: 'norte', labelKey: 'region_norte' },
-    { value: 'centro', labelKey: 'region_centro' },
-    { value: 'sur', labelKey: 'region_sur' },
-    { value: 'caribe', labelKey: 'region_caribe' },
-    { value: 'pacifico', labelKey: 'region_pacifico' },
-  ];
-
-  quarterOptions = [
-    { value: 'Q1', labelKey: 'quarter_q1' },
-    { value: 'Q2', labelKey: 'quarter_q2' },
-    { value: 'Q3', labelKey: 'quarter_q3' },
-    { value: 'Q4', labelKey: 'quarter_q4' },
-  ];
+  regionOptions: { value: string; labelKey: string }[] = [];
+  quarterOptions: { value: string; labelKey: string }[] = [];
 
   // Productos (cargados desde backend)
   products: Product[] = [];
@@ -250,12 +240,53 @@ export class SalesPlan {
     // Cargar productos disponibles desde backend
     this.loadAvailableProducts();
 
+    // Cargar catálogos desde Offer (8082)
+    this.loadCatalogs();
+
     // Reactivar validación cuando cambien región o período
     this.salesPlanForm.get('region')?.valueChanges.subscribe(() => {
       this.formVersion.set(this.formVersion() + 1);
     });
     this.salesPlanForm.get('quarter')?.valueChanges.subscribe(() => {
       this.formVersion.set(this.formVersion() + 1);
+    });
+  }
+
+  private loadCatalogs() {
+    // Regiones
+    this.offerService.getRegions().subscribe({
+      next: (regions) => {
+        // Espera: ["norte","centro",...] o etiquetas; mapeo a labelKey existentes
+        const safe = Array.isArray(regions) ? regions : [];
+        this.regionOptions = safe.map(r => ({ value: String(r).toLowerCase(), labelKey: `region_${String(r).toLowerCase()}` }));
+      },
+      error: () => {
+        // Fallback local
+        this.regionOptions = [
+          { value: 'norte', labelKey: 'region_norte' },
+          { value: 'centro', labelKey: 'region_centro' },
+          { value: 'sur', labelKey: 'region_sur' },
+          { value: 'caribe', labelKey: 'region_caribe' },
+          { value: 'pacifico', labelKey: 'region_pacifico' },
+        ];
+      }
+    });
+
+    // Períodos
+    this.offerService.getQuarters().subscribe({
+      next: (quarters) => {
+        const safe = Array.isArray(quarters) ? quarters : [];
+        // Espera: ["Q1","Q2","Q3","Q4"]
+        this.quarterOptions = safe.map(q => ({ value: String(q), labelKey: `quarter_${String(q).toLowerCase()}` }));
+      },
+      error: () => {
+        this.quarterOptions = [
+          { value: 'Q1', labelKey: 'quarter_q1' },
+          { value: 'Q2', labelKey: 'quarter_q2' },
+          { value: 'Q3', labelKey: 'quarter_q3' },
+          { value: 'Q4', labelKey: 'quarter_q4' },
+        ];
+      }
     });
   }
 
@@ -472,13 +503,20 @@ export class SalesPlan {
         }))
       };
       
-      console.log('Plan de venta creado:', salesPlanData);
-      
-      // Simular llamada al servicio
-      setTimeout(() => {
-        this.saveStatus.set('success');
-        // Ya no se navega automáticamente; el usuario permanece en la página
-      }, 1000);
+      console.log('Plan de venta a enviar:', salesPlanData);
+
+      const payload: CreateSalesPlanPayload = salesPlanData;
+
+      this.offerService.createSalesPlan(payload).subscribe({
+        next: (resp) => {
+          this.saveStatus.set(resp?.success ? 'success' : 'error');
+          this.showConfirmModal = false;
+        },
+        error: () => {
+          this.saveStatus.set('error');
+          this.showConfirmModal = false;
+        }
+      });
     }
   }
 

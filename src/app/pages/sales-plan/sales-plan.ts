@@ -20,6 +20,7 @@ import { PageHeader } from '../../shared/page-header/page-header';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { currentLangSignal, loadTranslations } from '../../shared/lang/lang-store';
 import { Router } from '@angular/router';
+import { ProductsService, Product as BackendProduct } from '../../services/products.service';
 
 interface Product {
   id: string;
@@ -55,6 +56,7 @@ export class SalesPlan {
   private readonly appRef = inject(ApplicationRef);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
+  private readonly productsService = inject(ProductsService);
   
   public readonly currentLangSignal = currentLangSignal;
   pageTitle = 'pageSalesPlanTitle';
@@ -79,24 +81,8 @@ export class SalesPlan {
     { value: 'Q4', labelKey: 'quarter_q4' },
   ];
 
-  // Productos de ejemplo (en un caso real vendrían de un servicio)
-  products: Product[] = [
-    { id: '1', name: 'Aspirina 500mg', price: 2.50 },
-    { id: '2', name: 'Paracetamol 1g', price: 3.20, image: 'assets/images/products/acetaminofen.png' },
-    { id: '3', name: 'Ibuprofeno 400mg', price: 4.80, image: 'assets/images/products/ibuprofeno.png' },
-    { id: '4', name: 'Omeprazol 20mg', price: 5.60 },
-    { id: '5', name: 'Loratadina 10mg', price: 3.90, image: 'assets/images/products/dolex.png' },
-    { id: '6', name: 'Vitamina C 1000mg', price: 6.40 },
-    { id: '7', name: 'Calcio + Vitamina D', price: 8.20 },
-    { id: '8', name: 'Magnesio 400mg', price: 7.50 },
-    { id: '9', name: 'Omega 3 1000mg', price: 12.80 },
-    { id: '10', name: 'Probióticos', price: 15.60 },
-    { id: '11', name: 'Melatonina 3mg', price: 9.40 },
-    { id: '12', name: 'Jarabe para la Tos', price: 4.20 },
-    { id: '13', name: 'Crema Hidratante', price: 6.80 },
-    { id: '14', name: 'Protector Solar FPS 50', price: 8.90 },
-    { id: '15', name: 'Shampoo Anticaspa', price: 5.30 },
-  ];
+  // Productos (cargados desde backend)
+  products: Product[] = [];
 
   // Imagen por defecto
   defaultImage = 'assets/images/products/por-defecto.png';
@@ -211,6 +197,36 @@ export class SalesPlan {
       region: ['', Validators.required],
       quarter: ['', Validators.required],
       totalGoal: ['', Validators.required],
+    });
+
+    // Cargar productos disponibles desde backend
+    this.loadAvailableProducts();
+  }
+
+  private loadAvailableProducts() {
+    // Usa /products/available (ProductsService.getAvailableProducts)
+    console.log('🛒 SalesPlan: Cargando productos disponibles desde el backend...');
+    this.productsService.getAvailableProducts(1).subscribe({
+      next: (resp) => {
+        console.log('🛒 SalesPlan: Respuesta recibida:', resp);
+        const list = (resp.products || []) as unknown as BackendProduct[];
+        this.products = list.map((p: any) => ({
+          id: String(p.product_id ?? p.id ?? p.sku ?? ''),
+          name: p.name,
+          price: Number(p.value) || 0,
+          image: p.image_url || undefined,
+        }));
+        console.log('🛒 SalesPlan: Productos mapeados:', this.products.length);
+
+        // Forzar detección de cambios en caso de que no se actualice de inmediato
+        this.appRef.tick();
+      },
+      error: () => {
+        console.error('🛒 SalesPlan: Error cargando productos.');
+        // Mantener lista vacía si falla (botón quedará deshabilitado hasta seleccionar productos)
+        this.products = [];
+        this.appRef.tick();
+      },
     });
   }
 

@@ -99,7 +99,7 @@
         
         <div class="product-image-container">
           <img 
-            [src]="product.image || '/assets/images/products/por-defecto.png'" 
+            [src]="product.image_url || '/assets/images/products/por-defecto.png'" 
             [alt]="product.name" 
             class="product-image"
             (error)="onImageError($event)">
@@ -112,7 +112,7 @@
           <div class="product-meta">
             <span class="warehouse-info">
               <mat-icon>warehouse</mat-icon>
-              {{ getWarehouseName(product.warehouse) }}
+              {{ getWarehouseName(product.warehouse?.toString() || '') }}
             </span>
           </div>
         </div>

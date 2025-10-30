@@ -36,7 +36,9 @@
                         matSuffix 
                         *ngIf="productSearchFilter()"
                         (click)="clearProductFilter()"
-                        class="clear-button">
+                        class="clear-button"
+                        [attr.aria-label]="'clearFilterAria' | translate"
+                        [attr.title]="'clearFilterAria' | translate">
                         <mat-icon>clear</mat-icon>
                       </button>
                     </mat-form-field>
@@ -62,7 +64,8 @@
                         mat-icon-button 
                         (click)="toggleSortOrder()"
                         class="sort-order-button"
-                        [title]="sortOrder() === 'asc' ? 'sort_desc' : 'sort_asc'">
+                        [attr.title]="sortOrder() === 'asc' ? ('sort_desc' | translate) : ('sort_asc' | translate)"
+                        [attr.aria-label]="sortOrder() === 'asc' ? ('sort_desc' | translate) : ('sort_asc' | translate)">
                         <mat-icon>{{ sortOrder() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
                       </button>
                     </div>
@@ -149,7 +152,9 @@
               mat-icon-button 
               (click)="previousPage()"
               [disabled]="paginationInfo().current === 1"
-              class="pagination-button">
+              class="pagination-button"
+              [attr.aria-label]="'prevPage' | translate"
+              [attr.title]="'prevPage' | translate">
               <mat-icon>chevron_left</mat-icon>
             </button>
             
@@ -174,7 +179,9 @@
               mat-icon-button 
               (click)="nextPage()"
               [disabled]="paginationInfo().current === paginationInfo().totalPages"
-              class="pagination-button">
+              class="pagination-button"
+              [attr.aria-label]="'nextPage' | translate"
+              [attr.title]="'nextPage' | translate">
               <mat-icon>chevron_right</mat-icon>
             </button>
           </div>

@@ -46,7 +46,7 @@
                   <div class="product-sort-pagination">
                     <!-- Ordenamiento -->
                     <div class="sort-controls">
-                      <mat-form-field appearance="outline" class="sort-field">
+                      <mat-form-field appearance="outline" floatLabel="always" class="sort-field">
                         <mat-label>{{ 'sort_by_label' | translate }}</mat-label>
                         <mat-select 
                           [ngModel]="sortBy()"
@@ -69,7 +69,7 @@
 
                     <!-- Items por página -->
                     <div class="items-per-page">
-                      <mat-form-field appearance="outline" class="items-field">
+                      <mat-form-field appearance="outline" floatLabel="always" class="items-field">
                         <mat-label>{{ 'items_per_page' | translate }}</mat-label>
                         <mat-select 
                           [ngModel]="itemsPerPage()"

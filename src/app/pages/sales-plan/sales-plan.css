@@ -573,8 +573,8 @@ mat-divider {
 }
 
 .items-field {
-  min-width: 140px;
-  max-width: 180px;
+  min-width: 180px;
+  max-width: 260px;
 }
 
 .items-field .mat-form-field-wrapper {

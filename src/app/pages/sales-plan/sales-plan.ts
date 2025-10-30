@@ -108,7 +108,7 @@ export class SalesPlan {
   productSearchFilter = signal('');
   sortBy = signal<'name' | 'price' | 'popularity'>('name');
   sortOrder = signal<'asc' | 'desc'>('asc');
-  itemsPerPage = signal(20);
+  itemsPerPage = signal(10);
   currentPage = signal(1);
   
   // Estados del modal de meta

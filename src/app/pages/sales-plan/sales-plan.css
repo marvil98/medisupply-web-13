@@ -666,7 +666,8 @@ mat-divider {
   background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
   border-radius: 16px;
   border: 1px solid #e0e0e0;
-  margin-top: 24px;
+  margin: 24px auto 0 auto;
+  width: 70%;
   box-shadow: 
     0 4px 20px rgba(0, 0, 0, 0.08),
     0 2px 8px rgba(0, 0, 0, 0.04);
@@ -726,10 +727,12 @@ mat-divider {
   display: flex;
   gap: 8px;
   margin: 0 16px;
+  justify-content: center;
 }
 
 .page-button {
   min-width: 44px;
+  width: 44px;
   height: 44px;
   border-radius: 50%;
   color: #666;
@@ -739,6 +742,13 @@ mat-divider {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   transform: perspective(1000px) rotateY(1deg);
   transition: all 0.3s ease;
+}
+
+.page-button[disabled] {
+  background: transparent;
+  border-color: transparent;
+  color: #b0b0b0;
+  box-shadow: none;
 }
 
 .page-button:hover {

@@ -191,6 +191,41 @@ export class SalesPlan {
     };
   });
 
+  // Paginación adaptable con elipsis (sin placeholders negativos)
+  visiblePages = computed(() => {
+    const total = this.paginationInfo().totalPages;
+    const current = this.paginationInfo().current;
+    const maxButtons = 9; // máximo de elementos (números y elipsis)
+
+    const result: (number | string)[] = [];
+    if (total <= maxButtons) {
+      for (let i = 1; i <= total; i++) result.push(i);
+      return result;
+    }
+
+    result.push(1);
+
+    const windowSize = 5; // cantidad de páginas alrededor de la actual
+    let start = Math.max(2, current - Math.floor(windowSize / 2));
+    let end = Math.min(total - 1, current + Math.floor(windowSize / 2));
+
+    // Ajuste si ventana toca bordes
+    if (current <= 3) {
+      start = 2;
+      end = 2 + windowSize - 1;
+    } else if (current >= total - 2) {
+      end = total - 1;
+      start = end - (windowSize - 1);
+    }
+
+    if (start > 2) result.push('…');
+    for (let p = start; p <= end; p++) result.push(p);
+    if (end < total - 1) result.push('…');
+
+    result.push(total);
+    return result.slice(0, maxButtons);
+  });
+
   constructor() {
     this.salesPlanForm = this.fb.group({
       product: ['', Validators.required],

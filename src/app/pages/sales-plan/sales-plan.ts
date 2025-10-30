@@ -105,6 +105,8 @@ export class SalesPlan {
   // Estados del selector de productos
   isProductSelectorOpen = false;
   selectedProducts: Product[] = [];
+  // Señal para forzar recomputes cuando cambien metas/selecciones
+  private selectedProductsVersion = signal(0);
   productSearchFilter = signal('');
   sortBy = signal<'name' | 'price' | 'popularity'>('name');
   sortOrder = signal<'asc' | 'desc'>('asc');
@@ -120,9 +122,15 @@ export class SalesPlan {
   saveStatus = signal<'idle' | 'saving' | 'success' | 'error'>('idle');
   formErrors = signal<Record<string, string>>({});
 
-  // Computed para validar si el formulario está completo
+  // Computed para validar si el formulario está completo (región + período + metas > 0)
   isFormValid = computed(() => {
-    return this.salesPlanForm.valid && this.selectedProducts.length > 0;
+    // Leer versión para que este cómputo reaccione a cambios en metas/selecciones
+    this.selectedProductsVersion();
+    const region = this.salesPlanForm.get('region')?.value;
+    const quarter = this.salesPlanForm.get('quarter')?.value;
+    // Considera metas en cualquier producto (seleccionado o no)
+    const hasUnits = this.products.some(p => (p.goal || 0) > 0);
+    return !!region && !!quarter && hasUnits;
   });
 
   // Computed para filtrar, ordenar y paginar productos
@@ -231,7 +239,7 @@ export class SalesPlan {
       product: ['', Validators.required],
       region: ['', Validators.required],
       quarter: ['', Validators.required],
-      totalGoal: ['', Validators.required],
+      totalGoal: [''], // se calcula automáticamente con unidades x precio
     });
 
     // Cargar productos disponibles desde backend
@@ -282,6 +290,8 @@ export class SalesPlan {
       // Si no está seleccionado, lo agregamos
       this.selectedProducts.push(product);
     }
+    this.updateTotalGoalFromProducts();
+    this.selectedProductsVersion.set(this.selectedProductsVersion() + 1);
   }
 
   isProductSelected(product: Product): boolean {
@@ -308,8 +318,25 @@ export class SalesPlan {
   saveGoal() {
     if (this.currentProduct && this.goalValue && !isNaN(Number(this.goalValue)) && Number(this.goalValue) > 0) {
       this.currentProduct.goal = Number(this.goalValue);
+      // Asegurar que el producto con meta quede seleccionado
+      const exists = this.selectedProducts.some(p => p.id === this.currentProduct!.id);
+      if (!exists) {
+        this.selectedProducts.push(this.currentProduct);
+      }
+      this.updateTotalGoalFromProducts();
+      this.selectedProductsVersion.set(this.selectedProductsVersion() + 1);
       this.closeGoalModal();
     }
+  }
+
+  private updateTotalGoalFromProducts(): void {
+    const totalValue = this.selectedProducts.reduce((sum, p) => {
+      const units = p.goal || 0;
+      const unitPrice = this.convertValue(p.price);
+      return sum + (units * unitPrice);
+    }, 0);
+    const formatted = `${this.currencySymbol()} ${totalValue.toLocaleString()}`;
+    this.salesPlanForm.get('totalGoal')?.setValue(formatted, { emitEvent: false });
   }
 
   closeGoalModal() {
@@ -402,10 +429,13 @@ export class SalesPlan {
       this.saveStatus.set('saving');
       
       // Preparar datos del plan de venta
+      const totalUnits = this.selectedProducts.reduce((sum, p) => sum + (p.goal || 0), 0);
+      const totalValue = this.selectedProducts.reduce((sum, p) => sum + ((p.goal || 0) * this.convertValue(p.price)), 0);
       const salesPlanData = {
         region: this.salesPlanForm.get('region')?.value,
         quarter: this.salesPlanForm.get('quarter')?.value,
-        totalGoal: this.salesPlanForm.get('totalGoal')?.value,
+        totalUnits,
+        totalValue,
         products: this.selectedProducts.map(product => ({
           id: product.id,
           name: product.name,
@@ -418,9 +448,7 @@ export class SalesPlan {
       // Simular llamada al servicio
       setTimeout(() => {
         this.saveStatus.set('success');
-        setTimeout(() => {
-          this.router.navigate(['/dashboard']);
-        }, 2000);
+        // Ya no se navega automáticamente; el usuario permanece en la página
       }, 1000);
     }
   }

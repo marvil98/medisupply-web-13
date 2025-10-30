@@ -38,7 +38,8 @@
                         (click)="clearProductFilter()"
                         class="clear-button"
                         [attr.aria-label]="'clearFilterAria' | translate"
-                        [attr.title]="'clearFilterAria' | translate">
+                        [attr.title]="'clearFilterAria' | translate"
+                        type="button">
                         <mat-icon>clear</mat-icon>
                       </button>
                     </mat-form-field>
@@ -65,7 +66,8 @@
                         (click)="toggleSortOrder()"
                         class="sort-order-button"
                         [attr.title]="sortOrder() === 'asc' ? ('sort_desc' | translate) : ('sort_asc' | translate)"
-                        [attr.aria-label]="sortOrder() === 'asc' ? ('sort_desc' | translate) : ('sort_asc' | translate)">
+                        [attr.aria-label]="sortOrder() === 'asc' ? ('sort_desc' | translate) : ('sort_asc' | translate)"
+                        type="button">
                         <mat-icon>{{ sortOrder() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
                       </button>
                     </div>
@@ -145,7 +147,8 @@
             <!-- Columna 3: Botón Meta -->
             <button class="meta-button" 
                     (click)="setProductGoal(product, $event)"
-                    [disabled]="!isProductSelected(product)">
+                    [disabled]="!isProductSelected(product)"
+                    type="button">
               {{ 'goal_button' | translate }}
             </button>
           </div>
@@ -162,7 +165,8 @@
               [disabled]="paginationInfo().current === 1"
               class="pagination-button"
               [attr.aria-label]="'prevPage' | translate"
-              [attr.title]="'prevPage' | translate">
+              [attr.title]="'prevPage' | translate"
+              type="button">
               <mat-icon>chevron_left</mat-icon>
             </button>
             
@@ -174,12 +178,13 @@
                   *ngIf="p !== '…'; else ellipsisTpl"
                   (click)="goToPage(+p)"
                   [class.active]="paginationInfo().current === p"
-                  class="page-button">
+                  class="page-button"
+                  type="button">
                   {{ p }}
                 </button>
               </ng-container>
               <ng-template #ellipsisTpl>
-                <button mat-button class="page-button" disabled>…</button>
+                <button mat-button class="page-button" disabled type="button">…</button>
               </ng-template>
             </div>
             
@@ -189,7 +194,8 @@
               [disabled]="paginationInfo().current === paginationInfo().totalPages"
               class="pagination-button"
               [attr.aria-label]="'nextPage' | translate"
-              [attr.title]="'nextPage' | translate">
+              [attr.title]="'nextPage' | translate"
+              type="button">
               <mat-icon>chevron_right</mat-icon>
             </button>
           </div>

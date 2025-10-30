@@ -116,6 +116,11 @@
   "saving_plan": "Saving plan...",
   "plan_created_success": "Sales plan created successfully!",
   "plan_creation_error": "Oops! There was a problem creating the plan. Please try again in a few minutes",
+  "confirm_plan_title": "Confirm sales plan",
+  "confirm_button": "Confirm",
+  "summary_region": "Region",
+  "summary_quarter": "Quarter",
+  "summary_total_value": "Total goal value",
 
   "set_goal_title": "Set Goal",
   "set_goal_for": "Set goal for",

@@ -119,6 +119,9 @@ export class SalesPlan {
   currentProduct: Product | null = null;
   goalValue = '';
 
+  // Modal de confirmación de creación
+  showConfirmModal = false;
+
   // Estados del formulario
   saveStatus = signal<'idle' | 'saving' | 'success' | 'error'>('idle');
   formErrors = signal<Record<string, string>>({});
@@ -414,6 +417,22 @@ export class SalesPlan {
   // Método para obtener el precio convertido de un producto
   getConvertedPrice(product: Product): number {
     return this.convertValue(product.price);
+  }
+
+  // Productos con meta > 0
+  plannedProducts = computed(() => this.products.filter(p => (p.goal || 0) > 0));
+
+  // Resumen monetario total
+  totalPlannedValue = computed(() => this.plannedProducts().reduce((sum, p) => sum + (this.convertValue(p.price) * (p.goal || 0)), 0));
+
+  // Abrir confirmación antes de crear
+  openConfirm() {
+    if (!this.isFormValid()) return;
+    this.showConfirmModal = true;
+  }
+
+  cancelConfirm() {
+    this.showConfirmModal = false;
   }
 
   clearError(field: string) {

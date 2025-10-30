@@ -5,7 +5,7 @@
 
 <div class="sales-plan-container">
   <div class="form-container">
-    <form [formGroup]="salesPlanForm" (ngSubmit)="createSalesPlan()">
+    <form [formGroup]="salesPlanForm" (ngSubmit)="openConfirm()">
       
       <!-- Selector de Producto -->
       <div class="product-selector-section">
@@ -328,6 +328,47 @@
         [disabled]="!goalValue || +goalValue <= 0"
         class="save-button">
         {{ 'save_goal_button' | translate }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación de creación de plan -->
+<div class="modal-overlay" *ngIf="showConfirmModal" (click)="cancelConfirm()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ 'confirm_plan_title' | translate }}</h3>
+      <button class="close-button" (click)="cancelConfirm()" type="button">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <p class="product-info">
+        {{ 'summary_region' | translate }}: <strong>{{ (salesPlanForm.get('region')?.value || '') | translate }}</strong>
+        <br>
+        {{ 'summary_quarter' | translate }}: <strong>{{ (salesPlanForm.get('quarter')?.value || '') }}</strong>
+      </p>
+
+      <div *ngIf="plannedProducts().length > 0">
+        <ul>
+          <li *ngFor="let p of plannedProducts()">
+            <strong>{{ p.name }}</strong> — {{ p.goal | number:'1.0-0' }} {{ 'units' | translate }}
+          </li>
+        </ul>
+      </div>
+
+      <p style="margin-top:12px; font-weight:600;">
+        {{ 'summary_total_value' | translate }}: {{ totalPlannedValue() | currency:currencySymbol():'symbol':'1.0-0' }}
+      </p>
+    </div>
+
+    <div class="modal-footer">
+      <button mat-button (click)="cancelConfirm()" class="cancel-button" type="button">
+        {{ 'cancel_button' | translate }}
+      </button>
+      <button mat-raised-button color="primary" (click)="showConfirmModal=false; createSalesPlan()" class="save-button" type="button">
+        {{ 'confirm_button' | translate }}
       </button>
     </div>
   </div>

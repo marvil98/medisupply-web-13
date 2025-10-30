@@ -107,6 +107,7 @@ export class SalesPlan {
   selectedProducts: Product[] = [];
   // Señal para forzar recomputes cuando cambien metas/selecciones
   private selectedProductsVersion = signal(0);
+  private formVersion = signal(0);
   productSearchFilter = signal('');
   sortBy = signal<'name' | 'price' | 'popularity'>('name');
   sortOrder = signal<'asc' | 'desc'>('asc');
@@ -126,6 +127,7 @@ export class SalesPlan {
   isFormValid = computed(() => {
     // Leer versión para que este cómputo reaccione a cambios en metas/selecciones
     this.selectedProductsVersion();
+    this.formVersion();
     const region = this.salesPlanForm.get('region')?.value;
     const quarter = this.salesPlanForm.get('quarter')?.value;
     // Considera metas en cualquier producto (seleccionado o no)
@@ -244,6 +246,14 @@ export class SalesPlan {
 
     // Cargar productos disponibles desde backend
     this.loadAvailableProducts();
+
+    // Reactivar validación cuando cambien región o período
+    this.salesPlanForm.get('region')?.valueChanges.subscribe(() => {
+      this.formVersion.set(this.formVersion() + 1);
+    });
+    this.salesPlanForm.get('quarter')?.valueChanges.subscribe(() => {
+      this.formVersion.set(this.formVersion() + 1);
+    });
   }
 
   private loadAvailableProducts() {

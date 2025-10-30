@@ -256,9 +256,9 @@ export class SalesPlan {
     // Regiones
     this.offerService.getRegions().subscribe({
       next: (regions) => {
-        // Espera: ["norte","centro",...] o etiquetas; mapeo a labelKey existentes
+        // Backend retorna [{ value:'Norte', label:'Norte' }, ...]
         const safe = Array.isArray(regions) ? regions : [];
-        this.regionOptions = safe.map(r => ({ value: String(r).toLowerCase(), labelKey: `region_${String(r).toLowerCase()}` }));
+        this.regionOptions = safe.map(r => ({ value: String(r.value), labelKey: `region_${String(r.value).toLowerCase()}` }));
       },
       error: () => {
         // Fallback local
@@ -276,8 +276,8 @@ export class SalesPlan {
     this.offerService.getQuarters().subscribe({
       next: (quarters) => {
         const safe = Array.isArray(quarters) ? quarters : [];
-        // Espera: ["Q1","Q2","Q3","Q4"]
-        this.quarterOptions = safe.map(q => ({ value: String(q), labelKey: `quarter_${String(q).toLowerCase()}` }));
+        // Backend retorna [{ value:'Q1', label:'Q1 - ...'}, ...]
+        this.quarterOptions = safe.map(q => ({ value: String(q.value), labelKey: `quarter_${String(q.value).toLowerCase()}` }));
       },
       error: () => {
         this.quarterOptions = [
@@ -489,18 +489,19 @@ export class SalesPlan {
       this.saveStatus.set('saving');
       
       // Preparar datos del plan de venta
-      const totalUnits = this.selectedProducts.reduce((sum, p) => sum + (p.goal || 0), 0);
-      const totalValue = this.selectedProducts.reduce((sum, p) => sum + ((p.goal || 0) * this.convertValue(p.price)), 0);
+      const totalUnits = this.products.reduce((sum, p) => sum + (p.goal || 0), 0);
+      const totalValue = this.products.reduce((sum, p) => sum + ((p.goal || 0) * this.convertValue(p.price)), 0);
       const salesPlanData = {
-        region: this.salesPlanForm.get('region')?.value,
-        quarter: this.salesPlanForm.get('quarter')?.value,
-        totalUnits,
-        totalValue,
-        products: this.selectedProducts.map(product => ({
-          id: product.id,
-          name: product.name,
-          goal: product.goal || 0
-        }))
+        region: this.salesPlanForm.get('region')?.value, // 'Norte', 'Centro', ...
+        quarter: this.salesPlanForm.get('quarter')?.value, // 'Q1'..'Q4'
+        year: new Date().getFullYear(),
+        total_goal: totalValue, // valor monetario de la meta total
+        products: this.products
+          .filter(p => (p.goal || 0) > 0)
+          .map(p => ({
+            product_id: Number(p.id) || 0,
+            individual_goal: p.goal || 0
+          }))
       };
       
       console.log('Plan de venta a enviar:', salesPlanData);
@@ -509,8 +510,10 @@ export class SalesPlan {
 
       this.offerService.createSalesPlan(payload).subscribe({
         next: (resp) => {
-          this.saveStatus.set(resp?.success ? 'success' : 'error');
+          const ok = !!resp && (resp as any).success === true || typeof (resp as any)?.plan_id !== 'undefined';
+          this.saveStatus.set(ok ? 'success' : 'error');
           this.showConfirmModal = false;
+          // No redirigir automáticamente; permanecer en la página
         },
         error: () => {
           this.saveStatus.set('error');

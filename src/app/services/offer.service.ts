@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, tap, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export interface SalesPlanProductPayload {
@@ -11,11 +11,11 @@ export interface SalesPlanProductPayload {
 }
 
 export interface CreateSalesPlanPayload {
-  region: string;
-  quarter: string;
-  totalUnits: number;
-  totalValue: number;
-  products: SalesPlanProductPayload[];
+  region: string;        // 'Norte', 'Centro', ...
+  quarter: string;       // 'Q1'..'Q4'
+  year: number;          // año actual
+  total_goal: number;    // suma de metas (unidades)
+  products: { product_id: number; individual_goal: number; }[];
 }
 
 export interface CreateSalesPlanResponse {
@@ -30,10 +30,11 @@ export class OfferService {
 
   constructor(private http: HttpClient) {}
 
-  getRegions() : Observable<string[]> {
-    const url = `${this.offerApi}offers/regions`;
+  getRegions() : Observable<{ value: string; label: string }[]> {
+    const url = `${this.offerApi}regions`;
     console.log('🌍 OfferService: GET regiones →', url);
-    return this.http.get<string[]>(url).pipe(
+    return this.http.get<any>(url).pipe(
+      map(resp => Array.isArray(resp) ? resp : []),
       tap(resp => console.log('✅ OfferService: Regiones:', resp)),
       catchError(err => {
         console.error('❌ OfferService: Error obteniendo regiones:', err);
@@ -42,10 +43,11 @@ export class OfferService {
     );
   }
 
-  getQuarters() : Observable<string[]> {
-    const url = `${this.offerApi}offers/quarters`;
+  getQuarters() : Observable<{ value: string; label: string }[]> {
+    const url = `${this.offerApi}quarters`;
     console.log('🗓️ OfferService: GET períodos →', url);
-    return this.http.get<string[]>(url).pipe(
+    return this.http.get<any>(url).pipe(
+      map(resp => Array.isArray(resp) ? resp : []),
       tap(resp => console.log('✅ OfferService: Períodos:', resp)),
       catchError(err => {
         console.error('❌ OfferService: Error obteniendo períodos:', err);
@@ -55,12 +57,27 @@ export class OfferService {
   }
 
   createSalesPlan(payload: CreateSalesPlanPayload): Observable<CreateSalesPlanResponse> {
-    const url = `${this.offerApi}offers`;
+    const url = `${this.offerApi}plans`;
+    const jsonPayload = JSON.stringify(payload);
     console.log('📝 OfferService: POST crear plan de ventas →', url, payload);
+    console.log('=== CURL EXACTO ===');
+    console.log(`curl -X POST -H 'Content-Type: application/json' -d '${jsonPayload}' ${url}`);
     return this.http.post<CreateSalesPlanResponse>(url, payload).pipe(
       tap(resp => console.log('✅ OfferService: Respuesta creación plan:', resp)),
       catchError(err => {
         console.error('❌ OfferService: Error al crear plan:', err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  getOfferProducts(): Observable<any[]> {
+    const url = `${this.offerApi}products`;
+    console.log('🛒 OfferService: GET productos →', url);
+    return this.http.get<any[]>(url).pipe(
+      tap(resp => console.log('✅ OfferService: Productos:', Array.isArray(resp) ? resp.length : resp)),
+      catchError(err => {
+        console.error('❌ OfferService: Error obteniendo productos:', err);
         return throwError(() => err);
       })
     );

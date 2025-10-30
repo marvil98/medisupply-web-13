@@ -59,7 +59,7 @@ describe('ProductsService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`${baseUrl}products/location/warehouses`);
+      const req = httpMock.expectOne(`${baseUrl}products/available`);
       expect(req.request.method).toBe('GET');
       req.flush(mockProducts);
     });
@@ -88,7 +88,7 @@ describe('ProductsService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`${baseUrl}products/location/warehouses`);
+      const req = httpMock.expectOne(`${baseUrl}products/available`);
       req.flush(mockResponse);
     });
 
@@ -102,7 +102,7 @@ describe('ProductsService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`${baseUrl}products/location/warehouses`);
+      const req = httpMock.expectOne(`${baseUrl}products/available`);
       req.flush([]);
     });
 
@@ -115,7 +115,7 @@ describe('ProductsService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`${baseUrl}products/location/warehouses`);
+      const req = httpMock.expectOne(`${baseUrl}products/available`);
       req.error(new ErrorEvent('Network error'));
     });
 

@@ -120,8 +120,10 @@
   "set_goal_title": "Establecer Meta",
   "set_goal_for": "Establecer meta para",
   "goal_value_label": "Valor de la meta",
+  "goal_units_label": "Meta (unidades)",
   "goal_validation_error": "La meta debe ser un número mayor a 0",
   "save_goal_button": "Guardar Meta",
+  "cancel_button": "Cancelar",
 
   "search_products_label": "Buscar productos",
   "search_products_placeholder": "Escribe el nombre del producto...",

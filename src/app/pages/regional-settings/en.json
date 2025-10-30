@@ -120,8 +120,10 @@
   "set_goal_title": "Set Goal",
   "set_goal_for": "Set goal for",
   "goal_value_label": "Goal value",
+  "goal_units_label": "Goal (units)",
   "goal_validation_error": "Goal must be a number greater than 0",
   "save_goal_button": "Save Goal",
+  "cancel_button": "Cancel",
 
   "search_products_label": "Search products",
   "search_products_placeholder": "Type product name...",

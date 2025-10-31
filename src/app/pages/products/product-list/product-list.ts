@@ -212,19 +212,6 @@ export class ProductList implements OnInit, AfterViewInit {
         const products = response.products || [];
         console.log('📦 ProductList: Productos individuales:', products);
         
-        // Verificar si hay datos del backend real
-        const hasRealData = products.some(p => 
-          p.sku === 'MED-001' || 
-          p.sku === 'MED-002' || 
-          p.sku === 'SURG-001' || 
-          p.sku === 'EQUIP-001'
-        );
-        
-        if (hasRealData) {
-          console.log('✅ ProductList: ¡DATOS REALES DEL BACKEND DETECTADOS!');
-          console.log('✅ ProductList: Los datos vienen del backend correctamente');
-        }
-        
         this.products.set(products);
         this.totalProducts.set(response.total || products.length);
         

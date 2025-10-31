@@ -190,18 +190,11 @@ export class ProductList implements OnInit, AfterViewInit {
     this.showErrorMessage.set(false);
     
     console.log('🔄 ProductList: Iniciando carga de productos desde el backend...');
-    console.log('🏙️ ProductList: Ciudad seleccionada:', this.selectedCityId);
     console.log('🏢 ProductList: Bodega seleccionada:', this.selectedWarehouseId);
     
-    // Cargar siempre desde catálogo activo (sin filtrar por bodega)
-    let productsObservable;
-    if (this.selectedCityId) {
-      console.log('🏙️ ProductList: Cargando productos por ciudad (catálogo activo):', this.selectedCityId);
-      productsObservable = this.productsService.getAvailableProducts(this.selectedCityId);
-    } else {
-      console.log('🏙️ ProductList: Cargando productos activos (por defecto ciudad 1)');
-      productsObservable = this.productsService.getAvailableProducts(1);
-    }
+    // Cargar siempre productos activos (sin filtrar por ciudad)
+    console.log('🟢 ProductList: Cargando productos activos (sin filtro de ciudad)');
+    const productsObservable = this.productsService.getAvailableProducts();
     
     productsObservable.subscribe({
       next: (response) => {

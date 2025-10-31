@@ -37,20 +37,20 @@ export class ProductsService {
    */
   getAvailableProducts(cityId: number = 1): Observable<ProductsResponse> {
     const url = `${this.api}products/active`;
-    
+
     console.log('🔍 ProductsService: ===== INICIANDO PETICIÓN AL BACKEND =====');
     console.log('🌐 ProductsService: URL completa:', url);
     console.log('🌐 ProductsService: API base:', this.api);
     console.log('📊 ProductsService: Método HTTP: GET');
     console.log('⏱️ ProductsService: Timestamp:', new Date().toISOString());
-    
+
     return this.http.get<any>(url).pipe(
       tap(data => {
         console.log('📡 ProductsService: ===== RESPUESTA RECIBIDA =====');
         console.log('📡 ProductsService: Respuesta completa:', data);
-        console.log('📊 ProductsService: Tipo de respuesta:', typeof data);
+        console.log('📊 ProductsService: TipogetAvailableProducts de respuesta:', typeof data);
         console.log('📋 ProductsService: Es array?', Array.isArray(data));
-        
+
         // El backend devuelve un array directo, no un objeto con products
         if (Array.isArray(data)) {
           console.log('📦 ProductsService: Backend devuelve array directo con', data.length, 'productos');
@@ -63,25 +63,32 @@ export class ProductsService {
       map(data => {
         console.log('🔄 ProductsService: ===== TRANSFORMANDO DATOS =====');
         console.log('🔄 ProductsService: Datos recibidos:', data);
-        
+
         // El endpoint /products/available devuelve un array directo de productos
         if (Array.isArray(data)) {
           console.log('✅ ProductsService: Transformando array directo');
-          
-          // El backend ya devuelve productos con total_quantity, solo necesitamos mapearlos
+
+          // Mapear cantidad total tolerando distintos nombres desde el backend
           const products = data.map((product: any) => ({
             product_id: product.product_id,
             sku: product.sku,
             name: product.name,
             value: product.value,
             category_name: product.category_name,
-            total_quantity: product.total_quantity || 0,
+            total_quantity: (
+              product.total_quantity ??
+              product.max_quantity ??
+              product.quantity ??
+              product.total_stock ??
+              product.stock ??
+              0
+            ),
             image_url: product.image_url || null
           }));
-          
+
           console.log('✅ ProductsService: Productos transformados:', products.length);
           console.log('✅ ProductsService: Primeros 3 productos:', products.slice(0, 3));
-          
+
           return {
             products,
             total: products.length,
@@ -97,10 +104,17 @@ export class ProductsService {
             name: product.name,
             value: product.value,
             category_name: product.category_name,
-            total_quantity: product.total_quantity || product.quantity || 0,
+            total_quantity: (
+              product.total_quantity ??
+              product.max_quantity ??
+              product.quantity ??
+              product.total_stock ??
+              product.stock ??
+              0
+            ),
             image_url: product.image_url || null
           }));
-          
+
           return {
             products,
             total: products.length,
@@ -135,10 +149,10 @@ export class ProductsService {
    */
   getProductsByWarehouse(warehouseId: number): Observable<ProductsResponse> {
     const url = `${this.api}products/by-warehouse/${warehouseId}`;
-    
+
     console.log('🔍 ProductsService: Obteniendo productos por bodega:', warehouseId);
     console.log('🌐 ProductsService: URL:', url);
-    
+
     return this.http.get<any>(url).pipe(
       tap(data => {
         console.log('📡 ProductsService: Productos por bodega recibidos:', data);
@@ -147,11 +161,11 @@ export class ProductsService {
         if (data.products && Array.isArray(data.products)) {
           // Agrupar productos por SKU (el backend puede devolver múltiples lotes como productos separados)
           const productsMap = new Map<string, any>();
-          
+
           data.products.forEach((product: any) => {
             const sku = product.sku || '';
             if (!sku) return;
-            
+
             if (productsMap.has(sku)) {
               // Ya existe, sumar la cantidad
               const existing = productsMap.get(sku);
@@ -169,9 +183,9 @@ export class ProductsService {
               });
             }
           });
-          
+
           const products = Array.from(productsMap.values());
-          
+
           return {
             products,
             total: products.length,
@@ -179,7 +193,7 @@ export class ProductsService {
             message: 'Productos por bodega cargados exitosamente'
           };
         }
-        
+
         return {
           products: [],
           total: 0,
@@ -199,10 +213,10 @@ export class ProductsService {
    */
   getProductsWithoutStock(): Observable<ProductsResponse> {
     const url = `${this.api}products/without-stock`;
-    
+
     console.log('🔍 ProductsService: Obteniendo productos sin stock');
     console.log('🌐 ProductsService: URL:', url);
-    
+
     return this.http.get<any>(url).pipe(
       tap(data => {
         console.log('📡 ProductsService: Productos sin stock recibidos:', data);
@@ -218,7 +232,7 @@ export class ProductsService {
             total_quantity: 0, // Sin stock
             image_url: product.image_url || null
           }));
-          
+
           return {
             products,
             total: products.length,
@@ -226,7 +240,7 @@ export class ProductsService {
             message: 'Productos sin stock cargados exitosamente'
           };
         }
-        
+
         return {
           products: [],
           total: 0,
@@ -246,9 +260,9 @@ export class ProductsService {
    */
   getProductById(id: string): Observable<Product> {
     const url = `${this.api}products/${id}`;
-    
+
     console.log('🔍 ProductsService: Solicitando producto por ID:', id, 'desde:', url);
-    
+
     return this.http.get<Product>(url).pipe(
       tap(data => console.log('📡 ProductsService: Producto recibido:', data)),
       catchError(error => {
@@ -263,10 +277,10 @@ export class ProductsService {
    */
   createProduct(product: Omit<Product, 'id' | 'fecha_creacion'>): Observable<Product> {
     const url = `${this.api}products`;
-    
+
     console.log('🔍 ProductsService: Creando producto:', product);
     console.log('🌐 ProductsService: URL:', url);
-    
+
     return this.http.post<Product>(url, product).pipe(
       tap(data => console.log('📡 ProductsService: Producto creado:', data)),
       catchError(error => {
@@ -281,10 +295,10 @@ export class ProductsService {
    */
   updateProduct(id: string, product: Partial<Product>): Observable<Product> {
     const url = `${this.api}products/${id}`;
-    
+
     console.log('🔍 ProductsService: Actualizando producto ID:', id, 'con datos:', product);
     console.log('🌐 ProductsService: URL:', url);
-    
+
     return this.http.put<Product>(url, product).pipe(
       tap(data => console.log('📡 ProductsService: Producto actualizado:', data)),
       catchError(error => {
@@ -299,10 +313,10 @@ export class ProductsService {
    */
   deleteProduct(id: string): Observable<{ success: boolean; message: string }> {
     const url = `${this.api}products/${id}`;
-    
+
     console.log('🔍 ProductsService: Eliminando producto ID:', id);
     console.log('🌐 ProductsService: URL:', url);
-    
+
     return this.http.delete<{ success: boolean; message: string }>(url).pipe(
       tap(data => console.log('📡 ProductsService: Producto eliminado:', data)),
       catchError(error => {
@@ -317,10 +331,10 @@ export class ProductsService {
    */
   toggleProductStatus(id: string, status: 'activo' | 'inactivo'): Observable<Product> {
     const url = `${this.api}products/${id}/status`;
-    
+
     console.log('🔍 ProductsService: Cambiando estado del producto ID:', id, 'a:', status);
     console.log('🌐 ProductsService: URL:', url);
-    
+
     return this.http.patch<Product>(url, { estado: status }).pipe(
       tap(data => console.log('📡 ProductsService: Estado del producto actualizado:', data)),
       catchError(error => {

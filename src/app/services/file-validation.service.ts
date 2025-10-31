@@ -382,7 +382,7 @@ export class FileValidationService {
       this.testFormDataStructure(file);
       
       console.log('=== ENVIANDO AL BACKEND ===');
-      console.log('URL del backend:', `${environment.baseUrl}products/upload3`);
+      console.log('URL del backend:', `${environment.baseUrl}products/upload3/validate`);
       console.log('File name:', file.name);
       console.log('File size:', file.size);
       console.log('File type:', file.type);
@@ -390,7 +390,7 @@ export class FileValidationService {
       
       // Simular el comando curl exacto
       console.log('=== COMANDO CURL EQUIVALENTE ===');
-      console.log(`curl -X POST -F "files=@${file.name}" ${environment.baseUrl}products/upload3`);
+      console.log(`curl -X POST -F "files=@${file.name}" ${environment.baseUrl}products/upload3/validate`);
       
       // Verificar el FormData exactamente como lo recibe el backend
       console.log('=== VERIFICACIÓN FORMDATA ===');
@@ -410,7 +410,7 @@ export class FileValidationService {
       console.log(`curl -X POST \\`);
       console.log(`  -F "files=@${file.name}" \\`);
       console.log(`  -H "Content-Type: multipart/form-data" \\`);
-      console.log(`  "${environment.baseUrl}products/upload3"`);
+      console.log(`  "${environment.baseUrl}products/upload3/validate"`);
       
       // Mostrar headers que enviará el navegador
       console.log('=== HEADERS QUE ENVIARÁ EL NAVEGADOR ===');
@@ -449,16 +449,16 @@ export class FileValidationService {
       
       // Log de la petición HTTP
       console.log('=== PETICIÓN HTTP ===');
-      console.log('URL:', `${environment.baseUrl}products/upload3`);
+      console.log('URL:', `${environment.baseUrl}products/upload3/validate`);
       console.log('Método: POST');
       console.log('Content-Type: text/plain');
       console.log('Body: Array JSON como string');
       
       // Log del CURL exacto en una sola línea
       console.log('=== CURL EXACTO ===');
-      console.log(`curl -X POST -H "Content-Type: text/plain" -d '${jsonPayload}' ${environment.baseUrl}products/upload3`);
+      console.log(`curl -X POST -H "Content-Type: text/plain" -d '${jsonPayload}' ${environment.baseUrl}products/upload3/validate`);
       
-            const response = await fetch(`${environment.baseUrl}products/upload3`, {
+            const response = await fetch(`${environment.baseUrl}products/upload3/validate`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'text/plain'
@@ -499,7 +499,7 @@ export class FileValidationService {
         
         // Agregar información adicional para debug
         errors.push(`Status HTTP: ${response.status}`);
-        errors.push(`URL: ${environment.baseUrl}products/upload3`);
+        errors.push(`URL: ${environment.baseUrl}products/upload3/validate`);
         
         return { isValid: false, errors, warnings };
       }
@@ -534,6 +534,25 @@ export class FileValidationService {
       // Usar validación local como fallback
       return this.validateLocallyOnly(data);
     }
+  }
+
+  /**
+   * Inserta productos ya validados usando el endpoint dedicado
+   */
+  async insertValidatedProducts(products: any[]): Promise<any> {
+    const url = `${environment.baseUrl}products/upload3/insert`;
+    const jsonPayload = JSON.stringify(products);
+    console.log('=== INSERT PRODUCTS (POST) ===');
+    console.log('URL:', url);
+    console.log('Productos:', products.length);
+    console.log('CURL:', `curl -X POST -H "Content-Type: application/json" -d '${jsonPayload}' ${url}`);
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: jsonPayload
+    });
+    const text = await resp.text();
+    try { return JSON.parse(text); } catch { return { raw: text, status: resp.status }; }
   }
 
   /**
@@ -620,7 +639,7 @@ export class FileValidationService {
     
     // Simular el comando curl equivalente
     console.log('Comando curl equivalente:');
-    console.log(`curl -X POST -F "files=@${file.name}" ${environment.baseUrl}products/upload3`);
+    console.log(`curl -X POST -F "files=@${file.name}" ${environment.baseUrl}products/upload3/validate`);
   }
 
   /**
@@ -637,7 +656,7 @@ export class FileValidationService {
     console.log('Tipo:', file.type);
     
     try {
-      const response = await fetch(`${environment.baseUrl}products/upload3`, {
+      const response = await fetch(`${environment.baseUrl}products/upload3/validate`, {
         method: 'POST',
         body: formData
       });

@@ -438,16 +438,16 @@ export class ProductList implements OnInit, AfterViewInit {
     try {
       console.log(`🔄 ProductList: Procesando ${validFiles.length} archivos válidos...`);
       
-      // Procesar cada archivo válido enviando datos al backend
+      // Procesar cada archivo válido: si ya pasó validación, insertar
       for (const file of validFiles) {
         if (file.validationResult?.data) {
-          console.log(`📤 ProductList: Enviando archivo ${file.file.name} al backend...`);
+          console.log(`📤 ProductList: Insertando productos del archivo ${file.file.name}...`);
           
           try {
-            // Enviar datos al backend - este método realmente hace el POST
-            console.log(`📊 ProductList: Datos a enviar para ${file.file.name}:`, file.validationResult.data.length, 'productos');
-            const result = await this.fileValidationService.validateAgainstExistingProducts(file.validationResult.data, file.file);
-            console.log(`✅ ProductList: Archivo ${file.file.name} enviado exitosamente`);
+            // Inserción final usando endpoint /insert
+            console.log(`📊 ProductList: Productos a insertar:`, file.validationResult.data.length);
+            const result = await this.fileValidationService.insertValidatedProducts(file.validationResult.data);
+            console.log(`✅ ProductList: Inserción completada para ${file.file.name}`);
             console.log(`📋 ProductList: Resultado del backend:`, result);
           } catch (error) {
             console.error(`❌ ProductList: Error enviando archivo ${file.file.name}:`, error);

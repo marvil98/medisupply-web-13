@@ -193,20 +193,13 @@ export class ProductList implements OnInit, AfterViewInit {
     console.log('🏙️ ProductList: Ciudad seleccionada:', this.selectedCityId);
     console.log('🏢 ProductList: Bodega seleccionada:', this.selectedWarehouseId);
     
-    // Determinar qué método usar según los parámetros disponibles
+    // Cargar siempre desde catálogo activo (sin filtrar por bodega)
     let productsObservable;
-    
-    if (this.selectedWarehouseId) {
-      // Si hay bodega seleccionada, cargar productos por bodega
-      console.log('📦 ProductList: Cargando productos por bodega:', this.selectedWarehouseId);
-      productsObservable = this.productsService.getProductsByWarehouse(this.selectedWarehouseId);
-    } else if (this.selectedCityId) {
-      // Si solo hay ciudad seleccionada, cargar productos por ciudad
-      console.log('🏙️ ProductList: Cargando productos por ciudad:', this.selectedCityId);
+    if (this.selectedCityId) {
+      console.log('🏙️ ProductList: Cargando productos por ciudad (catálogo activo):', this.selectedCityId);
       productsObservable = this.productsService.getAvailableProducts(this.selectedCityId);
     } else {
-      // Por defecto, cargar productos de Bogotá
-      console.log('🏙️ ProductList: Cargando productos por defecto (Bogotá)');
+      console.log('🏙️ ProductList: Cargando productos activos (por defecto ciudad 1)');
       productsObservable = this.productsService.getAvailableProducts(1);
     }
     

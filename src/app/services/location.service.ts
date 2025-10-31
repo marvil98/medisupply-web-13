@@ -89,7 +89,7 @@ export class LocationService {
 
   // Obtener todas las ciudades
   getCities(): Observable<CitiesResponse> {
-    return this.http.get<CitiesResponse>(`${this.baseUrl}cities`);
+    return this.http.get<CitiesResponse>(`${this.baseUrl}products/location/cities`);
   }
 
   // Obtener bodegas por ciudad

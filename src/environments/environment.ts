@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
-  baseUrl: 'http://localhost:8081/',
-  offerUrl: 'http://localhost:8082/'
+  baseUrl: 'http://MediSu-MediS-5XPY2MhrDivI-109634141.us-east-1.elb.amazonaws.com/',
+  offerUrl: 'http://MediSu-MediS-5XPY2MhrDivI-109634141.us-east-1.elb.amazonaws.com/'
 };
 
 

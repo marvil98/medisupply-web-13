@@ -115,6 +115,9 @@ export class SalesPlan {
   // Estados del formulario
   saveStatus = signal<'idle' | 'saving' | 'success' | 'error'>('idle');
   formErrors = signal<Record<string, string>>({});
+  
+  // Almacenar meta editada manualmente
+  private manualGoalValue = signal<number | null>(null);
 
   // Computed para validar si el formulario está completo (región + período + metas > 0)
   isFormValid = computed(() => {
@@ -319,6 +322,21 @@ export class SalesPlan {
 
   onTotalGoalChange(totalGoal: string) {
     this.salesPlanForm.get('totalGoal')?.setValue(totalGoal);
+    
+    // Extraer el valor numérico del string (remover símbolos de moneda y comas)
+    const numericValue = this.extractNumericValue(totalGoal);
+    if (!isNaN(numericValue) && numericValue > 0) {
+      this.manualGoalValue.set(numericValue);
+    }
+  }
+  
+  private extractNumericValue(formattedValue: string): number {
+    // Remover símbolos de moneda comunes, comas y espacios
+    // Remover: $, S/, coma, espacios
+    const cleaned = formattedValue
+      .replace(/S\//g, '')      // Remover S/ específicamente primero
+      .replace(/[$,\s]/g, '');   // Luego remover $, comas y espacios
+    return parseFloat(cleaned) || 0;
   }
 
   toggleProductSelector() {
@@ -367,6 +385,8 @@ export class SalesPlan {
       if (!exists) {
         this.selectedProducts.push(this.currentProduct);
       }
+      // Reset manual value cuando se recalcula automáticamente
+      this.manualGoalValue.set(null);
       this.updateTotalGoalFromProducts();
       this.selectedProductsVersion.set(this.selectedProductsVersion() + 1);
       this.closeGoalModal();
@@ -453,8 +473,14 @@ export class SalesPlan {
   // Productos con meta > 0
   plannedProducts = computed(() => this.products.filter(p => (p.goal || 0) > 0));
 
-  // Resumen monetario total
-  totalPlannedValue = computed(() => this.plannedProducts().reduce((sum, p) => sum + (this.convertValue(p.price) * (p.goal || 0)), 0));
+  // Resumen monetario total (usa valor manual si existe, sino calcula)
+  totalPlannedValue = computed(() => {
+    const manualValue = this.manualGoalValue();
+    if (manualValue !== null) {
+      return manualValue;
+    }
+    return this.plannedProducts().reduce((sum, p) => sum + (this.convertValue(p.price) * (p.goal || 0)), 0);
+  });
 
   // Abrir confirmación antes de crear
   openConfirm() {
@@ -491,11 +517,16 @@ export class SalesPlan {
       // Preparar datos del plan de venta
       const totalUnits = this.products.reduce((sum, p) => sum + (p.goal || 0), 0);
       const totalValue = this.products.reduce((sum, p) => sum + ((p.goal || 0) * this.convertValue(p.price)), 0);
+      
+      // Usar valor manual si existe, sino usar el calculado
+      const manualValue = this.manualGoalValue();
+      const finalTotalGoal = manualValue !== null ? manualValue : totalValue;
+      
       const salesPlanData = {
         region: this.salesPlanForm.get('region')?.value, // 'Norte', 'Centro', ...
         quarter: this.salesPlanForm.get('quarter')?.value, // 'Q1'..'Q4'
         year: new Date().getFullYear(),
-        total_goal: totalValue, // valor monetario de la meta total
+        total_goal: finalTotalGoal, // valor monetario de la meta total (manual o calculado)
         products: this.products
           .filter(p => (p.goal || 0) > 0)
           .map(p => ({

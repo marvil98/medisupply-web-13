@@ -31,7 +31,7 @@ export class OfferService {
   constructor(private http: HttpClient) {}
 
   getRegions() : Observable<{ value: string; label: string }[]> {
-    const url = `${this.offerApi}regions`;
+    const url = `${this.offerApi}offers/regions`;
     console.log('🌍 OfferService: GET regiones →', url);
     return this.http.get<any>(url).pipe(
       map(resp => Array.isArray(resp) ? resp : []),
@@ -44,7 +44,7 @@ export class OfferService {
   }
 
   getQuarters() : Observable<{ value: string; label: string }[]> {
-    const url = `${this.offerApi}quarters`;
+    const url = `${this.offerApi}offers/quarters`;
     console.log('🗓️ OfferService: GET períodos →', url);
     return this.http.get<any>(url).pipe(
       map(resp => Array.isArray(resp) ? resp : []),
@@ -57,7 +57,7 @@ export class OfferService {
   }
 
   createSalesPlan(payload: CreateSalesPlanPayload): Observable<CreateSalesPlanResponse> {
-    const url = `${this.offerApi}plans`;
+    const url = `${this.offerApi}offers/plans`;
     const jsonPayload = JSON.stringify(payload);
     console.log('📝 OfferService: POST crear plan de ventas →', url, payload);
     console.log('=== CURL EXACTO ===');
@@ -72,7 +72,7 @@ export class OfferService {
   }
 
   getOfferProducts(): Observable<any[]> {
-    const url = `${this.offerApi}products`;
+    const url = `${this.offerApi}offers/products`;
     console.log('🛒 OfferService: GET productos →', url);
     return this.http.get<any[]>(url).pipe(
       tap(resp => console.log('✅ OfferService: Productos:', Array.isArray(resp) ? resp.length : resp)),

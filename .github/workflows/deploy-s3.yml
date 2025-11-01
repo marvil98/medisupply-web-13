@@ -74,13 +74,7 @@ jobs:
           
           # Ejecutar pruebas con más verbosidad
           echo "🚀 Iniciando pruebas..."
-          npx ng test --watch=false --browsers=ChromeHeadless --code-coverage --progress=false || {
-            echo "❌ Las pruebas fallaron, intentando sin headless..."
-            npx ng test --watch=false --browsers=Chrome --code-coverage --progress=false || {
-              echo "❌ Las pruebas fallaron completamente"
-              exit 1
-            }
-          }
+          npx ng test --watch=false --browsers=ChromeHeadless --code-coverage --progress=false
           
           echo "✅ Pruebas completadas"
           echo "📁 Verificando archivos de cobertura generados..."

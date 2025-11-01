@@ -102,7 +102,7 @@ export class LocationService {
 
   // Obtener todos los productos con ubicaciones
   getProductsLocation(): Observable<LocationResponse> {
-    return this.http.get<LocationResponse>(`${this.baseUrl}/products/location`);
+    return this.http.get<LocationResponse>(`${this.baseUrl}products/location`);
   }
 
   // Obtener productos por bodega

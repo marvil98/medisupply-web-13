@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { of, throwError } from 'rxjs';
@@ -227,19 +227,17 @@ describe('UbicacionComponent', () => {
       expect(component.message.type).toBe('warning');
     });
 
-    it('should filter products by search query', (done) => {
+    it('should filter products by search query', fakeAsync(() => {
       component.products = mockProducts;
       component.selectedWarehouse.set('1');
       component.searchQuery = 'Producto 1';
       
       component.onSearch();
       
-      setTimeout(() => {
-        expect(component.filteredProducts.length).toBe(1);
-        expect(component.filteredProducts[0].name).toBe('Producto 1');
-        done();
-      }, 600);
-    });
+      tick(600);
+      expect(component.filteredProducts.length).toBe(1);
+      expect(component.filteredProducts[0].name).toBe('Producto 1');
+    }));
   });
 
   describe('onViewLocations', () => {

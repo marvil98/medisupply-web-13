@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MatDialog } from '@angular/material/dialog';
@@ -148,17 +148,15 @@ describe('ProductList', () => {
   });
 
   describe('loadProducts', () => {
-    it('should load products successfully', (done) => {
+    it('should load products successfully', fakeAsync(() => {
       component.loadProducts();
       
-      setTimeout(() => {
-        expect(component.isLoading()).toBe(false);
-        expect(component.products().length).toBe(2);
-        expect(component.totalProducts()).toBe(2);
-        expect(component.dataSource.data.length).toBe(2);
-        done();
-      }, 150);
-    });
+      tick(150);
+      expect(component.isLoading()).toBe(false);
+      expect(component.products().length).toBe(2);
+      expect(component.totalProducts()).toBe(2);
+      expect(component.dataSource.data.length).toBe(2);
+    }));
 
     it('should handle error when loading products', () => {
       productsService.getAvailableProducts.and.returnValue(
@@ -172,7 +170,7 @@ describe('ProductList', () => {
       expect(snackBar.open).toHaveBeenCalled();
     });
 
-    it('should show snackbar when no products found', () => {
+    it('should show snackbar when no products found', fakeAsync(() => {
       const emptyResponse: ProductsResponse = {
         products: [],
         total: 0,
@@ -182,10 +180,9 @@ describe('ProductList', () => {
       
       component.loadProducts();
       
-      setTimeout(() => {
-        expect(snackBar.open).toHaveBeenCalled();
-      }, 150);
-    });
+      tick(150);
+      expect(snackBar.open).toHaveBeenCalled();
+    }));
   });
 
   describe('toggleUploadSection', () => {

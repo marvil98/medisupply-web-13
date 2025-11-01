@@ -473,13 +473,37 @@ export class SalesPlan {
   // Productos con meta > 0
   plannedProducts = computed(() => this.products.filter(p => (p.goal || 0) > 0));
 
+  // Valor calculado automáticamente (suma de productos x unidades)
+  calculatedTotalValue = computed(() => {
+    return this.plannedProducts().reduce((sum, p) => sum + (this.convertValue(p.price) * (p.goal || 0)), 0);
+  });
+
   // Resumen monetario total (usa valor manual si existe, sino calcula)
   totalPlannedValue = computed(() => {
     const manualValue = this.manualGoalValue();
     if (manualValue !== null) {
       return manualValue;
     }
-    return this.plannedProducts().reduce((sum, p) => sum + (this.convertValue(p.price) * (p.goal || 0)), 0);
+    return this.calculatedTotalValue();
+  });
+
+  // Validar si el valor manual está dentro del rango permitido
+  // Rango permitido: entre 10% menor y 20% mayor que el calculado
+  isGoalValid = computed(() => {
+    const manualValue = this.manualGoalValue();
+    const calculatedValue = this.calculatedTotalValue();
+    
+    // Si no hay valor manual, es válido (usa el calculado)
+    if (manualValue === null || calculatedValue === 0) {
+      return true;
+    }
+    
+    // Calcular los límites: 10% menor y 20% mayor
+    const minAllowed = calculatedValue * 0.90;  // 10% menos
+    const maxAllowed = calculatedValue * 1.20;  // 20% más
+    
+    // Validar que esté dentro del rango
+    return manualValue >= minAllowed && manualValue <= maxAllowed;
   });
 
   // Abrir confirmación antes de crear

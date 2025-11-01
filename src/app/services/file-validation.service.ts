@@ -544,14 +544,42 @@ export class FileValidationService {
     const jsonPayload = JSON.stringify(products);
     console.log('=== INSERT PRODUCTS (POST) ===');
     console.log('URL:', url);
+    console.log('Método: POST');
+    console.log('Content-Type: application/json');
     console.log('Productos:', products.length);
-    console.log('CURL:', `curl -X POST -H "Content-Type: application/json" -d '${jsonPayload}' ${url}`);
+    console.log('Payload JSON:', jsonPayload);
+    console.log('Tamaño del payload:', jsonPayload.length, 'caracteres');
+    console.log('CURL EXACTO:');
+    console.log(`curl -X POST -H "Content-Type: application/json" -d '${jsonPayload}' ${url}`);
+    console.log('=== ENVIANDO REQUEST ===');
+    console.log('Headers:', { 'Content-Type': 'application/json' });
+    console.log('Body:', jsonPayload);
     const resp = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: jsonPayload
     });
+    console.log('=== RESPUESTA DEL SERVIDOR ===');
+    console.log('Status:', resp.status);
+    console.log('Status Text:', resp.statusText);
+    console.log('Headers de respuesta:', Object.fromEntries(resp.headers.entries()));
     const text = await resp.text();
+    console.log('Cuerpo de la respuesta:', text);
+    console.log('=== CURL DE RESPUESTA ===');
+    const statusLine = resp.status === 200 ? 'HTTP/1.1 200 OK' : resp.status === 201 ? 'HTTP/1.1 201 Created' : `HTTP/1.1 ${resp.status} ${resp.statusText}`;
+    console.log(statusLine);
+    console.log('Headers de respuesta:');
+    resp.headers.forEach((value, key) => {
+      console.log(`${key}: ${value}`);
+    });
+    console.log('');
+    console.log('Body de respuesta:');
+    console.log(text);
+    console.log('');
+    console.log('=== RESUMEN ===');
+    console.log(`curl -X POST -H "Content-Type: application/json" -d '${jsonPayload}' ${url}`);
+    console.log(`Respuesta: HTTP ${resp.status} ${resp.statusText}`);
+    console.log(`Body: ${text}`);
     try { return JSON.parse(text); } catch { return { raw: text, status: resp.status }; }
   }
 

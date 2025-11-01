@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { PageHeader } from './page-header';
 
@@ -12,8 +13,11 @@ describe('PageHeader', () => {
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
-      imports: [PageHeader],
-      providers: [{ provide: Router, useValue: routerSpy }]
+      imports: [PageHeader, RouterTestingModule.withRoutes([])],
+      providers: [
+        { provide: Router, useValue: routerSpy },
+        { provide: ActivatedRoute, useValue: {} }
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(PageHeader);

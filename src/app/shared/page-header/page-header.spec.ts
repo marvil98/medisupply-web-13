@@ -10,14 +10,8 @@ describe('PageHeader', () => {
   let router: Router;
 
   beforeEach(async () => {
-    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-
     await TestBed.configureTestingModule({
-      imports: [PageHeader, RouterTestingModule.withRoutes([])],
-      providers: [
-        { provide: Router, useValue: routerSpy },
-        { provide: ActivatedRoute, useValue: {} }
-      ]
+      imports: [PageHeader, RouterTestingModule.withRoutes([])]
     }).compileComponents();
 
     fixture = TestBed.createComponent(PageHeader);
@@ -61,8 +55,10 @@ describe('PageHeader', () => {
   });
 
   describe('goBack', () => {
-    it('should navigate when backRoute is set', () => {
+    it('should call goBack when backRoute is set', () => {
       component.backRoute = '/previous-page';
+      spyOn(router, 'navigate');
+      
       component.goBack();
       
       expect(router.navigate).toHaveBeenCalledWith(['/previous-page']);
@@ -70,6 +66,8 @@ describe('PageHeader', () => {
 
     it('should not navigate when backRoute is null', () => {
       component.backRoute = null;
+      spyOn(router, 'navigate');
+      
       component.goBack();
       
       expect(router.navigate).not.toHaveBeenCalled();
@@ -77,6 +75,8 @@ describe('PageHeader', () => {
 
     it('should not navigate when backRoute is empty string', () => {
       component.backRoute = '';
+      spyOn(router, 'navigate');
+      
       component.goBack();
       
       // Empty string is falsy, so navigation should not happen

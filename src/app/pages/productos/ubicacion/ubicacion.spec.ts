@@ -41,6 +41,7 @@ describe('UbicacionComponent', () => {
       name: 'Producto 1',
       quantity: 50,
       totalAvailable: 50,
+      hasAvailability: true,
       locations: [
         {
           section: 'A',
@@ -59,7 +60,8 @@ describe('UbicacionComponent', () => {
       sku: 'MED-002',
       name: 'Producto 2',
       quantity: 0,
-      totalAvailable: 0
+      totalAvailable: 0,
+      hasAvailability: false
     }
   ];
 
@@ -486,5 +488,147 @@ describe('UbicacionComponent', () => {
       expect(event.target.src).toBe('/assets/images/products/por-defecto.png');
     });
   });
+
+  describe('getStockStatusClass', () => {
+    it('should return available class for product with stock', () => {
+      const product = mockProducts[0];
+      const statusClass = component.getStockStatusClass(product);
+      
+      expect(statusClass).toBe('available');
+    });
+
+    it('should return unavailable class for product without stock', () => {
+      const product = mockProducts[1];
+      const statusClass = component.getStockStatusClass(product);
+      
+      expect(statusClass).toBe('unavailable');
+    });
+
+    it('should return low-stock class for product with low quantity', () => {
+      const product = {
+        ...mockProducts[0],
+        totalAvailable: 5
+      };
+      const statusClass = component.getStockStatusClass(product);
+      
+      expect(statusClass).toBe('low-stock');
+    });
+  });
+
+  describe('getCityName', () => {
+    it('should return city name for valid city id', () => {
+      component.cityOptions = [
+        { value: '1', name: 'Bogotá', labelKey: 'city_bogota' }
+      ];
+      
+      const cityName = component.getCityName('1');
+      
+      expect(cityName).toBe('Bogotá');
+    });
+
+    it('should return city id when city not found', () => {
+      component.cityOptions = [];
+      
+      const cityName = component.getCityName('999');
+      
+      expect(cityName).toBe('999');
+    });
+  });
+
+  describe('getWarehouseName', () => {
+    it('should return warehouse name with description', () => {
+      component.warehouseOptions = [
+        { value: '1', name: 'Bodega Norte', description: 'Bodega principal', labelKey: 'Bodega Norte' }
+      ];
+      
+      const warehouseName = component.getWarehouseName('1');
+      
+      expect(warehouseName).toBe('Bodega Norte - Bodega principal');
+    });
+
+    it('should return warehouse id when warehouse not found', () => {
+      component.warehouseOptions = [];
+      
+      const warehouseName = component.getWarehouseName('999');
+      
+      expect(warehouseName).toBe('999');
+    });
+  });
+
+  describe('getTotalFilteredProducts', () => {
+    it('should return total count when filter is all', () => {
+      component.filteredProducts = mockProducts;
+      component.availabilityFilter = 'all';
+      
+      const count = component.getTotalFilteredProducts();
+      
+      expect(count).toBe(2);
+    });
+
+    it('should return available count when filter is available', () => {
+      component.filteredProducts = mockProducts;
+      component.availabilityFilter = 'available';
+      
+      const count = component.getTotalFilteredProducts();
+      
+      expect(count).toBe(1);
+    });
+
+    it('should return unavailable count when filter is unavailable', () => {
+      component.filteredProducts = mockProducts;
+      component.availabilityFilter = 'unavailable';
+      
+      const count = component.getTotalFilteredProducts();
+      
+      expect(count).toBe(1);
+    });
+  });
+
+  describe('getSortTooltip', () => {
+    it('should return correct tooltip for name sort', () => {
+      component.sortBy = 'name';
+      const tooltip = component.getSortTooltip();
+      
+      expect(tooltip).toBeTruthy();
+    });
+
+    it('should return correct tooltip for availability sort', () => {
+      component.sortBy = 'availability';
+      const tooltip = component.getSortTooltip();
+      
+      expect(tooltip).toBeTruthy();
+    });
+
+    it('should return correct tooltip for no sort', () => {
+      component.sortBy = 'none';
+      const tooltip = component.getSortTooltip();
+      
+      expect(tooltip).toBeTruthy();
+    });
+  });
+
+  describe('getSortLabel', () => {
+    it('should return correct label for name sort', () => {
+      component.sortBy = 'name';
+      const label = component.getSortLabel();
+      
+      expect(label).toBeTruthy();
+    });
+
+    it('should return correct label for availability sort', () => {
+      component.sortBy = 'availability';
+      const label = component.getSortLabel();
+      
+      expect(label).toBeTruthy();
+    });
+
+    it('should return empty string for no sort', () => {
+      component.sortBy = 'none';
+      const label = component.getSortLabel();
+      
+      expect(label).toBe('');
+    });
+  });
+
 });
 

@@ -212,7 +212,7 @@
           <mat-option 
             *ngFor="let region of regionOptions" 
             [value]="region.value">
-            {{ region.labelKey | translate }}
+            {{ region.label || (region.labelKey | translate) }}
           </mat-option>
         </mat-select>
         <mat-error *ngIf="getErrorMessage('region')">
@@ -361,13 +361,32 @@
       <p style="margin-top:12px; font-weight:600;">
         {{ 'summary_total_value' | translate }}: {{ totalPlannedValue() | currency:currencySymbol():'symbol':'1.0-0' }}
       </p>
+
+      <!-- Mensaje de advertencia si el valor manual está fuera del rango permitido -->
+      <div *ngIf="!isGoalValid()" style="margin-top:16px; padding:12px; background-color:#fff3cd; border:1px solid #ffc107; border-radius:4px;">
+        <div style="display:flex; align-items:center; gap:8px; color:#856404;">
+          <mat-icon style="font-size:20px; width:20px; height:20px;">warning</mat-icon>
+          <span style="font-weight:500;">Advertencia de validación</span>
+        </div>
+        <p style="margin:8px 0 0 0; color:#856404; font-size:14px;">
+          El valor ingresado debe estar dentro del rango permitido: entre 10% menos y 20% más que el valor calculado automáticamente 
+          ({{ calculatedTotalValue() | currency:currencySymbol():'symbol':'1.0-0' }}). 
+          Por favor, ajusta los valores de los productos o el total para continuar.
+        </p>
+      </div>
     </div>
 
     <div class="modal-footer">
       <button mat-button (click)="cancelConfirm()" class="cancel-button" type="button">
         {{ 'cancel_button' | translate }}
       </button>
-      <button mat-raised-button color="primary" (click)="showConfirmModal=false; createSalesPlan()" class="save-button" type="button">
+      <button 
+        mat-raised-button 
+        color="primary" 
+        (click)="showConfirmModal=false; createSalesPlan()" 
+        [disabled]="!isGoalValid()"
+        class="save-button" 
+        type="button">
         {{ 'confirm_button' | translate }}
       </button>
     </div>

@@ -68,7 +68,7 @@ export class SalesPlan {
   salesPlanForm: FormGroup;
 
   // Opciones para los selectores
-  regionOptions: { value: string; labelKey: string }[] = [];
+  regionOptions: { value: string; label?: string; labelKey: string }[] = [];
   quarterOptions: { value: string; labelKey: string }[] = [];
 
   // Productos (cargados desde backend)
@@ -261,7 +261,12 @@ export class SalesPlan {
       next: (regions) => {
         // Backend retorna [{ value:'Norte', label:'Norte' }, ...]
         const safe = Array.isArray(regions) ? regions : [];
-        this.regionOptions = safe.map(r => ({ value: String(r.value), labelKey: `region_${String(r.value).toLowerCase()}` }));
+        // Usar el label directamente del backend
+        this.regionOptions = safe.map(r => ({ 
+          value: String(r.value), 
+          label: String(r.label || r.value), // Label directo del backend
+          labelKey: `region_${String(r.value).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}` // Clave sin acentos para traducción
+        }));
       },
       error: () => {
         // Fallback local

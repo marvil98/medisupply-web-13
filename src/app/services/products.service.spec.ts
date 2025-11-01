@@ -129,8 +129,176 @@ describe('ProductsService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`${baseUrl}products/location/warehouses`);
+      const req = httpMock.expectOne(`${baseUrl}products/available`);
       req.flush({ invalid: 'format' });
+    });
+
+    it('should use max_quantity when total_quantity is missing', (done) => {
+      const mockProducts: any[] = [
+        {
+          product_id: 1,
+          sku: 'MED-001',
+          name: 'Producto 1',
+          value: 1000,
+          category_name: 'Medicamentos',
+          max_quantity: 50
+        }
+      ];
+
+      service.getAvailableProducts(1).subscribe({
+        next: (response: ProductsResponse) => {
+          expect(response.success).toBe(true);
+          expect(response.products[0].total_quantity).toBe(50);
+          done();
+        }
+      });
+
+      const req = httpMock.expectOne(`${baseUrl}products/available`);
+      req.flush(mockProducts);
+    });
+
+    it('should use quantity when total_quantity and max_quantity are missing', (done) => {
+      const mockProducts: any[] = [
+        {
+          product_id: 1,
+          sku: 'MED-001',
+          name: 'Producto 1',
+          value: 1000,
+          category_name: 'Medicamentos',
+          quantity: 25
+        }
+      ];
+
+      service.getAvailableProducts(1).subscribe({
+        next: (response: ProductsResponse) => {
+          expect(response.success).toBe(true);
+          expect(response.products[0].total_quantity).toBe(25);
+          done();
+        }
+      });
+
+      const req = httpMock.expectOne(`${baseUrl}products/available`);
+      req.flush(mockProducts);
+    });
+
+    it('should use total_stock when other quantity fields are missing', (done) => {
+      const mockProducts: any[] = [
+        {
+          product_id: 1,
+          sku: 'MED-001',
+          name: 'Producto 1',
+          value: 1000,
+          category_name: 'Medicamentos',
+          total_stock: 100
+        }
+      ];
+
+      service.getAvailableProducts(1).subscribe({
+        next: (response: ProductsResponse) => {
+          expect(response.success).toBe(true);
+          expect(response.products[0].total_quantity).toBe(100);
+          done();
+        }
+      });
+
+      const req = httpMock.expectOne(`${baseUrl}products/available`);
+      req.flush(mockProducts);
+    });
+
+    it('should use stock when all other quantity fields are missing', (done) => {
+      const mockProducts: any[] = [
+        {
+          product_id: 1,
+          sku: 'MED-001',
+          name: 'Producto 1',
+          value: 1000,
+          category_name: 'Medicamentos',
+          stock: 75
+        }
+      ];
+
+      service.getAvailableProducts(1).subscribe({
+        next: (response: ProductsResponse) => {
+          expect(response.success).toBe(true);
+          expect(response.products[0].total_quantity).toBe(75);
+          done();
+        }
+      });
+
+      const req = httpMock.expectOne(`${baseUrl}products/available`);
+      req.flush(mockProducts);
+    });
+
+    it('should use 0 when no quantity fields are present', (done) => {
+      const mockProducts: any[] = [
+        {
+          product_id: 1,
+          sku: 'MED-001',
+          name: 'Producto 1',
+          value: 1000,
+          category_name: 'Medicamentos'
+        }
+      ];
+
+      service.getAvailableProducts(1).subscribe({
+        next: (response: ProductsResponse) => {
+          expect(response.success).toBe(true);
+          expect(response.products[0].total_quantity).toBe(0);
+          done();
+        }
+      });
+
+      const req = httpMock.expectOne(`${baseUrl}products/available`);
+      req.flush(mockProducts);
+    });
+
+    it('should handle products with image_url', (done) => {
+      const mockProducts: any[] = [
+        {
+          product_id: 1,
+          sku: 'MED-001',
+          name: 'Producto 1',
+          value: 1000,
+          category_name: 'Medicamentos',
+          total_quantity: 50,
+          image_url: 'https://example.com/image.jpg'
+        }
+      ];
+
+      service.getAvailableProducts(1).subscribe({
+        next: (response: ProductsResponse) => {
+          expect(response.success).toBe(true);
+          expect(response.products[0].image_url).toBe('https://example.com/image.jpg');
+          done();
+        }
+      });
+
+      const req = httpMock.expectOne(`${baseUrl}products/available`);
+      req.flush(mockProducts);
+    });
+
+    it('should handle products without image_url', (done) => {
+      const mockProducts: any[] = [
+        {
+          product_id: 1,
+          sku: 'MED-001',
+          name: 'Producto 1',
+          value: 1000,
+          category_name: 'Medicamentos',
+          total_quantity: 50
+        }
+      ];
+
+      service.getAvailableProducts(1).subscribe({
+        next: (response: ProductsResponse) => {
+          expect(response.success).toBe(true);
+          expect(response.products[0].image_url).toBeNull();
+          done();
+        }
+      });
+
+      const req = httpMock.expectOne(`${baseUrl}products/available`);
+      req.flush(mockProducts);
     });
   });
 
@@ -202,6 +370,154 @@ describe('ProductsService', () => {
       const req = httpMock.expectOne(`${baseUrl}products/by-warehouse/1`);
       req.flush(mockResponse);
     });
+
+    it('should handle response without products array', (done) => {
+      const mockResponse = {
+        success: false
+      };
+
+      service.getProductsByWarehouse(1).subscribe({
+        next: (response: ProductsResponse) => {
+          expect(response.products.length).toBe(0);
+          expect(response.success).toBe(false);
+          expect(response.message).toBe('No se pudieron cargar los productos por bodega');
+          done();
+        }
+      });
+
+      const req = httpMock.expectOne(`${baseUrl}products/by-warehouse/1`);
+      req.flush(mockResponse);
+    });
+
+    it('should skip products without SKU', (done) => {
+      const mockResponse = {
+        products: [
+          {
+            product_id: 1,
+            sku: '',
+            name: 'Producto sin SKU',
+            value: 1000,
+            category_name: 'Medicamentos',
+            quantity: 10
+          },
+          {
+            product_id: 2,
+            sku: 'MED-001',
+            name: 'Producto con SKU',
+            value: 1000,
+            category_name: 'Medicamentos',
+            quantity: 20
+          }
+        ],
+        success: true
+      };
+
+      service.getProductsByWarehouse(1).subscribe({
+        next: (response: ProductsResponse) => {
+          expect(response.products.length).toBe(1);
+          expect(response.products[0].sku).toBe('MED-001');
+          done();
+        }
+      });
+
+      const req = httpMock.expectOne(`${baseUrl}products/by-warehouse/1`);
+      req.flush(mockResponse);
+    });
+
+    it('should handle products with null image_url', (done) => {
+      const mockResponse = {
+        products: [
+          {
+            product_id: 1,
+            sku: 'MED-001',
+            name: 'Producto 1',
+            value: 1000,
+            category_name: 'Medicamentos',
+            quantity: 10,
+            image_url: null
+          }
+        ],
+        success: true
+      };
+
+      service.getProductsByWarehouse(1).subscribe({
+        next: (response: ProductsResponse) => {
+          expect(response.products[0].image_url).toBeNull();
+          done();
+        }
+      });
+
+      const req = httpMock.expectOne(`${baseUrl}products/by-warehouse/1`);
+      req.flush(mockResponse);
+    });
+
+    it('should sum quantities correctly for multiple lots of same SKU', (done) => {
+      const mockResponse = {
+        products: [
+          {
+            product_id: 1,
+            sku: 'MED-001',
+            name: 'Producto 1',
+            value: 1000,
+            category_name: 'Medicamentos',
+            quantity: 10
+          },
+          {
+            product_id: 1,
+            sku: 'MED-001',
+            name: 'Producto 1',
+            value: 1000,
+            category_name: 'Medicamentos',
+            quantity: 15
+          },
+          {
+            product_id: 1,
+            sku: 'MED-001',
+            name: 'Producto 1',
+            value: 1000,
+            category_name: 'Medicamentos',
+            quantity: 25
+          }
+        ],
+        success: true
+      };
+
+      service.getProductsByWarehouse(1).subscribe({
+        next: (response: ProductsResponse) => {
+          expect(response.products.length).toBe(1);
+          expect(response.products[0].total_quantity).toBe(50); // 10 + 15 + 25
+          done();
+        }
+      });
+
+      const req = httpMock.expectOne(`${baseUrl}products/by-warehouse/1`);
+      req.flush(mockResponse);
+    });
+
+    it('should handle products without quantity field', (done) => {
+      const mockResponse = {
+        products: [
+          {
+            product_id: 1,
+            sku: 'MED-001',
+            name: 'Producto 1',
+            value: 1000,
+            category_name: 'Medicamentos'
+          }
+        ],
+        success: true
+      };
+
+      service.getProductsByWarehouse(1).subscribe({
+        next: (response: ProductsResponse) => {
+          expect(response.products[0].total_quantity).toBe(0);
+          done();
+        }
+      });
+
+      const req = httpMock.expectOne(`${baseUrl}products/by-warehouse/1`);
+      req.flush(mockResponse);
+    });
   });
 
   describe('getProductsWithoutStock', () => {
@@ -243,6 +559,75 @@ describe('ProductsService', () => {
 
       const req = httpMock.expectOne(`${baseUrl}products/without-stock`);
       req.error(new ErrorEvent('Network error'));
+    });
+
+    it('should handle response without products_without_stock array', (done) => {
+      const mockResponse = {
+        success: false
+      };
+
+      service.getProductsWithoutStock().subscribe({
+        next: (response: ProductsResponse) => {
+          expect(response.products.length).toBe(0);
+          expect(response.success).toBe(false);
+          expect(response.message).toBe('No se pudieron cargar los productos sin stock');
+          done();
+        }
+      });
+
+      const req = httpMock.expectOne(`${baseUrl}products/without-stock`);
+      req.flush(mockResponse);
+    });
+
+    it('should set image_url to null when not provided', (done) => {
+      const mockResponse = {
+        products_without_stock: [
+          {
+            product_id: 1,
+            sku: 'MED-001',
+            name: 'Producto 1',
+            value: 1000,
+            category_name: 'Medicamentos'
+          }
+        ],
+        success: true
+      };
+
+      service.getProductsWithoutStock().subscribe({
+        next: (response: ProductsResponse) => {
+          expect(response.products[0].image_url).toBeNull();
+          done();
+        }
+      });
+
+      const req = httpMock.expectOne(`${baseUrl}products/without-stock`);
+      req.flush(mockResponse);
+    });
+
+    it('should preserve image_url when provided', (done) => {
+      const mockResponse = {
+        products_without_stock: [
+          {
+            product_id: 1,
+            sku: 'MED-001',
+            name: 'Producto 1',
+            value: 1000,
+            category_name: 'Medicamentos',
+            image_url: 'https://example.com/image.jpg'
+          }
+        ],
+        success: true
+      };
+
+      service.getProductsWithoutStock().subscribe({
+        next: (response: ProductsResponse) => {
+          expect(response.products[0].image_url).toBe('https://example.com/image.jpg');
+          done();
+        }
+      });
+
+      const req = httpMock.expectOne(`${baseUrl}products/without-stock`);
+      req.flush(mockResponse);
     });
   });
 

@@ -89,14 +89,14 @@ export class LocationService {
 
   // Obtener todas las ciudades
   getCities(): Observable<CitiesResponse> {
-    return this.http.get<CitiesResponse>(`${this.baseUrl}products/location/cities`);
+    return this.http.get<CitiesResponse>(`${this.baseUrl}products/cities`);
   }
 
   // Obtener bodegas por ciudad
   getWarehouses(cityId?: number): Observable<WarehousesResponse> {
     const url = cityId 
-      ? `${this.baseUrl}warehouses/by-city/${cityId}`
-      : `${this.baseUrl}warehouses`;
+      ? `${this.baseUrl}products/warehouses/by-city/${cityId}`
+      : `${this.baseUrl}products/warehouses`;
     return this.http.get<WarehousesResponse>(url);
   }
 
